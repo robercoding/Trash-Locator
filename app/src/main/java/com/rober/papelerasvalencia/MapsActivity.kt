@@ -2,6 +2,7 @@ package com.rober.papelerasvalencia
 
 import android.Manifest
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
@@ -10,6 +11,8 @@ import android.location.LocationListener
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
+import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -283,7 +286,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, TrashListener {
                 startActivity(Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS))
                 dialog.dismiss()
             }
-            .setNegativeButton("No", null)
+            .setNegativeButton("No"){ dialog, which ->
+                val messageConnectionTV = findViewById<TextView>(R.id.messageConnection)
+                messageConnectionTV.setBackgroundColor(ContextCompat.getColor(messageConnectionTV.context, R.color.red))
+                messageConnectionTV.text = "GPS is disconnected :("
+                messageConnectionTV.setTextColor(ContextCompat.getColor(messageConnectionTV.context, R.color.white))
+                messageConnectionTV.visibility = View.VISIBLE
+            }
             .show()
     }
 
@@ -323,8 +332,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, TrashListener {
             return
         }
 
-
-
         fusedLocationProviderClient.requestLocationUpdates(
             locationRequest,
             locationCallback,
@@ -345,7 +352,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, TrashListener {
             return
         }
 
-        val gpsBroadcastReceiver = GPSBroadcastReceiver(findViewById(R.id.map), locationManager)
+        val gpsBroadcastReceiver = GPSBroadcastReceiver(findViewById(R.id.messageConnection), locationManager)
         registerReceiver(gpsBroadcastReceiver, IntentFilter("android.location.PROVIDERS_CHANGED"))
     }
 

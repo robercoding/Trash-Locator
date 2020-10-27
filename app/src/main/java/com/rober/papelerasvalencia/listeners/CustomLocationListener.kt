@@ -37,7 +37,7 @@ class CustomLocationListener(
                 LatLng(
                     currentLocationModified.latitude,
                     currentLocationModified.longitude
-                ), 20f
+                ), 12f
             )
         )
         trashListener.updateCurrentLocation(currentLocationModified)

@@ -4,23 +4,32 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.location.LocationManager
+import android.os.Handler
 import android.util.Log
 import android.view.View
+import android.widget.TextView
+import androidx.core.content.ContextCompat
 import com.google.android.material.snackbar.Snackbar
+import com.rober.papelerasvalencia.R
 
-class GPSBroadcastReceiver(private val view: View, private val locationManager: LocationManager) :
+class GPSBroadcastReceiver(private val messageConnectionTV: TextView, private val locationManager: LocationManager) :
     BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            Log.i("SeeGps", "is on")
+
+            messageConnectionTV.visibility = View.VISIBLE
+            messageConnectionTV.text = "Location is back!"
+            messageConnectionTV.setBackgroundColor(ContextCompat.getColor(messageConnectionTV.context, R.color.green))
+
+            Handler().postDelayed(Runnable {
+                messageConnectionTV.visibility = View.GONE
+            }, 3000)
         } else {
-            Log.i("SeeGps", "is off")
-            Snackbar.make(
-                view,
-                "We can't get your actual location and display nearest trash around you",
-                Snackbar.LENGTH_LONG
-            ).show()
+            messageConnectionTV.setBackgroundColor(ContextCompat.getColor(messageConnectionTV.context, R.color.red))
+            messageConnectionTV.text = "GPS is disconnected :("
+            messageConnectionTV.setTextColor(ContextCompat.getColor(messageConnectionTV.context, R.color.white))
+            messageConnectionTV.visibility = View.VISIBLE
         }
     }
 }
