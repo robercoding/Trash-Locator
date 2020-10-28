@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">Papeleras Valencia</string>
     <string name="title_activity_maps">Map</string>
+
+    <string name="location_works">Location is back!</string>
+    <string name="location_error">GPS is disconnected :(</string>
+
+    <string name="navigation_drawer_open">"Idk something open"</string>
+    <string name="navigation_drawer_close">"Idk something close"</string>
 </resources>

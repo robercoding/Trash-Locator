@@ -11,13 +11,16 @@ import android.location.LocationListener
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
+import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -25,6 +28,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.navigation.NavigationView
 import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.data.geojson.GeoJsonLayer
 import com.rober.papelerasvalencia.listeners.CustomLocationListener
@@ -33,7 +37,7 @@ import com.rober.papelerasvalencia.listeners.TrashListener
 import com.rober.papelerasvalencia.utils.GPSBroadcastReceiver
 
 
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback, TrashListener {
+class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, TrashListener {
 
     private val TAG = "MainActivity"
 
@@ -343,6 +347,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, TrashListener {
         Toast.makeText(applicationContext, message, Toast.LENGTH_LONG).show()
     }
 
+    private fun setupView(){
+        val drawer = findViewById<DrawerLayout>(R.id.drawerLayout)
+        val toggle = ActionBarDrawerToggle(this, drawer, findViewById(R.id.appBarLayout), R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+        drawer.addDrawerListener(toggle)
+        toggle.syncState()
+
+        val navigationView = findViewById<NavigationView>(R.id.navigationView)
+        navigationView.setNavigationItemSelectedListener(this)
+    }
+
     private fun setupListeners() {
         if (ActivityCompat.checkSelfPermission(
                 this,
@@ -356,6 +370,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, TrashListener {
         registerReceiver(gpsBroadcastReceiver, IntentFilter("android.location.PROVIDERS_CHANGED"))
     }
 
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        return true
+    }
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
