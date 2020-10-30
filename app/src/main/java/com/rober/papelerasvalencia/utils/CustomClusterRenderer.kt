@@ -1,4 +1,4 @@
-package com.rober.papelerasvalencia
+package com.rober.papelerasvalencia.utils
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -21,6 +21,7 @@ import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.clustering.view.DefaultClusterRenderer
 import com.google.maps.android.ui.IconGenerator
 import com.google.maps.android.ui.SquareTextView
+import com.rober.papelerasvalencia.R
 import com.rober.papelerasvalencia.models.Trash
 
 

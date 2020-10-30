@@ -11,7 +11,6 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.snackbar.Snackbar
 
 class CustomLocationListener(
-    private val view: View,
     private val mMap: GoogleMap,
     private val trashListener: TrashListener
 ) : LocationListener {
@@ -48,16 +47,6 @@ class CustomLocationListener(
     }
 
     override fun onProviderEnabled(provider: String?) {
-        when (provider) {
-            LocationManager.GPS_PROVIDER -> {
-                Snackbar.make(
-                    view,
-                    "Finding nearest trash around you..",
-                    Snackbar.LENGTH_LONG
-                )
-//                        Toast.makeText(this, "Getting ")
-            }
-        }
     }
 
     override fun onProviderDisabled(provider: String?) {

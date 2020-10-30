@@ -4,8 +4,7 @@
 
     <permission
         android:name="com.pkg.map.permission.MAPS_RECEIVE"
-        android:protectionLevel="signature" >
-    </permission>
+        android:protectionLevel="signature"></permission>
 
     <meta-data
         android:name="com.google.android.gms.version"
@@ -13,7 +12,6 @@
     <meta-data
         android:name="com.google.android.geo.API_KEY"
         android:value="@string/google_maps_key" />
-
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
          Google Maps Android API v2, but you must specify either coarse or fine
@@ -30,7 +28,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.PapelerasValencia">
-
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
