@@ -26,7 +26,7 @@ class GPSBroadcastReceiver(
 
     override fun onReceive(context: Context?, intent: Intent?) {
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            Log.i("MapsFragment", "ACTIVE!")
+
             messageConnectionTV.show()
             messageConnectionTV.text = "Location is back!"
             messageConnectionTV.setBackgroundColor(
@@ -42,7 +42,6 @@ class GPSBroadcastReceiver(
             if (runnable != null)
                 handler?.removeCallbacks(runnable!!)
 
-            Log.i("MapsFragment", "not active")
             messageConnectionTV.setBackgroundColor(
                 ContextCompat.getColor(
                     messageConnectionTV.context,
