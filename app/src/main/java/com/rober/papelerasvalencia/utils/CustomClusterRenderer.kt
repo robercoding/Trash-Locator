@@ -38,7 +38,6 @@ class CustomClusterRenderer(
     private val clusterSizes: SparseArray<Int?> = SparseArray<Int?>()
 
     override fun onBeforeClusterRendered(cluster: Cluster<Trash>, markerOptions: MarkerOptions) {
-        Log.i("SeeCluster", "On before")
         val bucket = getBucket(cluster)
         val clusterSize = cluster.size
 
@@ -111,21 +110,17 @@ class CustomClusterRenderer(
 
     override fun onClusterRendered(cluster: Cluster<Trash>, marker: Marker) {
         super.onClusterRendered(cluster, marker)
-        Log.i("SeeCluster", "Render cluster")
 
         val bucket = getBucket(cluster)
         val clusterSize = clusterSizes.get(bucket)
 
         if(clusterSize != null){
 
-            Log.i("SeeCluster", "Render cluster return, size = ${clusterSize} and bucket == ${bucket}")
             return
         }
 
-        Log.i("SeeCluster", "Render cluster make a design")
         makeIconDesign(cluster)
         val descriptor = icons.get(bucket)
-        Log.i("SeeCluster", "Render cluster add icon")
         marker.setIcon(descriptor)
     }
 

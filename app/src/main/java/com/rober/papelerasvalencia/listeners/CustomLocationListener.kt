@@ -11,7 +11,6 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.snackbar.Snackbar
 
 class CustomLocationListener(
-    private val mMap: GoogleMap,
     private val trashListener: TrashListener
 ) : LocationListener {
 
@@ -19,27 +18,8 @@ class CustomLocationListener(
         if (location == null) {
             return
         }
-        mMap.moveCamera(
-            CameraUpdateFactory.newLatLngZoom(
-                LatLng(
-                    location.latitude,
-                    location.longitude
-                ), 20f
-            )
-        )
-        //Fake location
-        val currentLocationModified = Location("")
-        currentLocationModified.longitude = -16.251763
-        currentLocationModified.latitude = 28.463636
-        mMap.moveCamera(
-            CameraUpdateFactory.newLatLngZoom(
-                LatLng(
-                    currentLocationModified.latitude,
-                    currentLocationModified.longitude
-                ), 12f
-            )
-        )
-        trashListener.updateCurrentLocation(currentLocationModified)
+
+        trashListener.updateCurrentLocation(location)
     }
 
     override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {

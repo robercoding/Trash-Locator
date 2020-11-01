@@ -22,10 +22,14 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.maps.android.clustering.Cluster
 import com.google.maps.android.clustering.ClusterManager
 import com.rober.papelerasvalencia.R
 import com.rober.papelerasvalencia.databinding.MapsFragmentBinding
@@ -87,8 +91,6 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         checkIfLocationGPSIsOn()
     }
 
-
-
     private fun initializeMaps() {
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment =
@@ -104,7 +106,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         this.googleMap.mapType = GoogleMap.MAP_TYPE_NORMAL
 
         locationListener =
-            CustomLocationListener(googleMap, this)
+            CustomLocationListener(this)
 //
         updateLocationUI()
 //        getTrashCluster()
@@ -118,9 +120,9 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         Log.i(TAG, "Map is initialized")
 
 
-        val isPermissionsOk = checkGeneralPermissions()
+        val isLocationOk = checkLocationPermissionAndSettings()
 
-        if(!isPermissionsOk){
+        if (!isLocationOk) {
             return
         }
 
@@ -144,7 +146,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         }
     }
 
-    private fun checkGeneralPermissions(): Boolean{
+    private fun checkLocationPermissionAndSettings(): Boolean {
         checkLocationPermission()
         if (!locationPermissionGranted && !alreadyRequestLocationPermission) {
             requestLocationPermissions()
@@ -290,21 +292,32 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     }
 
     private fun setCluster(listTrash: List<Trash>) {
-        if(this::clusterManager.isInitialized){
+        if (this::clusterManager.isInitialized) {
+            //Clear to don't duplicate the cluster that was loaded before
             googleMap.clear()
             clusterManager.clearItems()
+            clusterManager.cluster()
         }
 
         clusterManager = ClusterManager<Trash>(context, googleMap)
 
         clusterManager.renderer = CustomClusterRenderer(requireContext(), googleMap, clusterManager)
-
+        clusterManager.setOnClusterClickListener {clusterTrash->
+            val builder = LatLngBounds.builder()
+            for(trash in clusterTrash.items){
+                builder.include(trash.position)
+            }
+            val bounds = builder.build()
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 50))
+            false
+        }
 
         googleMap.setOnCameraIdleListener(clusterManager)
         googleMap.setOnMarkerClickListener(clusterManager)
 
 //        Log.i("MapDeviceLocation", "Places = ${places.size}")
         clusterManager.addItems(listTrash)
+        clusterManager.cluster()
         clusterManager.setAnimation(true)
     }
 
@@ -320,9 +333,14 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     }
 
     override fun updateCurrentLocation(location: Location) {
-        currentLocation = location
-        if(!this::googleMap.isInitialized)
+        val currentLocationModified = Location("")
+        currentLocationModified.longitude = -16.251763
+        currentLocationModified.latitude = 28.463636
+        currentLocation = currentLocationModified
+        if (!this::googleMap.isInitialized)
             return
+
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(currentLocation.latitude, currentLocation.longitude), 18f))
 
         viewModel.getTrashCluster(googleMap, currentLocation, requireContext())
     }
@@ -350,10 +368,10 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
     override fun onResume() {
         super.onResume()
-        if(!this::clusterManager.isInitialized){
+        if (!this::clusterManager.isInitialized) {
             updateLocationUI()
         }
-        checkGeneralPermissions()
+        checkLocationPermissionAndSettings()
         initializeReceivers()
     }
 }
