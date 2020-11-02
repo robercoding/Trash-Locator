@@ -29,8 +29,8 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.maps.android.clustering.Cluster
 import com.google.maps.android.clustering.ClusterManager
+import com.rober.papelerasvalencia.MapsActivity
 import com.rober.papelerasvalencia.R
 import com.rober.papelerasvalencia.databinding.MapsFragmentBinding
 import com.rober.papelerasvalencia.listeners.CustomLocationListener
@@ -39,6 +39,7 @@ import com.rober.papelerasvalencia.models.Trash
 import com.rober.papelerasvalencia.ui.base.BaseFragment
 import com.rober.papelerasvalencia.ui.base.viewBinding
 import com.rober.papelerasvalencia.utils.*
+import org.threeten.bp.Instant
 
 class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapReadyCallback,
     TrashListener {
@@ -61,6 +62,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     private lateinit var clusterManager: ClusterManager<Trash>
 
     private lateinit var currentLocation: Location
+    private var lastTimeLocationRequested: Long = -1
 
     private lateinit var dialogRequestGps: AlertDialog
 
@@ -276,13 +278,11 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
     override fun setupListeners() {
         super.setupListeners()
-        if (ActivityCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            return
+
+        binding.toolbarSandwich.setOnClickListener {
+            (requireActivity() as MapsActivity).openDrawer()
         }
+
     }
 
     private fun subscribeObservers() {
@@ -302,12 +302,13 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         clusterManager = ClusterManager<Trash>(context, googleMap)
 
         clusterManager.renderer = CustomClusterRenderer(requireContext(), googleMap, clusterManager)
-        clusterManager.setOnClusterClickListener {clusterTrash->
+        clusterManager.setOnClusterClickListener { clusterTrash ->
             val builder = LatLngBounds.builder()
-            for(trash in clusterTrash.items){
+            for (trash in clusterTrash.items) {
                 builder.include(trash.position)
             }
             val bounds = builder.build()
+//            googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
             googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 50))
             false
         }
@@ -319,12 +320,13 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         clusterManager.addItems(listTrash)
         clusterManager.cluster()
         clusterManager.setAnimation(true)
+        viewModel.getAdressesByName("test", requireContext())
     }
 
     private fun initializeReceivers() {
         if (gpsBroadcastReceiver == null) {
             gpsBroadcastReceiver =
-                GPSBroadcastReceiver(binding.textLocationSettings, locationManager)
+                GPSBroadcastReceiver(binding.textLocationSettings, locationManager, this)
             requireActivity().registerReceiver(
                 gpsBroadcastReceiver,
                 IntentFilter("android.location.PROVIDERS_CHANGED")
@@ -340,15 +342,25 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         if (!this::googleMap.isInitialized)
             return
 
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(currentLocation.latitude, currentLocation.longitude), 18f))
+        googleMap.moveCamera(
+            CameraUpdateFactory.newLatLngZoom(
+                LatLng(
+                    currentLocation.latitude,
+                    currentLocation.longitude
+                ), 17f
+            )
+        )
 
         viewModel.getTrashCluster(googleMap, currentLocation, requireContext())
     }
 
-    override fun getTrashAround() {
-    }
+    override fun requestLocationUpdate() {
+        if(!Utils.canUserRequestUpdateLocation(lastTimeLocationRequested)){
+            return
+        }
 
-    override fun getTrashSantaCruz() {
+        lastTimeLocationRequested = Instant.now().epochSecond
+        getDeviceLocation()
     }
 
     override fun onRequestPermissionsResult(
