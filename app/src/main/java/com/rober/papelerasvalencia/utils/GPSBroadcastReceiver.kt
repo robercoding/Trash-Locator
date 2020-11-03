@@ -5,15 +5,15 @@ import android.content.Context
 import android.content.Intent
 import android.location.LocationManager
 import android.os.Handler
-import android.util.Log
-import android.view.View
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.rober.papelerasvalencia.R
+import com.rober.papelerasvalencia.listeners.TrashListener
 
 class GPSBroadcastReceiver(
     private val messageConnectionTV: TextView,
-    private val locationManager: LocationManager
+    private val locationManager: LocationManager,
+    private val trashListener: TrashListener
 ) :
     BroadcastReceiver() {
 
@@ -28,7 +28,7 @@ class GPSBroadcastReceiver(
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
 
             messageConnectionTV.show()
-            messageConnectionTV.text = "Location is back!"
+            messageConnectionTV.text = context?.getString(R.string.location_works)
             messageConnectionTV.setBackgroundColor(
                 ContextCompat.getColor(
                     messageConnectionTV.context,
@@ -36,6 +36,7 @@ class GPSBroadcastReceiver(
                 )
             )
 
+            trashListener.requestLocationUpdate()
             runnable = Runnable { messageConnectionTV.hide() }
             handler?.postDelayed(runnable!!, 3000)
         } else {
@@ -48,7 +49,7 @@ class GPSBroadcastReceiver(
                     R.color.red
                 )
             )
-            messageConnectionTV.text = "GPS is disconnected :("
+            messageConnectionTV.text = context?.getString(R.string.location_error)
             messageConnectionTV.setTextColor(
                 ContextCompat.getColor(
                     messageConnectionTV.context,

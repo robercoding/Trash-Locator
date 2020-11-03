@@ -7,6 +7,54 @@
     android:layout_height="match_parent"
     tools:context=".ui.maps.MapsFragment">
 
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@color/blueLight2">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/toolbarSandwich"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:src="@drawable/ic_menu"
+                android:layout_marginStart="10dp"
+                app:layout_constraintWidth_percent="0.1"
+                app:layout_constraintHeight_percent="0.55"
+                android:contentDescription="@string/toolbar_sandwich" />
+
+            <EditText
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintWidth_percent="0.8"
+                app:layout_constraintHeight_percent="0.6"
+                app:layout_constraintStart_toEndOf="@id/toolbarSandwich"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:background="@drawable/round_corner"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:hint="@string/search_location_hint"
+                android:gravity="center_vertical|start"
+                android:textSize="14sp"
+                android:autofillHints="no"
+                android:inputType="none" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/mapsContainer"
         android:name="com.google.android.gms.maps.SupportMapFragment"
@@ -15,7 +63,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/appBarLayout" />
 
     <TextView
         android:id="@+id/textPermissionApp"

@@ -19,7 +19,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -157,8 +156,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         }
 
         if (!locationPermissionGranted && alreadyRequestLocationPermission) {
-            binding.textPermissionApp.text =
-                "We don't have permissions to get your current location, so we can't help to find nearest trash around you :("
+            binding.textPermissionApp.text = getString(R.string.location_permission_error)
             binding.textPermissionApp.show()
             binding.textPermissionApp.setBackgroundColor(
                 ContextCompat.getColor(
@@ -205,7 +203,10 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
             locationManager.requestSingleUpdate(criteria, locationListener, null)
         } catch (e: Exception) {
-            Log.e(TAG, e.message)
+            val errorMessage = e.message
+            if (errorMessage != null) {
+                Log.e(TAG, errorMessage)
+            }
         }
     }
 
@@ -264,7 +265,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
                         R.color.red
                     )
                 )
-                messageConnectionTV.text = "GPS is disconnected :("
+                messageConnectionTV.text = context?.getString(R.string.location_error)
                 messageConnectionTV.setTextColor(
                     ContextCompat.getColor(
                         messageConnectionTV.context,
@@ -282,13 +283,12 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         binding.toolbarSandwich.setOnClickListener {
             (requireActivity() as MapsActivity).openDrawer()
         }
-
     }
 
     private fun subscribeObservers() {
-        viewModel.listTrash.observe(viewLifecycleOwner, Observer { listTrash ->
+        viewModel.listTrash.observe(viewLifecycleOwner) { listTrash ->
             setCluster(listTrash)
-        })
+        }
     }
 
     private fun setCluster(listTrash: List<Trash>) {
@@ -308,8 +308,17 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
                 builder.include(trash.position)
             }
             val bounds = builder.build()
-//            googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 50))
+
+            //Animate camera doesn't zoom!
+//            googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 50))
+//            googleMap.animateCamera(CameraUpdateFactory.zoomTo(100f))
+
+            googleMap.moveCamera(
+                CameraUpdateFactory.newLatLngBounds(
+                    bounds,
+                    googleMap.cameraPosition.zoom.toInt()
+                )
+            )
             false
         }
 
@@ -320,7 +329,9 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         clusterManager.addItems(listTrash)
         clusterManager.cluster()
         clusterManager.setAnimation(true)
-        viewModel.getAdressesByName("test", requireContext())
+        viewModel.getAdressesByName("Massamagrell", requireContext())
+
+//        viewModel.getAddressByLocation(currentLocation, requireContext())
     }
 
     private fun initializeReceivers() {
@@ -355,7 +366,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     }
 
     override fun requestLocationUpdate() {
-        if(!Utils.canUserRequestUpdateLocation(lastTimeLocationRequested)){
+        if (!Utils.canUserRequestUpdateLocation(lastTimeLocationRequested)) {
             return
         }
 

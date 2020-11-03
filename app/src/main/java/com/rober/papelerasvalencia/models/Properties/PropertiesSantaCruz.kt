@@ -1,9 +1,9 @@
-package com.rober.papelerasvalencia.models
+package com.rober.papelerasvalencia.models.Properties
 
 
 import com.google.gson.annotations.SerializedName
 
-data class Properties(
+data class PropertiesSantaCruz(
     @SerializedName("CVIA")
     val cVIA: String,
     @SerializedName("CVIA_1")
