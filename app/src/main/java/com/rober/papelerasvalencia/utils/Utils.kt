@@ -22,4 +22,13 @@ object Utils {
 
         return true
     }
+
+    fun isNumber(text: String): Boolean {
+        return try {
+            text.toInt()
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
 }

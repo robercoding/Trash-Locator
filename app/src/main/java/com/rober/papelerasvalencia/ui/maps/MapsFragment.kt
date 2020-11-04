@@ -12,9 +12,7 @@ import android.location.LocationManager
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -65,20 +63,6 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
     private lateinit var dialogRequestGps: AlertDialog
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-//        viewModel = ViewModelProvider(this).get(MapsViewModel::class.java)
-        subscribeObservers()
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return super.onCreateView(inflater, container, savedInstanceState)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         locationManager =
@@ -87,6 +71,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        subscribeObservers()
         initializeMaps()
         checkLocationPermission()
         checkIfLocationGPSIsOn()
@@ -329,7 +314,10 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         clusterManager.addItems(listTrash)
         clusterManager.cluster()
         clusterManager.setAnimation(true)
-        viewModel.getAdressesByName("Massamagrell", requireContext())
+        val locationfake = Location("")
+        locationfake.latitude = 28.463674
+        locationfake.longitude = -16.251643
+//        viewModel.getAddressByLocation(locationfake, requireContext())
 
 //        viewModel.getAddressByLocation(currentLocation, requireContext())
     }
