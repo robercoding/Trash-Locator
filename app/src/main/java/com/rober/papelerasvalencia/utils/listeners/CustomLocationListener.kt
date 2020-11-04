@@ -1,14 +1,9 @@
-package com.rober.papelerasvalencia.listeners
+package com.rober.papelerasvalencia.utils.listeners
 
 import android.location.Location
 import android.location.LocationListener
-import android.location.LocationManager
 import android.os.Bundle
-import android.view.View
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.material.snackbar.Snackbar
+import com.rober.papelerasvalencia.utils.listeners.interfaces.TrashListener
 
 class CustomLocationListener(
     private val trashListener: TrashListener

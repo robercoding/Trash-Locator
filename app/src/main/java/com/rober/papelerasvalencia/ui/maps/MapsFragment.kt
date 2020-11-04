@@ -30,16 +30,19 @@ import com.google.maps.android.clustering.ClusterManager
 import com.rober.papelerasvalencia.MapsActivity
 import com.rober.papelerasvalencia.R
 import com.rober.papelerasvalencia.databinding.MapsFragmentBinding
-import com.rober.papelerasvalencia.listeners.CustomLocationListener
-import com.rober.papelerasvalencia.listeners.TrashListener
 import com.rober.papelerasvalencia.models.Trash
 import com.rober.papelerasvalencia.ui.base.BaseFragment
 import com.rober.papelerasvalencia.ui.base.viewBinding
 import com.rober.papelerasvalencia.utils.*
+import com.rober.papelerasvalencia.utils.listeners.CustomLocationListener
+import com.rober.papelerasvalencia.utils.listeners.TextWatcherListener
+import com.rober.papelerasvalencia.utils.listeners.interfaces.TextListener
+import com.rober.papelerasvalencia.utils.listeners.interfaces.TrashListener
 import org.threeten.bp.Instant
+import java.util.*
 
 class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapReadyCallback,
-    TrashListener {
+    TrashListener, TextListener {
 
     private val TAG = "MapsFragment"
 
@@ -62,6 +65,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     private var lastTimeLocationRequested: Long = -1
 
     private lateinit var dialogRequestGps: AlertDialog
+    private lateinit var timer: Timer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -262,19 +266,6 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
             .show()
     }
 
-    override fun setupListeners() {
-        super.setupListeners()
-
-        binding.toolbarSandwich.setOnClickListener {
-            (requireActivity() as MapsActivity).openDrawer()
-        }
-    }
-
-    private fun subscribeObservers() {
-        viewModel.listTrash.observe(viewLifecycleOwner) { listTrash ->
-            setCluster(listTrash)
-        }
-    }
 
     private fun setCluster(listTrash: List<Trash>) {
         if (this::clusterManager.isInitialized) {
@@ -310,16 +301,32 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         googleMap.setOnCameraIdleListener(clusterManager)
         googleMap.setOnMarkerClickListener(clusterManager)
 
-//        Log.i("MapDeviceLocation", "Places = ${places.size}")
         clusterManager.addItems(listTrash)
         clusterManager.cluster()
         clusterManager.setAnimation(true)
         val locationfake = Location("")
         locationfake.latitude = 28.463674
         locationfake.longitude = -16.251643
-//        viewModel.getAddressByLocation(locationfake, requireContext())
+    }
 
-//        viewModel.getAddressByLocation(currentLocation, requireContext())
+    override fun setupListeners() {
+        super.setupListeners()
+
+        binding.toolbarSandwich.setOnClickListener {
+            (requireActivity() as MapsActivity).openDrawer()
+        }
+
+        binding.ETsearchLocation.addTextChangedListener(TextWatcherListener(this))
+    }
+
+    private fun subscribeObservers() {
+        viewModel.listTrash.observe(viewLifecycleOwner) { listTrash ->
+            setCluster(listTrash)
+        }
+
+        viewModel.listAddressesLocation.observe(viewLifecycleOwner) { listAddressesLocation ->
+            Log.i("SeeListAddresses", "${listAddressesLocation}")
+        }
     }
 
     private fun initializeReceivers() {
@@ -331,6 +338,10 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
                 IntentFilter("android.location.PROVIDERS_CHANGED")
             )
         }
+    }
+
+    override fun onUserStopTyping(text: String) {
+        viewModel.getAdressesByName(text, requireContext())
     }
 
     override fun updateCurrentLocation(location: Location) {

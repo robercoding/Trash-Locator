@@ -8,32 +8,39 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
-import com.google.gson.Gson
 import com.google.maps.android.data.geojson.GeoJsonLayer
 import com.rober.papelerasvalencia.R
+import com.rober.papelerasvalencia.models.AddressLocation
 import com.rober.papelerasvalencia.models.Trash
 import com.rober.papelerasvalencia.models.TrashLocation
 import com.rober.papelerasvalencia.utils.Utils
 
 class MapsViewModel : ViewModel() {
 
-    var listTrash: MutableLiveData<List<Trash>> = MutableLiveData()
-    val gson = Gson()
+    val listTrash: MutableLiveData<List<Trash>> = MutableLiveData()
+    val listAddressesLocation: MutableLiveData<List<AddressLocation>> = MutableLiveData()
+
     lateinit var geoCoder: Geocoder
 
     fun getAdressesByName(nameLocation: String, context: Context) {
         geoCoder = Geocoder(context)
 
-        val addresses = geoCoder.getFromLocationName(nameLocation, 4)
+        val addresses = geoCoder.getFromLocationName(nameLocation, 5)
+        val mutableListAddressesLocation = mutableListOf<AddressLocation>()
         for (address in addresses) {
-            Log.i("SeeAddress", "PostalCode = ${address.postalCode}")
-            Log.i("SeeAddress", "Country = ${address.countryName}")
-            Log.i("SeeAddress", "Locality = ${address.locality}")
-            Log.i("SeeAddress", "Latitude = ${address.latitude}")
-            Log.i("SeeAddress", "Longitude = ${address.longitude}")
+            val location = AddressLocation()
+
+            val addressLine = address.getAddressLine(0)
+
+            location.streetName = addressLine
+            location.latitude = address.latitude
+            location.longitude = address.longitude
+
+            Log.i("SeeAddress", "Location = ${location}}")
+            mutableListAddressesLocation.add(location)
         }
 
-
+        listAddressesLocation.postValue(mutableListAddressesLocation.toList())
     }
 
     private fun getSingleAddressLocation(location: Location, context: Context): TrashLocation {

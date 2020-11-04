@@ -8,7 +8,7 @@ import android.os.Handler
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.rober.papelerasvalencia.R
-import com.rober.papelerasvalencia.listeners.TrashListener
+import com.rober.papelerasvalencia.utils.listeners.interfaces.TrashListener
 
 class GPSBroadcastReceiver(
     private val messageConnectionTV: TextView,
