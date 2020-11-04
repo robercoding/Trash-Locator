@@ -20,4 +20,7 @@
     <color name="grayLightText">#6E7881</color>
     <color name="grayWhite">#E7ECF0</color>
 
+    <color name="background">@color/white</color>
+    <color name="primaryText">@color/black</color>
+
 </resources>

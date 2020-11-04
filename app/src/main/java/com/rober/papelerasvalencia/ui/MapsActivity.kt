@@ -1,4 +1,4 @@
-package com.rober.papelerasvalencia
+package com.rober.papelerasvalencia.ui
 
 import android.os.Bundle
 import android.view.MenuItem
@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.navigation.NavigationView
+import com.rober.papelerasvalencia.R
 import com.rober.papelerasvalencia.databinding.ActivityMapsBinding
 import com.rober.papelerasvalencia.utils.closeDrawer
 import com.rober.papelerasvalencia.utils.openDrawer

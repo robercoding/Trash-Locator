@@ -38,6 +38,6 @@ class TextWatcherListener(val textListener: TextListener) : TextWatcher {
             override fun scheduledExecutionTime(): Long {
                 return super.scheduledExecutionTime()
             }
-        }, 400)
+        }, 600)
     }
 }

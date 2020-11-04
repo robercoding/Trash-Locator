@@ -1,4 +1,4 @@
-package com.rober.papelerasvalencia.ui.maps
+package com.rober.papelerasvalencia.ui.ui.maps
 
 import android.Manifest
 import android.content.Context
@@ -17,6 +17,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -27,22 +29,24 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.maps.android.clustering.ClusterManager
-import com.rober.papelerasvalencia.MapsActivity
 import com.rober.papelerasvalencia.R
 import com.rober.papelerasvalencia.databinding.MapsFragmentBinding
+import com.rober.papelerasvalencia.models.AddressLocation
 import com.rober.papelerasvalencia.models.Trash
+import com.rober.papelerasvalencia.ui.MapsActivity
 import com.rober.papelerasvalencia.ui.base.BaseFragment
 import com.rober.papelerasvalencia.ui.base.viewBinding
 import com.rober.papelerasvalencia.utils.*
 import com.rober.papelerasvalencia.utils.listeners.CustomLocationListener
 import com.rober.papelerasvalencia.utils.listeners.TextWatcherListener
+import com.rober.papelerasvalencia.utils.listeners.interfaces.RecyclerAddressLocationClickListener
 import com.rober.papelerasvalencia.utils.listeners.interfaces.TextListener
 import com.rober.papelerasvalencia.utils.listeners.interfaces.TrashListener
 import org.threeten.bp.Instant
 import java.util.*
 
 class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapReadyCallback,
-    TrashListener, TextListener {
+    TrashListener, TextListener, RecyclerAddressLocationClickListener {
 
     private val TAG = "MapsFragment"
 
@@ -267,6 +271,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     }
 
 
+
     private fun setCluster(listTrash: List<Trash>) {
         if (this::clusterManager.isInitialized) {
             //Clear to don't duplicate the cluster that was loaded before
@@ -309,6 +314,26 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         locationfake.longitude = -16.251643
     }
 
+    private fun setSearchAdapter(listAddressLocation: List<AddressLocation>) {
+        val searchAdapter = SearchLocationAdapter(listAddressLocation, this)
+
+        binding.recyclerLocation.apply {
+            adapter = searchAdapter
+            layoutManager = LinearLayoutManager(requireContext())
+            addItemDecoration(
+                DividerItemDecoration(
+                    requireContext(),
+                    DividerItemDecoration.HORIZONTAL
+                )
+            )
+            scheduleLayoutAnimation()
+        }
+
+        Log.i("SeeRecycler", "adapted and show")
+        binding.recyclerLocation.show()
+
+    }
+
     override fun setupListeners() {
         super.setupListeners()
 
@@ -325,7 +350,9 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         }
 
         viewModel.listAddressesLocation.observe(viewLifecycleOwner) { listAddressesLocation ->
-            Log.i("SeeListAddresses", "${listAddressesLocation}")
+            if (listAddressesLocation.isNotEmpty()) {
+                setSearchAdapter(listAddressesLocation)
+            }
         }
     }
 
@@ -342,6 +369,18 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
     override fun onUserStopTyping(text: String) {
         viewModel.getAdressesByName(text, requireContext())
+    }
+
+    override fun onAddressLocationClickListener(location: Location) {
+        binding.recyclerLocation.hide()
+        googleMap.moveCamera(
+            CameraUpdateFactory.newLatLngZoom(
+                LatLng(
+                    location.latitude,
+                    location.longitude
+                ), 17f
+            )
+        )
     }
 
     override fun updateCurrentLocation(location: Location) {

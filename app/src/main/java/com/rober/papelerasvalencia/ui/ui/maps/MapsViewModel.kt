@@ -1,4 +1,4 @@
-package com.rober.papelerasvalencia.ui.maps
+package com.rober.papelerasvalencia.ui.ui.maps
 
 import android.content.Context
 import android.location.Geocoder
@@ -22,7 +22,15 @@ class MapsViewModel : ViewModel() {
 
     lateinit var geoCoder: Geocoder
 
+    var lastNameLocation = ""
+
     fun getAdressesByName(nameLocation: String, context: Context) {
+        if ((nameLocation == lastNameLocation) || nameLocation.isBlank()) {
+            return
+        }
+        Log.i("SeeNameLocation", nameLocation)
+        lastNameLocation = nameLocation
+
         geoCoder = Geocoder(context)
 
         val addresses = geoCoder.getFromLocationName(nameLocation, 5)

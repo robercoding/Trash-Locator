@@ -17,4 +17,7 @@
 
     <!--    Content Description-->
     <string name="toolbar_sandwich">Open the drawer</string>
+
+    <string name="mock_text_short">Mock test, just testing</string>
+    <string name="mock_text_long">Mock test, just testing, hope you like this, well, it just a mock to test if everything is right, hope is as long as the developer(me) needs for its mock text!</string>
 </resources>
