@@ -4,6 +4,7 @@ import android.content.Context
 import android.location.Geocoder
 import android.location.Location
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.android.gms.maps.GoogleMap
@@ -17,14 +18,31 @@ import com.rober.papelerasvalencia.utils.Utils
 
 class MapsViewModel : ViewModel() {
 
-    val listTrash: MutableLiveData<List<Trash>> = MutableLiveData()
-    val listAddressesLocation: MutableLiveData<List<AddressLocation>> = MutableLiveData()
-
     lateinit var geoCoder: Geocoder
 
+    //Set List of Trash Item for cluster manager
+    private val _listTrash: MutableLiveData<List<Trash>> = MutableLiveData()
+    val listTrash: LiveData<List<Trash>> get() = _listTrash
+
+    //Set list of addresses location for search toolbar
+    private val _listAddressesLocation: MutableLiveData<List<AddressLocation>> = MutableLiveData()
+    val listAddressesLocation: LiveData<List<AddressLocation>> get() = _listAddressesLocation
+
+    //Observe location to move camera
+    private val _location: MutableLiveData<Location> = MutableLiveData()
+    val location: LiveData<Location> get() = _location
+
+    private val _onBackPressed: MutableLiveData<Boolean> = MutableLiveData()
+    val onBackPressed: LiveData<Boolean> get() = _onBackPressed
+
+    init {
+        _onBackPressed.value = false
+    }
+
+    var listLocations = mutableListOf<Location>()
     var lastNameLocation = ""
 
-    fun getAdressesByName(nameLocation: String, context: Context) {
+    fun getListAdressesByName(nameLocation: String, context: Context) {
         if ((nameLocation == lastNameLocation) || nameLocation.isBlank()) {
             return
         }
@@ -48,7 +66,7 @@ class MapsViewModel : ViewModel() {
             mutableListAddressesLocation.add(location)
         }
 
-        listAddressesLocation.postValue(mutableListAddressesLocation.toList())
+        _listAddressesLocation.postValue(mutableListAddressesLocation.toList())
     }
 
     private fun getSingleAddressLocation(location: Location, context: Context): TrashLocation {
@@ -148,6 +166,23 @@ class MapsViewModel : ViewModel() {
             }
         }
 
-        listTrash.value = places
+        _listTrash.value = places
+    }
+
+    fun setUpdateLocation(updateLocation: Location) {
+        listLocations.add(updateLocation)
+        _location.postValue(updateLocation)
+    }
+
+    fun getLastLocation() {
+        if (listLocations.size > 1) {
+            listLocations.removeLast()
+            val newLocation = listLocations.last()
+            _location.value = newLocation
+        } else {
+            Log.i("SeeBackPressed", "Is empty")
+            _onBackPressed.value = true
+        }
+//        val lastLocation =
     }
 }

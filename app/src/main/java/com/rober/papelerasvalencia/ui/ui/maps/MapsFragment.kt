@@ -13,6 +13,7 @@ import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
 import android.view.View
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -215,6 +216,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         }
     }
 
+
     private fun requestLocationPermissions() {
         ActivityCompat.requestPermissions(
             requireActivity(),
@@ -271,7 +273,6 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     }
 
 
-
     private fun setCluster(listTrash: List<Trash>) {
         if (this::clusterManager.isInitialized) {
             //Clear to don't duplicate the cluster that was loaded before
@@ -314,6 +315,20 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         locationfake.longitude = -16.251643
     }
 
+    private fun moveCamera(location: Location) {
+        currentLocation = location
+        googleMap.moveCamera(
+            CameraUpdateFactory.newLatLngZoom(
+                LatLng(
+                    location.latitude,
+                    location.longitude
+                ), 17f
+            )
+        )
+
+        viewModel.getTrashCluster(googleMap, currentLocation, requireContext())
+    }
+
     private fun setSearchAdapter(listAddressLocation: List<AddressLocation>) {
         val searchAdapter = SearchLocationAdapter(listAddressLocation, this)
 
@@ -334,16 +349,6 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
     }
 
-    override fun setupListeners() {
-        super.setupListeners()
-
-        binding.toolbarSandwich.setOnClickListener {
-            (requireActivity() as MapsActivity).openDrawer()
-        }
-
-        binding.ETsearchLocation.addTextChangedListener(TextWatcherListener(this))
-    }
-
     private fun subscribeObservers() {
         viewModel.listTrash.observe(viewLifecycleOwner) { listTrash ->
             setCluster(listTrash)
@@ -353,6 +358,20 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
             if (listAddressesLocation.isNotEmpty()) {
                 setSearchAdapter(listAddressesLocation)
             }
+        }
+
+        viewModel.location.observe(viewLifecycleOwner) { location ->
+            Log.i("SeeBackPressed", "Location changed!")
+            moveCamera(location)
+        }
+
+        viewModel.onBackPressed.observe(viewLifecycleOwner) { onBackPressed ->
+            Log.i("SeeBackPressed", "Changed boolean to ${onBackPressed}")
+            if (!onBackPressed) {
+                return@observe
+            }
+
+            defaultOnBackPressed()
         }
     }
 
@@ -367,21 +386,36 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         }
     }
 
+    override fun setupListeners() {
+        super.setupListeners()
+
+        binding.toolbarSandwich.setOnClickListener {
+            (requireActivity() as MapsActivity).openDrawer()
+        }
+
+        binding.ETsearchLocation.addTextChangedListener(TextWatcherListener(this))
+
+    }
+
+    override fun detectOnBackPressed() {
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    viewModel.getLastLocation()
+                }
+            })
+    }
+
     override fun onUserStopTyping(text: String) {
-        viewModel.getAdressesByName(text, requireContext())
+        viewModel.getListAdressesByName(text, requireContext())
     }
 
     override fun onAddressLocationClickListener(location: Location) {
         Log.i("SeeClick", "See action click on implemeneted")
         binding.recyclerLocation.hide()
-        googleMap.moveCamera(
-            CameraUpdateFactory.newLatLngZoom(
-                LatLng(
-                    location.latitude,
-                    location.longitude
-                ), 17f
-            )
-        )
+        viewModel.setUpdateLocation(location)
+
         binding.ETsearchLocation.clearFocus()
         binding.containerToolbar.requestFocus()
         hideKeyBoard()
@@ -392,19 +426,10 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         currentLocationModified.longitude = -16.251763
         currentLocationModified.latitude = 28.463636
         currentLocation = currentLocationModified
+
+        viewModel.setUpdateLocation(currentLocation)
         if (!this::googleMap.isInitialized)
             return
-
-        googleMap.moveCamera(
-            CameraUpdateFactory.newLatLngZoom(
-                LatLng(
-                    currentLocation.latitude,
-                    currentLocation.longitude
-                ), 17f
-            )
-        )
-
-        viewModel.getTrashCluster(googleMap, currentLocation, requireContext())
     }
 
     override fun requestLocationUpdate() {
