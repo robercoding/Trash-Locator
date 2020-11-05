@@ -1,6 +1,13 @@
 package com.rober.papelerasvalencia.models
 
-data class AddressLocation(var streetName: String, var latitude: Double, var longitude: Double) {
+import android.location.Location
 
-    constructor() : this("", 0.0, 0.0)
+data class AddressLocation(
+    var localityName: String,
+    var localityAdminAreaName: String,
+    var streetName: String,
+    var location: Location
+) {
+
+    constructor() : this("", "", "", Location(""))
 }

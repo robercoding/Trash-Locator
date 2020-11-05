@@ -8,12 +8,12 @@ import android.os.Handler
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.rober.papelerasvalencia.R
-import com.rober.papelerasvalencia.utils.listeners.interfaces.TrashListener
+import com.rober.papelerasvalencia.utils.listeners.interfaces.ICustomLocationListener
 
 class GPSBroadcastReceiver(
     private val messageConnectionTV: TextView,
     private val locationManager: LocationManager,
-    private val trashListener: TrashListener
+    private val iCustomLocationListener: ICustomLocationListener
 ) :
     BroadcastReceiver() {
 
@@ -36,7 +36,7 @@ class GPSBroadcastReceiver(
                 )
             )
 
-            trashListener.requestLocationUpdate()
+            iCustomLocationListener.requestLocationUpdate()
             runnable = Runnable { messageConnectionTV.hide() }
             handler?.postDelayed(runnable!!, 3000)
         } else {

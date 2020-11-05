@@ -1,7 +1,7 @@
 package com.rober.papelerasvalencia.utils.listeners.interfaces
 
-import android.location.Location
+import com.rober.papelerasvalencia.models.AddressLocation
 
 interface RecyclerAddressLocationClickListener {
-    fun onAddressLocationClickListener(location: Location)
+    fun onAddressLocationClickListener(addressLocation: AddressLocation)
 }

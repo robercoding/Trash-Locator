@@ -14,6 +14,7 @@ import com.rober.papelerasvalencia.R
 import com.rober.papelerasvalencia.models.AddressLocation
 import com.rober.papelerasvalencia.models.Trash
 import com.rober.papelerasvalencia.models.TrashLocation
+import com.rober.papelerasvalencia.utils.LocalitesDataset
 import com.rober.papelerasvalencia.utils.Utils
 
 class MapsViewModel : ViewModel() {
@@ -29,8 +30,8 @@ class MapsViewModel : ViewModel() {
     val listAddressesLocation: LiveData<List<AddressLocation>> get() = _listAddressesLocation
 
     //Observe location to move camera
-    private val _location: MutableLiveData<Location> = MutableLiveData()
-    val location: LiveData<Location> get() = _location
+    private val _addressLocation: MutableLiveData<AddressLocation> = MutableLiveData()
+    val addressLocation: LiveData<AddressLocation> get() = _addressLocation
 
     private val _onBackPressed: MutableLiveData<Boolean> = MutableLiveData()
     val onBackPressed: LiveData<Boolean> get() = _onBackPressed
@@ -39,10 +40,11 @@ class MapsViewModel : ViewModel() {
         _onBackPressed.value = false
     }
 
-    var listLocations = mutableListOf<Location>()
+    var listLocations = mutableListOf<AddressLocation>()
     var lastNameLocation = ""
 
-    fun getListAdressesByName(nameLocation: String, context: Context) {
+    //Get list addresses of addresses by name location and set on MutableLiveData
+    fun getListAddressesByName(nameLocation: String, context: Context) {
         if ((nameLocation == lastNameLocation) || nameLocation.isBlank()) {
             return
         }
@@ -54,22 +56,26 @@ class MapsViewModel : ViewModel() {
         val addresses = geoCoder.getFromLocationName(nameLocation, 5)
         val mutableListAddressesLocation = mutableListOf<AddressLocation>()
         for (address in addresses) {
+            Log.i("SeeAddress", "$address")
             val location = AddressLocation()
 
             val addressLine = address.getAddressLine(0)
 
             location.streetName = addressLine
-            location.latitude = address.latitude
-            location.longitude = address.longitude
+            location.location.latitude = address.latitude
+            location.location.longitude = address.longitude
+            location.localityName = address.locality
+            location.localityAdminAreaName = address.adminArea
 
-            Log.i("SeeAddress", "Location = ${location}}")
+//            Log.i("SeeAddress", "Location = ${location}}")
             mutableListAddressesLocation.add(location)
         }
 
         _listAddressesLocation.postValue(mutableListAddressesLocation.toList())
     }
 
-    private fun getSingleAddressLocation(location: Location, context: Context): TrashLocation {
+    //Get information by coordinates location and return a custom object TrashLocation
+    private fun getSingleTrashLocation(location: Location, context: Context): TrashLocation {
         geoCoder = Geocoder(context)
 
         val address = geoCoder.getFromLocation(location.latitude, location.longitude, 4)[0]
@@ -87,6 +93,25 @@ class MapsViewModel : ViewModel() {
         return trashLocation
     }
 
+    /*
+     * Get single addresslocation by location
+     */
+    private fun getSingleAddressLocation(location: Location, context: Context): AddressLocation {
+        geoCoder = Geocoder(context)
+
+        val address = geoCoder.getFromLocation(location.latitude, location.longitude, 1)[0]
+
+        Log.i("SeeASingleAddress", "${address}")
+        val addressLocation = AddressLocation()
+        addressLocation.localityName = address.locality
+        addressLocation.localityAdminAreaName = address.adminArea
+        addressLocation.location = location
+
+        return addressLocation
+    }
+
+    //I'm not using this yet
+    //Get by information of addresses by location and return a list of custom object TrashLocation
     private fun getListAddressLocation(location: Location, context: Context): List<TrashLocation> {
         geoCoder = Geocoder(context)
 
@@ -111,7 +136,10 @@ class MapsViewModel : ViewModel() {
         return mutableListTrashLocation.toList()
     }
 
-    //Add a comma if next word is available
+    /*
+     * Format TrashLocation object
+     * Add a comma if next word is available
+     */
     private fun addCommaTrashLocation(
         trashLocation: TrashLocation,
         context: Context
@@ -135,8 +163,31 @@ class MapsViewModel : ViewModel() {
         return trashLocation
     }
 
-    fun getTrashCluster(googleMap: GoogleMap, currentLocation: Location, context: Context) {
-        val layer = GeoJsonLayer(googleMap, R.raw.papeleras_canarias, context)
+    fun getTrashCluster(googleMap: GoogleMap, addressLocation: AddressLocation, context: Context) {
+        var raw = -1
+
+        //Try to find the dataset in file Object LocalitiesDataset
+        loopLocalityDataset@ for (localityDataset in LocalitesDataset.listLocalityDataset) {
+            if (localityDataset.localityName != addressLocation.localityName) return
+
+            /*
+             * Split by comma because admin areas can have
+             * different names example = "Canary Islands" == "Canarias"
+             */
+            val adminAreas = localityDataset.localityAdmin.split(',')
+            loopAdminArea@ for (adminArea in adminAreas) {
+                if (adminArea == addressLocation.localityAdminAreaName) {
+                    raw = localityDataset.dataset
+                    break@loopLocalityDataset
+                }
+            }
+        }
+
+        if (raw == -1) {
+            return
+        }
+
+        val layer = GeoJsonLayer(googleMap, R.raw.trash_santa_cruz_de_tenerife, context)
 
         val places = mutableListOf<Trash>()
         for (feature in layer.features) {
@@ -148,12 +199,13 @@ class MapsViewModel : ViewModel() {
             locationPlace.latitude = latLng.latitude
             locationPlace.longitude = latLng.longitude
 
-            val distance = currentLocation.distanceTo(locationPlace)
+            val distance = addressLocation.location.distanceTo(locationPlace)
             Log.i("MapDeviceLocation", "${distance}")
 
 //            listDistances.add(distance)
             if (distance < 100f) {
-                val trashLocation = getSingleAddressLocation(locationPlace, context)
+                //Get info street name where this trash is.
+                val trashLocation = getSingleTrashLocation(locationPlace, context)
 
                 val place = Trash(
                     latLng.latitude,
@@ -169,20 +221,24 @@ class MapsViewModel : ViewModel() {
         _listTrash.value = places
     }
 
-    fun setUpdateLocation(updateLocation: Location) {
-        listLocations.add(updateLocation)
-        _location.postValue(updateLocation)
+    fun setUpdateLocationByAddressLocation(addressLocation: AddressLocation) {
+        listLocations.add(addressLocation)
+        _addressLocation.postValue(addressLocation)
+    }
+
+    fun setUpdateLocationByLocation(location: Location, context: Context) {
+        val addressLocation = getSingleAddressLocation(location, context)
+        listLocations.add(addressLocation)
+        _addressLocation.postValue(addressLocation)
     }
 
     fun getLastLocation() {
         if (listLocations.size > 1) {
             listLocations.removeLast()
-            val newLocation = listLocations.last()
-            _location.value = newLocation
+            val newAddressLocation = listLocations.last()
+            _addressLocation.value = newAddressLocation
         } else {
-            Log.i("SeeBackPressed", "Is empty")
             _onBackPressed.value = true
         }
-//        val lastLocation =
     }
 }

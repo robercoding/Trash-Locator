@@ -40,14 +40,13 @@ import com.rober.papelerasvalencia.ui.base.viewBinding
 import com.rober.papelerasvalencia.utils.*
 import com.rober.papelerasvalencia.utils.listeners.CustomLocationListener
 import com.rober.papelerasvalencia.utils.listeners.TextWatcherListener
+import com.rober.papelerasvalencia.utils.listeners.interfaces.ICustomLocationListener
 import com.rober.papelerasvalencia.utils.listeners.interfaces.RecyclerAddressLocationClickListener
 import com.rober.papelerasvalencia.utils.listeners.interfaces.TextListener
-import com.rober.papelerasvalencia.utils.listeners.interfaces.TrashListener
 import org.threeten.bp.Instant
-import java.util.*
 
 class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapReadyCallback,
-    TrashListener, TextListener, RecyclerAddressLocationClickListener {
+    ICustomLocationListener, TextListener, RecyclerAddressLocationClickListener {
 
     private val TAG = "MapsFragment"
 
@@ -70,7 +69,6 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     private var lastTimeLocationRequested: Long = -1
 
     private lateinit var dialogRequestGps: AlertDialog
-    private lateinit var timer: Timer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -315,18 +313,18 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         locationfake.longitude = -16.251643
     }
 
-    private fun moveCamera(location: Location) {
-        currentLocation = location
-        googleMap.moveCamera(
+    private fun moveCamera(addressLocation: AddressLocation) {
+        currentLocation = addressLocation.location
+        googleMap.animateCamera(
             CameraUpdateFactory.newLatLngZoom(
                 LatLng(
-                    location.latitude,
-                    location.longitude
+                    currentLocation.latitude,
+                    currentLocation.longitude
                 ), 17f
             )
         )
 
-        viewModel.getTrashCluster(googleMap, currentLocation, requireContext())
+        viewModel.getTrashCluster(googleMap, addressLocation, requireContext())
     }
 
     private fun setSearchAdapter(listAddressLocation: List<AddressLocation>) {
@@ -344,9 +342,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
             scheduleLayoutAnimation()
         }
 
-        Log.i("SeeRecycler", "adapted and show")
         binding.recyclerLocation.show()
-
     }
 
     private fun subscribeObservers() {
@@ -360,9 +356,9 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
             }
         }
 
-        viewModel.location.observe(viewLifecycleOwner) { location ->
+        viewModel.addressLocation.observe(viewLifecycleOwner) { addressLocation ->
             Log.i("SeeBackPressed", "Location changed!")
-            moveCamera(location)
+            moveCamera(addressLocation)
         }
 
         viewModel.onBackPressed.observe(viewLifecycleOwner) { onBackPressed ->
@@ -394,7 +390,6 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         }
 
         binding.ETsearchLocation.addTextChangedListener(TextWatcherListener(this))
-
     }
 
     override fun detectOnBackPressed() {
@@ -408,14 +403,15 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     }
 
     override fun onUserStopTyping(text: String) {
-        viewModel.getListAdressesByName(text, requireContext())
+        viewModel.getListAddressesByName(text, requireContext())
     }
 
-    override fun onAddressLocationClickListener(location: Location) {
+    override fun onAddressLocationClickListener(addressLocation: AddressLocation) {
         Log.i("SeeClick", "See action click on implemeneted")
         binding.recyclerLocation.hide()
-        viewModel.setUpdateLocation(location)
+        viewModel.setUpdateLocationByAddressLocation(addressLocation)
 
+        binding.ETsearchLocation.setText(addressLocation.streetName)
         binding.ETsearchLocation.clearFocus()
         binding.containerToolbar.requestFocus()
         hideKeyBoard()
@@ -427,7 +423,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         currentLocationModified.latitude = 28.463636
         currentLocation = currentLocationModified
 
-        viewModel.setUpdateLocation(currentLocation)
+        viewModel.setUpdateLocationByLocation(currentLocation, requireContext())
         if (!this::googleMap.isInitialized)
             return
     }

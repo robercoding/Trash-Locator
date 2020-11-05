@@ -3,10 +3,11 @@ package com.rober.papelerasvalencia.utils.listeners
 import android.location.Location
 import android.location.LocationListener
 import android.os.Bundle
-import com.rober.papelerasvalencia.utils.listeners.interfaces.TrashListener
+import com.rober.papelerasvalencia.utils.listeners.interfaces.ICustomLocationListener
+
 
 class CustomLocationListener(
-    private val trashListener: TrashListener
+    private val customLocationListener: ICustomLocationListener
 ) : LocationListener {
 
     override fun onLocationChanged(location: Location?) {
@@ -14,7 +15,7 @@ class CustomLocationListener(
             return
         }
 
-        trashListener.updateCurrentLocation(location)
+        customLocationListener.updateCurrentLocation(location)
     }
 
     override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {

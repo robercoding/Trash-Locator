@@ -25,9 +25,7 @@ abstract class BaseFragment<VM : ViewModel>(view: Int) : Fragment(view) {
         detectOnBackPressed()
     }
 
-    open fun setupView() {
-
-    }
+    open fun setupView() {}
 
     fun hideKeyBoard() {
         val imm: InputMethodManager =
@@ -55,9 +53,5 @@ abstract class BaseFragment<VM : ViewModel>(view: Int) : Fragment(view) {
         } else {
             findNavController().popBackStack()
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
     }
 }
