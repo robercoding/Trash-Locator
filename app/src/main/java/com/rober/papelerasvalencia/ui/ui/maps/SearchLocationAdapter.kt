@@ -1,6 +1,7 @@
 package com.rober.papelerasvalencia.ui.ui.maps
 
 import android.location.Location
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -39,7 +40,8 @@ class SearchLocationAdapter(
     private fun bind(holder: SearchLocationViewHolder, position: Int) {
         holder.textRowAddress?.text = listAddressLocation[position].streetName
 
-        holder.containerRowAddress?.setOnClickListener {
+        holder.textRowAddress?.setOnClickListener {
+            Log.i("SeeClick", "Clicked on adapter text")
             val location = Location("")
             location.latitude = listAddressLocation[position].latitude
             location.longitude = listAddressLocation[position].longitude

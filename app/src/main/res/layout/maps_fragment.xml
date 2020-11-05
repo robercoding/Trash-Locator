@@ -17,8 +17,11 @@
         android:background="@color/blueLight2">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/containerToolbar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:focusable="true"
+            android:focusableInTouchMode="true">
 
             <ImageView
                 android:id="@+id/toolbarSandwich"
@@ -32,6 +35,13 @@
                 app:layout_constraintWidth_percent="0.1"
                 app:layout_constraintHeight_percent="0.55"
                 android:contentDescription="@string/toolbar_sandwich" />
+
+            <!--            <EditText-->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                app:layout_constraintStart_toStartOf="parent"-->
+            <!--                app:layout_constraintTop_toTopOf="parent"-->
+            <!--                android:visibility="visible"/>-->
 
             <EditText
                 android:id="@+id/ETsearchLocation"
@@ -66,7 +76,8 @@
         tools:listitem="@layout/row_addresslocation"
         tools:itemCount="5"
         android:elevation="3dp"
-        android:layoutAnimation="@anim/layout_animation" />
+        android:layoutAnimation="@anim/layout_animation"
+        android:overScrollMode="never" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/mapsContainer"
@@ -77,6 +88,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/appBarLayout" />
+
 
     <TextView
         android:id="@+id/textPermissionApp"

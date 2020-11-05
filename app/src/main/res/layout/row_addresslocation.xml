@@ -3,24 +3,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:id="@+id/rowContainer"
     android:background="@color/background">
 
-    <TextView
-        android:id="@+id/rowAddress"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:padding="10dp"
-        android:layout_marginStart="5dp"
-        android:text="@string/mock_text_short"
-        android:textColor="@color/primaryText"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:maxLines="2"
-        android:ellipsize="end" />
-
-
+        <TextView
+            android:id="@+id/rowAddress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:padding="10dp"
+            android:text="@string/mock_text_short"
+            android:textColor="@color/primaryText"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:background="?android:attr/selectableItemBackground" />
 </androidx.constraintlayout.widget.ConstraintLayout>

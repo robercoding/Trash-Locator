@@ -372,6 +372,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     }
 
     override fun onAddressLocationClickListener(location: Location) {
+        Log.i("SeeClick", "See action click on implemeneted")
         binding.recyclerLocation.hide()
         googleMap.moveCamera(
             CameraUpdateFactory.newLatLngZoom(
@@ -381,6 +382,9 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
                 ), 17f
             )
         )
+        binding.ETsearchLocation.clearFocus()
+        binding.containerToolbar.requestFocus()
+        hideKeyBoard()
     }
 
     override fun updateCurrentLocation(location: Location) {
