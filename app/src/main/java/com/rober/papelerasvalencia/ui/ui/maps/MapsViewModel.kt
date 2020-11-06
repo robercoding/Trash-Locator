@@ -55,16 +55,13 @@ class MapsViewModel : ViewModel() {
         if ((nameLocation == lastNameLocation) || nameLocation.isBlank()) {
             return
         }
-        Log.i("SeeNameLocation", nameLocation)
         lastNameLocation = nameLocation
 
         geoCoder = Geocoder(context)
 
         val addresses = geoCoder.getFromLocationName(nameLocation, 5)
-        Log.i("SeeQuantity", "${addresses.size}")
         val mutableListAddressesLocation = mutableListOf<AddressLocation>()
         for (address in addresses) {
-            Log.i("SeeAddress", "$address")
             val location = AddressLocation()
 
             val addressLine = address.getAddressLine(0)
@@ -73,9 +70,9 @@ class MapsViewModel : ViewModel() {
             location.location.latitude = address.latitude
             location.location.longitude = address.longitude
             location.localityName = if (address.locality == null) "" else address.locality
-            location.localityAdminAreaName = address.adminArea
+            location.localityAdminAreaName =
+                if (address.adminArea == null) "" else address.adminArea
 
-//            Log.i("SeeAddress", "Location = ${location}}")
             mutableListAddressesLocation.add(location)
         }
 
@@ -109,7 +106,6 @@ class MapsViewModel : ViewModel() {
 
         val address = geoCoder.getFromLocation(location.latitude, location.longitude, 1)[0]
 
-        Log.i("SeeASingleAddress", "${address}")
         val addressLocation = AddressLocation()
         addressLocation.localityName = address.locality
         addressLocation.localityAdminAreaName = address.adminArea
@@ -127,10 +123,6 @@ class MapsViewModel : ViewModel() {
 
         val mutableListTrashLocation = mutableListOf<TrashLocation>()
         for (address in addresses) {
-            Log.i(
-                "SeeAddress",
-                "Locality = ${address.locality}, PostalCode = ${address.postalCode} Sublocality= ${address.subLocality}"
-            )
             val trashLocation = TrashLocation()
             trashLocation.streetName = address.thoroughfare
             trashLocation.locality = address.locality
@@ -164,7 +156,7 @@ class MapsViewModel : ViewModel() {
         }
 
         if (!isStreetNameAvailable && !isFeatureNameAvailable) {
-            trashLocation.streetName = context.resources.getString(R.string.trash_no_information)
+            trashLocation.streetName = context.getStringResources(R.string.trash_no_information)
             trashLocation.feature = ""
             trashLocation.locality = ""
         }
@@ -180,8 +172,6 @@ class MapsViewModel : ViewModel() {
 //            _message.value = Event(message)
             return
         }
-
-        Log.i("SeeLayered", "Lets layer")
 
         val layer = GeoJsonLayer(googleMap, raw, context)
 
@@ -220,20 +210,14 @@ class MapsViewModel : ViewModel() {
 
     private fun getDataset(addressLocation: AddressLocation): Int {
         var raw = -1
-        Log.i(
-            "SeeTrashCluster",
-            "Getting trash cluster of locality = ${addressLocation.localityName} and localityAdmin = ${addressLocation.localityAdminAreaName}"
-        )
+
         //Try to find the dataset in file Object LocalitiesDataset
         loopLocalityDataset@ for (localityDataset in LocalitesDataset.listLocalityDataset) {
-            Log.i("SeeTrashCluster", "Enter loop")
-            Log.i("SeeLocalityDataset", "Localiy name ${localityDataset.localityName}")
             //Some localities are with "" so they directly go to check the admin area
             if (addressLocation.localityName != "") {
                 if (localityDataset.localityName != addressLocation.localityName) continue@loopLocalityDataset
             }
 
-            Log.i("SeeLocalityDataset", "Pass first")
             /*
              * Split by comma because admin areas can have
              * different names example = "Canary Islands" == "Canarias"
@@ -241,11 +225,9 @@ class MapsViewModel : ViewModel() {
             val adminAreas = localityDataset.localityAdmin.split(',')
             loopAdminArea@ for (adminArea in adminAreas) {
                 if (adminArea == addressLocation.localityAdminAreaName) {
-                    Log.i("SeeLocalityDataset", "Admin area is equal!! localiydataset ${adminArea}")
                     raw = localityDataset.dataset
                     break@loopLocalityDataset
                 }
-                Log.i("SeeLocalityDataset", "Not equal :( ${adminArea}")
             }
         }
 
