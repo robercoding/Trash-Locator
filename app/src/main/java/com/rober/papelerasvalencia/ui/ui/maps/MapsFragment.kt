@@ -76,12 +76,14 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         super.onCreate(savedInstanceState)
         locationManager =
             requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+//        initializeMaps()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        subscribeObservers()
+        Log.i("SeeOnViewCreated", "OnViewCreated")
         initializeMaps()
+        subscribeObservers()
         checkLocationPermission()
         checkIfLocationGPSIsOn()
     }
@@ -96,7 +98,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
-        Log.i("MapDeviceLocation", "onMapReady")
+        Log.i("SeeReady", "onMapReady")
         this.googleMap = googleMap
         this.googleMap.mapType = GoogleMap.MAP_TYPE_NORMAL
 
@@ -109,19 +111,10 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     }
 
     private fun updateLocationUI() {
-        if (!this::googleMap.isInitialized) {
-            Log.i(TAG, "Map is not initialized")
-            return
-        }
-        Log.i(TAG, "Map is initialized")
-
+        if (!isGoogleMapInitialized()) return
 
         val isLocationOk = checkLocationPermissionAndSettings()
-
-        if (!isLocationOk) {
-            return
-        }
-
+        if (!isLocationOk) return
 
         Log.i(TAG, "LocationPermission ${locationPermissionGranted} && gps = ${gpsEnabled}")
 
@@ -275,6 +268,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
 
     private fun setCluster(listTrash: List<Trash>) {
+        Log.i("SeeReady", "Cluster is already searching!")
         if (this::clusterManager.isInitialized) {
             //Clear to don't duplicate the cluster that was loaded before
             googleMap.clear()
@@ -353,23 +347,26 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
     private fun subscribeObservers() {
         viewModel.listTrash.observe(viewLifecycleOwner) { listTrash ->
+            if (!isGoogleMapInitialized()) return@observe
             setCluster(listTrash)
         }
 
         viewModel.listAddressesLocation.observe(viewLifecycleOwner) { listAddressesLocation ->
             if (listAddressesLocation.isNotEmpty()) {
+                if (!isGoogleMapInitialized()) return@observe
                 setSearchAdapter(listAddressesLocation)
             }
         }
 
         viewModel.addressLocation.observe(viewLifecycleOwner) { addressLocation ->
             Log.i("SeeBackPressed", "Location changed!")
+            if (!isGoogleMapInitialized()) return@observe
             moveCamera(addressLocation)
         }
 
         viewModel.onBackPressed.observe(viewLifecycleOwner) { onBackPressed ->
             Log.i("SeeBackPressed", "Changed boolean to ${onBackPressed}")
-            if (!onBackPressed) {
+            if (!onBackPressed || !isGoogleMapInitialized()) {
                 return@observe
             }
 
@@ -392,6 +389,13 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
                 IntentFilter("android.location.PROVIDERS_CHANGED")
             )
         }
+    }
+
+    private fun isGoogleMapInitialized(): Boolean {
+        if (!this::googleMap.isInitialized) {
+            return false
+        }
+        return true
     }
 
     private fun clearFocusSearchToolbar() {
@@ -444,8 +448,6 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         currentLocation = currentLocationModified
 
         viewModel.setUpdateLocationByLocation(currentLocation, requireContext())
-        if (!this::googleMap.isInitialized)
-            return
     }
 
     override fun requestLocationUpdate() {

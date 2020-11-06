@@ -46,8 +46,9 @@ class MapsViewModel : ViewModel() {
         _onBackPressed.value = false
     }
 
-    var listLocations = mutableListOf<AddressLocation>()
-    var lastNameLocation = ""
+    private lateinit var googleMap: GoogleMap
+    private var listLocations = mutableListOf<AddressLocation>()
+    private var lastNameLocation = ""
 
     //Get list addresses of addresses by name location and set on MutableLiveData
     fun getListAddressesByName(nameLocation: String, context: Context) {
@@ -270,5 +271,13 @@ class MapsViewModel : ViewModel() {
         } else {
             _onBackPressed.value = true
         }
+    }
+
+    fun setGoogleMap(googleMap: GoogleMap) {
+        this.googleMap = googleMap
+    }
+
+    fun getGoogleMap(): GoogleMap {
+        return googleMap
     }
 }
