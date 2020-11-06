@@ -48,7 +48,7 @@ import org.threeten.bp.Instant
 
 class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapReadyCallback,
     ICustomLocationListener, TextListener, RecyclerAddressLocationClickListener,
-    GoogleMap.OnCameraMoveStartedListener {
+    GoogleMap.OnCameraMoveStartedListener, GoogleMap.OnMyLocationButtonClickListener {
 
     private val TAG = "MapsFragment"
 
@@ -77,7 +77,6 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     private var onRestored = false
     private var listSavedTrash =
         listOf<Trash>() //Only useful when change rotation and restore trash
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -113,6 +112,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     override fun onMapReady(googleMap: GoogleMap) {
         this.googleMap = googleMap
         this.googleMap.mapType = GoogleMap.MAP_TYPE_NORMAL
+        googleMap.setOnMyLocationButtonClickListener(this)
 
         this.googleMap.setOnCameraMoveStartedListener(this)
         locationListener =
@@ -219,7 +219,6 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         }
     }
 
-
     private fun checkLocationPermission() {
         if (ContextCompat.checkSelfPermission(
                 requireContext(),
@@ -230,7 +229,6 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
             locationPermissionGranted = true
         }
     }
-
 
     private fun requestLocationPermissions() {
         ActivityCompat.requestPermissions(
@@ -287,7 +285,6 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
             .show()
     }
 
-
     private fun setCluster(listTrash: List<Trash>) {
         if (this::clusterManager.isInitialized) {
             //Clear to don't duplicate the cluster that was loaded before
@@ -328,19 +325,25 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     }
 
     private fun moveCamera(addressLocation: AddressLocation) {
-        //Hide when user search in toolbar
-
-        currentAddressLocation = addressLocation
+        /*
+         * Zoom doesnt work!
+         * To make animate Camera work we have to add the lapse 2500
+         * To don't lag and provide a good UI experience I look for trash after finishing
+         */
         googleMap.animateCamera(
             CameraUpdateFactory.newLatLngZoom(
                 LatLng(
-                    currentAddressLocation.location.latitude,
-                    currentAddressLocation.location.longitude
+                    addressLocation.location.latitude,
+                    addressLocation.location.longitude
                 ), 17f
-            )
-        )
+            ), 2500, object : GoogleMap.CancelableCallback {
+                override fun onFinish() {
+                    viewModel.getTrashCluster(googleMap, addressLocation, requireContext())
+                }
 
-        viewModel.getTrashCluster(googleMap, addressLocation, requireContext())
+                override fun onCancel() {}
+            }
+        )
     }
 
     private fun setSearchAdapter(listAddressLocation: List<AddressLocation>) {
@@ -380,7 +383,6 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
         viewModel.addressLocation.observe(viewLifecycleOwner) { addressLocation ->
             if (!isGoogleMapInitialized()) return@observe
-            currentAddressLocation = addressLocation
             moveCamera(addressLocation)
         }
 
@@ -459,11 +461,15 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     }
 
     override fun updateCurrentLocation(location: Location) {
-        val currentAddressLocationModified = Location("")
-        currentAddressLocationModified.longitude = -16.251763
-        currentAddressLocationModified.latitude = 28.463636
+        //Location modified for testing, emulator points out to google headquarters
+        //val currentAddressLocationModified = Location("")
+        //currentAddressLocationModified.longitude = -16.251763
+        //currentAddressLocationModified.latitude = 28.463636
 
-        viewModel.setUpdateLocationByLocation(currentAddressLocationModified, requireContext())
+        //Everytime we get their device location we save currentAdressLocation
+        currentAddressLocation = AddressLocation()
+        currentAddressLocation.location = location
+        viewModel.setUpdateLocationByLocation(location, requireContext())
     }
 
     override fun requestLocationUpdate() {
@@ -477,6 +483,11 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
     override fun onCameraMoveStarted(p0: Int) {
         clearFocusSearchToolbar()
+    }
+
+    override fun onMyLocationButtonClick(): Boolean {
+        getDeviceLocation()
+        return true
     }
 
     override fun onRequestPermissionsResult(
