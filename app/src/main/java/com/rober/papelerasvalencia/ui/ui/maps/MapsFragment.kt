@@ -69,6 +69,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     private var lastTimeLocationRequested: Long = -1
 
     private lateinit var dialogRequestGps: AlertDialog
+    private lateinit var textWatcherListener: TextWatcherListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -314,6 +315,8 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     }
 
     private fun moveCamera(addressLocation: AddressLocation) {
+        //Hide when user search in toolbar
+
         currentLocation = addressLocation.location
         googleMap.animateCamera(
             CameraUpdateFactory.newLatLngZoom(
@@ -328,6 +331,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     }
 
     private fun setSearchAdapter(listAddressLocation: List<AddressLocation>) {
+        Log.i("SeeRecyclerVisiblity", "Lets adapter this")
         val searchAdapter = SearchLocationAdapter(listAddressLocation, this)
 
         binding.recyclerLocation.apply {
@@ -389,7 +393,8 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
             (requireActivity() as MapsActivity).openDrawer()
         }
 
-        binding.ETsearchLocation.addTextChangedListener(TextWatcherListener(this))
+        textWatcherListener = TextWatcherListener(this)
+        binding.ETsearchLocation.addTextChangedListener(textWatcherListener)
     }
 
     override fun detectOnBackPressed() {
@@ -408,13 +413,18 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
     override fun onAddressLocationClickListener(addressLocation: AddressLocation) {
         Log.i("SeeClick", "See action click on implemeneted")
-        binding.recyclerLocation.hide()
+
+        //Deactive to don't trigger textWatcher listener to don't trigger onUserStopTyping
+        textWatcherListener.setIsSettingText(true)
         viewModel.setUpdateLocationByAddressLocation(addressLocation)
 
         binding.ETsearchLocation.setText(addressLocation.streetName)
         binding.ETsearchLocation.clearFocus()
         binding.containerToolbar.requestFocus()
+        binding.recyclerLocation.hide()
         hideKeyBoard()
+
+        textWatcherListener.setIsSettingText(false)
     }
 
     override fun updateCurrentLocation(location: Location) {

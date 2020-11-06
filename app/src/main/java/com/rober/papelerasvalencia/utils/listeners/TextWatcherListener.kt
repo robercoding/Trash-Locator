@@ -8,6 +8,8 @@ import java.util.*
 class TextWatcherListener(val textListener: TextListener) : TextWatcher {
 
     private var timer: Timer? = null
+    private var isSettingText =
+        false //Flag that checks if text being set programatically so it don't trigger textwatcher listener
 
     override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
 
@@ -18,6 +20,9 @@ class TextWatcherListener(val textListener: TextListener) : TextWatcher {
     }
 
     override fun afterTextChanged(s: Editable?) {
+        if (isSettingText) {
+            return
+        }
         timer = Timer()
 
         timer?.schedule(object : TimerTask() {
@@ -39,5 +44,9 @@ class TextWatcherListener(val textListener: TextListener) : TextWatcher {
                 return super.scheduledExecutionTime()
             }
         }, 600)
+    }
+
+    fun setIsSettingText(settingText: Boolean) {
+        isSettingText = settingText
     }
 }

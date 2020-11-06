@@ -166,10 +166,17 @@ class MapsViewModel : ViewModel() {
     fun getTrashCluster(googleMap: GoogleMap, addressLocation: AddressLocation, context: Context) {
         var raw = -1
 
+        Log.i(
+            "SeeTrashCluster",
+            "Getting trash cluster of locality = ${addressLocation.localityName} and localityAdmin = ${addressLocation.localityAdminAreaName}"
+        )
         //Try to find the dataset in file Object LocalitiesDataset
         loopLocalityDataset@ for (localityDataset in LocalitesDataset.listLocalityDataset) {
-            if (localityDataset.localityName != addressLocation.localityName) return
+            Log.i("SeeTrashCluster", "Enter loop")
+            Log.i("SeeLocalityDataset", "Localiy name ${localityDataset.localityName}")
+            if (localityDataset.localityName != addressLocation.localityName) continue@loopLocalityDataset
 
+            Log.i("SeeLocalityDataset", "Pass first")
             /*
              * Split by comma because admin areas can have
              * different names example = "Canary Islands" == "Canarias"
@@ -177,17 +184,22 @@ class MapsViewModel : ViewModel() {
             val adminAreas = localityDataset.localityAdmin.split(',')
             loopAdminArea@ for (adminArea in adminAreas) {
                 if (adminArea == addressLocation.localityAdminAreaName) {
+                    Log.i("SeeLocalityDataset", "Admin area is equal!! localiydataset ${adminArea}")
                     raw = localityDataset.dataset
                     break@loopLocalityDataset
                 }
+                Log.i("SeeLocalityDataset", "Not equal :( ${adminArea}")
             }
         }
-
+        Log.i("SeeLayered", "Lets check raw ")
         if (raw == -1) {
+            Log.i("SeeLayered", "Return :(")
             return
         }
 
-        val layer = GeoJsonLayer(googleMap, R.raw.trash_santa_cruz_de_tenerife, context)
+        Log.i("SeeLayered", "Lets layer")
+
+        val layer = GeoJsonLayer(googleMap, raw, context)
 
         val places = mutableListOf<Trash>()
         for (feature in layer.features) {
