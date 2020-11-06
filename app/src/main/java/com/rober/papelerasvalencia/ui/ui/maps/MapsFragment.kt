@@ -46,7 +46,8 @@ import com.rober.papelerasvalencia.utils.listeners.interfaces.TextListener
 import org.threeten.bp.Instant
 
 class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapReadyCallback,
-    ICustomLocationListener, TextListener, RecyclerAddressLocationClickListener {
+    ICustomLocationListener, TextListener, RecyclerAddressLocationClickListener,
+    GoogleMap.OnCameraMoveStartedListener {
 
     private val TAG = "MapsFragment"
 
@@ -99,6 +100,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         this.googleMap = googleMap
         this.googleMap.mapType = GoogleMap.MAP_TYPE_NORMAL
 
+        this.googleMap.setOnCameraMoveStartedListener(this)
         locationListener =
             CustomLocationListener(this)
 //
@@ -373,6 +375,12 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
             defaultOnBackPressed()
         }
+
+        viewModel.message.observe(viewLifecycleOwner) { eventMessage ->
+            eventMessage.getContentIfNotHandled()?.let {
+                displayToast(it)
+            }
+        }
     }
 
     private fun initializeReceivers() {
@@ -384,6 +392,13 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
                 IntentFilter("android.location.PROVIDERS_CHANGED")
             )
         }
+    }
+
+    private fun clearFocusSearchToolbar() {
+        binding.ETsearchLocation.clearFocus()
+        binding.containerToolbar.requestFocus()
+        binding.recyclerLocation.hide()
+        hideKeyBoard()
     }
 
     override fun setupListeners() {
@@ -419,11 +434,6 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         viewModel.setUpdateLocationByAddressLocation(addressLocation)
 
         binding.ETsearchLocation.setText(addressLocation.streetName)
-        binding.ETsearchLocation.clearFocus()
-        binding.containerToolbar.requestFocus()
-        binding.recyclerLocation.hide()
-        hideKeyBoard()
-
         textWatcherListener.setIsSettingText(false)
     }
 
@@ -445,6 +455,11 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
         lastTimeLocationRequested = Instant.now().epochSecond
         getDeviceLocation()
+    }
+
+    override fun onCameraMoveStarted(p0: Int) {
+        Log.i("SeeOnCameraMove", "Started!")
+        clearFocusSearchToolbar()
     }
 
     override fun onRequestPermissionsResult(

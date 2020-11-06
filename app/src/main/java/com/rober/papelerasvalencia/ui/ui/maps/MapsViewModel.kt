@@ -14,27 +14,33 @@ import com.rober.papelerasvalencia.R
 import com.rober.papelerasvalencia.models.AddressLocation
 import com.rober.papelerasvalencia.models.Trash
 import com.rober.papelerasvalencia.models.TrashLocation
+import com.rober.papelerasvalencia.utils.Event
 import com.rober.papelerasvalencia.utils.LocalitesDataset
 import com.rober.papelerasvalencia.utils.Utils
+import com.rober.papelerasvalencia.utils.getStringResources
 
 class MapsViewModel : ViewModel() {
 
     lateinit var geoCoder: Geocoder
 
     //Set List of Trash Item for cluster manager
-    private val _listTrash: MutableLiveData<List<Trash>> = MutableLiveData()
+    private val _listTrash = MutableLiveData<List<Trash>>()
     val listTrash: LiveData<List<Trash>> get() = _listTrash
 
     //Set list of addresses location for search toolbar
-    private val _listAddressesLocation: MutableLiveData<List<AddressLocation>> = MutableLiveData()
+    private val _listAddressesLocation = MutableLiveData<List<AddressLocation>>()
     val listAddressesLocation: LiveData<List<AddressLocation>> get() = _listAddressesLocation
 
     //Observe location to move camera
-    private val _addressLocation: MutableLiveData<AddressLocation> = MutableLiveData()
+    private val _addressLocation = MutableLiveData<AddressLocation>()
     val addressLocation: LiveData<AddressLocation> get() = _addressLocation
 
-    private val _onBackPressed: MutableLiveData<Boolean> = MutableLiveData()
+    private val _onBackPressed = MutableLiveData<Boolean>()
     val onBackPressed: LiveData<Boolean> get() = _onBackPressed
+
+    private val _message = MutableLiveData<Event<String>>()
+    val message: LiveData<Event<String>>
+        get() = _message
 
     init {
         _onBackPressed.value = false
@@ -54,6 +60,7 @@ class MapsViewModel : ViewModel() {
         geoCoder = Geocoder(context)
 
         val addresses = geoCoder.getFromLocationName(nameLocation, 5)
+        Log.i("SeeQuantity", "${addresses.size}")
         val mutableListAddressesLocation = mutableListOf<AddressLocation>()
         for (address in addresses) {
             Log.i("SeeAddress", "$address")
@@ -64,7 +71,7 @@ class MapsViewModel : ViewModel() {
             location.streetName = addressLine
             location.location.latitude = address.latitude
             location.location.longitude = address.longitude
-            location.localityName = address.locality
+            location.localityName = if (address.locality == null) "" else address.locality
             location.localityAdminAreaName = address.adminArea
 
 //            Log.i("SeeAddress", "Location = ${location}}")
@@ -164,36 +171,12 @@ class MapsViewModel : ViewModel() {
     }
 
     fun getTrashCluster(googleMap: GoogleMap, addressLocation: AddressLocation, context: Context) {
-        var raw = -1
+        val raw = getDataset(addressLocation)
 
-        Log.i(
-            "SeeTrashCluster",
-            "Getting trash cluster of locality = ${addressLocation.localityName} and localityAdmin = ${addressLocation.localityAdminAreaName}"
-        )
-        //Try to find the dataset in file Object LocalitiesDataset
-        loopLocalityDataset@ for (localityDataset in LocalitesDataset.listLocalityDataset) {
-            Log.i("SeeTrashCluster", "Enter loop")
-            Log.i("SeeLocalityDataset", "Localiy name ${localityDataset.localityName}")
-            if (localityDataset.localityName != addressLocation.localityName) continue@loopLocalityDataset
-
-            Log.i("SeeLocalityDataset", "Pass first")
-            /*
-             * Split by comma because admin areas can have
-             * different names example = "Canary Islands" == "Canarias"
-             */
-            val adminAreas = localityDataset.localityAdmin.split(',')
-            loopAdminArea@ for (adminArea in adminAreas) {
-                if (adminArea == addressLocation.localityAdminAreaName) {
-                    Log.i("SeeLocalityDataset", "Admin area is equal!! localiydataset ${adminArea}")
-                    raw = localityDataset.dataset
-                    break@loopLocalityDataset
-                }
-                Log.i("SeeLocalityDataset", "Not equal :( ${adminArea}")
-            }
-        }
-        Log.i("SeeLayered", "Lets check raw ")
         if (raw == -1) {
-            Log.i("SeeLayered", "Return :(")
+            _message.value = Event(context.getStringResources(R.string.dataset_not_found))
+//            val message = context.resources.getString(R.string.dataset_not_found)
+//            _message.value = Event(message)
             return
         }
 
@@ -231,6 +214,41 @@ class MapsViewModel : ViewModel() {
         }
 
         _listTrash.value = places
+    }
+
+
+    private fun getDataset(addressLocation: AddressLocation): Int {
+        var raw = -1
+        Log.i(
+            "SeeTrashCluster",
+            "Getting trash cluster of locality = ${addressLocation.localityName} and localityAdmin = ${addressLocation.localityAdminAreaName}"
+        )
+        //Try to find the dataset in file Object LocalitiesDataset
+        loopLocalityDataset@ for (localityDataset in LocalitesDataset.listLocalityDataset) {
+            Log.i("SeeTrashCluster", "Enter loop")
+            Log.i("SeeLocalityDataset", "Localiy name ${localityDataset.localityName}")
+            //Some localities are with "" so they directly go to check the admin area
+            if (addressLocation.localityName != "") {
+                if (localityDataset.localityName != addressLocation.localityName) continue@loopLocalityDataset
+            }
+
+            Log.i("SeeLocalityDataset", "Pass first")
+            /*
+             * Split by comma because admin areas can have
+             * different names example = "Canary Islands" == "Canarias"
+             */
+            val adminAreas = localityDataset.localityAdmin.split(',')
+            loopAdminArea@ for (adminArea in adminAreas) {
+                if (adminArea == addressLocation.localityAdminAreaName) {
+                    Log.i("SeeLocalityDataset", "Admin area is equal!! localiydataset ${adminArea}")
+                    raw = localityDataset.dataset
+                    break@loopLocalityDataset
+                }
+                Log.i("SeeLocalityDataset", "Not equal :( ${adminArea}")
+            }
+        }
+
+        return raw
     }
 
     fun setUpdateLocationByAddressLocation(addressLocation: AddressLocation) {
