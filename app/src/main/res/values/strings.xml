@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Papeleras Valencia</string>
+    <string name="app_name">Trash Locator</string>
     <string name="title_activity_maps">Map</string>
 
     <string name="location_works">Location is back!</string>
