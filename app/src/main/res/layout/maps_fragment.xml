@@ -99,10 +99,12 @@
         android:gravity="center"
         android:visibility="gone"
         android:textColor="@color/white"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:elevation="3dp"/>
+        android:elevation="3dp"
+        android:padding="10dp" />
 
     <TextView
         android:id="@+id/textLocationSettings"
@@ -113,9 +115,11 @@
         android:text="@string/location_works"
         android:visibility="gone"
         android:textColor="@color/white"
+        android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@id/textPermissionApp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:elevation="2dp"/>
+        android:elevation="2dp"
+        android:padding="10dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

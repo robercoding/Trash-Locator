@@ -15,10 +15,15 @@
     <string name="trash_no_information">"There's no information about this trash"</string>
     <string name="dataset_not_found">"Sorry, your locality haven't provided any information about the trash location"</string>
 
-
     <!--    Content Description-->
     <string name="toolbar_sandwich">Open the drawer</string>
 
     <string name="mock_text_short">Mock test, just testing</string>
     <string name="mock_text_long">Mock test, just testing, hope you like this, well, it just a mock to test if everything is right, hope is as long as the developer(me) needs for its mock text!</string>
+
+    <!--    Menu items names    -->
+    <string name="drawer_menu_maps">Maps</string>
+    <string name="drawer_menu_trash_stats">Trash stats</string>
+    <string name="drawer_menu_errors">Errors</string>
+    <string name="drawer_menu_about">About</string>
 </resources>

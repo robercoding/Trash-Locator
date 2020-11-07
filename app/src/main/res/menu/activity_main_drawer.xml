@@ -2,34 +2,29 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <group
-        android:id="@+id/top"
+        android:id="@+id/groupFunctionalities"
         android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_map"
+            android:id="@+id/mapsFragment"
             android:icon="@drawable/ic_garbage"
-            android:title="Map" />
+            android:title="@string/drawer_menu_maps" />
+        <item
+            android:id="@+id/trashStatsFragment"
+            android:icon="@drawable/ic_garbage"
+            android:title="@string/drawer_menu_trash_stats" />
     </group>
 
     <group
-        android:id="@+id/middle"
+        android:id="@+id/groupInformation"
         android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_trash_stats"
+            android:id="@+id/errorsFragment"
             android:icon="@drawable/ic_garbage"
-            android:title="Trash stats" />
-    </group>
-
-    <group
-        android:id="@+id/bottom"
-        android:checkableBehavior="single">
+            android:title="@string/drawer_menu_errors" />
         <item
-            android:id="@+id/nav_errors"
+            android:id="@+id/aboutFragment"
             android:icon="@drawable/ic_garbage"
-            android:title="Errors" />
-        <item
-            android:id="@+id/nav_about_us"
-            android:icon="@drawable/ic_garbage"
-            android:title="About Us" />
+            android:title="@string/drawer_menu_about" />
     </group>
 
 </menu>

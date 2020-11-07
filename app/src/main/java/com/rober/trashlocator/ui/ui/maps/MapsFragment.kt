@@ -435,6 +435,11 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
         textWatcherListener = TextWatcherListener(this)
         binding.ETsearchLocation.addTextChangedListener(textWatcherListener)
+        binding.ETsearchLocation.setOnFocusChangeListener { v, hasFocus ->
+            if (hasFocus) {
+                binding.recyclerLocation.show()
+            }
+        }
     }
 
     override fun detectOnBackPressed() {
@@ -507,7 +512,9 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putParcelable(Constants.CURRENT_ADDRESS_LOCATION, currentAddressLocation)
+        if (this::currentAddressLocation.isInitialized) {
+            outState.putParcelable(Constants.CURRENT_ADDRESS_LOCATION, currentAddressLocation)
+        }
         outState.putParcelable(Constants.GOOGLE_MAP_CAMERA_POSITION, googleMap.cameraPosition)
     }
 
