@@ -24,6 +24,6 @@
     <!--    Menu items names    -->
     <string name="drawer_menu_maps">Maps</string>
     <string name="drawer_menu_trash_stats">Trash stats</string>
-    <string name="drawer_menu_errors">Errors</string>
-    <string name="drawer_menu_about">About</string>
+    <string name="drawer_menu_errors">Notify errors</string>
+    <string name="drawer_menu_about">About app</string>
 </resources>

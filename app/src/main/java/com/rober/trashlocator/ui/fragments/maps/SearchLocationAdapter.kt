@@ -1,4 +1,4 @@
-package com.rober.trashlocator.ui.ui.maps
+package com.rober.trashlocator.ui.fragments.maps
 
 import android.view.LayoutInflater
 import android.view.View

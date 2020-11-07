@@ -7,7 +7,22 @@
 
     <fragment
         android:id="@+id/mapsFragment"
-        android:name="com.rober.trashlocator.ui.ui.maps.MapsFragment"
+        android:name="com.rober.trashlocator.ui.fragments.maps.MapsFragment"
         android:label="maps_fragment"
         tools:layout="@layout/maps_fragment" />
+    <fragment
+        android:id="@+id/trashStatsFragment"
+        android:name="com.rober.trashlocator.ui.fragments.trashstats.TrashStatsFragment"
+        android:label="trash_stats_fragment"
+        tools:layout="@layout/trash_stats_fragment" />
+    <fragment
+        android:id="@+id/aboutAppFragment"
+        android:name="com.rober.trashlocator.ui.fragments.about.AboutAppFragment"
+        android:label="about_app_fragment"
+        tools:layout="@layout/about_app_fragment" />
+    <fragment
+        android:id="@+id/notifyErrorsFragment"
+        android:name="com.rober.trashlocator.ui.fragments.error.NotifyErrorsFragment"
+        android:label="notify_errors_fragment"
+        tools:layout="@layout/notify_errors_fragment" />
 </navigation>

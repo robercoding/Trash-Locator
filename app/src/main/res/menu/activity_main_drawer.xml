@@ -18,11 +18,11 @@
         android:id="@+id/groupInformation"
         android:checkableBehavior="single">
         <item
-            android:id="@+id/errorsFragment"
+            android:id="@+id/notifyErrorsFragment"
             android:icon="@drawable/ic_garbage"
             android:title="@string/drawer_menu_errors" />
         <item
-            android:id="@+id/aboutFragment"
+            android:id="@+id/aboutAppFragment"
             android:icon="@drawable/ic_garbage"
             android:title="@string/drawer_menu_about" />
     </group>
