@@ -7,4 +7,5 @@ object Destinations {
     const val trashStatsFragment = R.id.trashStatsFragment
     const val aboutAppFragment = R.id.aboutAppFragment
     const val notifyErrorsFragment = R.id.notifyErrorsFragment
+    const val settingsFragment = R.id.settingsFragment
 }

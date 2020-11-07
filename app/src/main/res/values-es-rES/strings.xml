@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Trash Locator</string>
+    <string name="title_activity_maps">Map</string>
+
+    <string name="location_works">La localicación GPS está conectado de vuelta!</string>
+    <string name="location_error">El GPS se encuentra desconectado :(</string>
+
+    <string name="navigation_drawer_open">Drawer abierto</string>
+    <string name="navigation_drawer_close">Drawer cerrado"</string>
+
+    <string name="search_location_hint">Buscar un lugar</string>
+
+    <!--    Errors message    -->
+    <string name="location_permission_error">No tenemos permisos para obtener tu actual ubicación, así que no podemos ayudarte a encontrar las papeleras más cercas de manera automática :(</string>
+    <string name="trash_no_information">No hay información de esta papelera</string>
+    <string name="dataset_not_found">Lo siento, en tu ciudad no han dado información sobre la ubicación de las papeleras</string>
+
+    <!--    Content Description-->
+    <string name="toolbar_sandwich">Abre el drawer</string>
+
+    <string name="mock_text_short">Mock test, just testing</string>
+    <string name="mock_text_long">Mock test, just testing, hope you like this, well, it just a mock to test if everything is right, hope is as long as the developer(me) needs for its mock text!</string>
+
+    <!--    Menu items names    -->
+    <string name="drawer_menu_maps">Maps</string>
+    <string name="drawer_menu_trash_stats">Estadisticas</string>
+    <string name="drawer_menu_errors">Notificar error</string>
+    <string name="drawer_menu_about">Sobre la app</string>
+
+    <!--    SettingsFragment    -->
+    <string-array name="list_languages">
+        <item>Inglés</item>
+        <item>Español</item>
+    </string-array>
+</resources>

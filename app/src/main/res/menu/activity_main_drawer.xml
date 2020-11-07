@@ -27,4 +27,14 @@
             android:title="@string/drawer_menu_about" />
     </group>
 
+    <group
+        android:id="@+id/groupSettings"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/settingsFragment"
+            android:icon="@drawable/ic_garbage"
+            android:title="@string/drawer_menu_about" />
+
+    </group>
+
 </menu>

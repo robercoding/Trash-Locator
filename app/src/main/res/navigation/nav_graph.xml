@@ -25,4 +25,9 @@
         android:name="com.rober.trashlocator.ui.fragments.error.NotifyErrorsFragment"
         android:label="notify_errors_fragment"
         tools:layout="@layout/notify_errors_fragment" />
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.rober.trashlocator.ui.fragments.settings.SettingsFragment"
+        android:label="settings_fragment"
+        tools:layout="@layout/settings_fragment" />
 </navigation>

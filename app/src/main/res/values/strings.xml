@@ -24,6 +24,12 @@
     <!--    Menu items names    -->
     <string name="drawer_menu_maps">Maps</string>
     <string name="drawer_menu_trash_stats">Trash stats</string>
-    <string name="drawer_menu_errors">Notify errors</string>
+    <string name="drawer_menu_errors">Notify error</string>
     <string name="drawer_menu_about">About app</string>
+
+    <!--    SettingsFragment    -->
+    <string-array name="list_languages">
+        <item>English</item>
+        <item>Spanish</item>
+    </string-array>
 </resources>

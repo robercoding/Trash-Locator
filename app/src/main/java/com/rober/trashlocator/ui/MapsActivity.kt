@@ -104,6 +104,11 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         closeDrawer()
     }
 
+    private fun navigateToSettings() {
+        navController.navigate(Destinations.settingsFragment)
+        closeDrawer()
+    }
+
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
         if (id == currentDestinationId) {
@@ -117,6 +122,7 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             Destinations.trashStatsFragment -> navigateToTrashStats()
             Destinations.notifyErrorsFragment -> navigateToNotifyErrors()
             Destinations.aboutAppFragment -> navigateToAbout()
+            Destinations.settingsFragment -> navigateToSettings()
         }
         return false
     }
