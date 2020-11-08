@@ -26,8 +26,12 @@
     <string name="drawer_menu_trash_stats">Trash stats</string>
     <string name="drawer_menu_errors">Notify error</string>
     <string name="drawer_menu_about">About app</string>
+    <string name="drawer_menu_settings">Settings</string>
+
 
     <!--    SettingsFragment    -->
+    <string name="settings_languages">Language</string>
+    <string name="settings_dark_theme">Enable Dark Theme</string>
     <string-array name="list_languages">
         <item>English</item>
         <item>Spanish</item>

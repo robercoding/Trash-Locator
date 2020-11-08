@@ -27,8 +27,11 @@
     <string name="drawer_menu_trash_stats">Estadisticas</string>
     <string name="drawer_menu_errors">Notificar error</string>
     <string name="drawer_menu_about">Sobre la app</string>
+    <string name="drawer_menu_settings">Configuración</string>
 
     <!--    SettingsFragment    -->
+    <string name="settings_languages">Idiomas</string>
+    <string name="settings_dark_theme">Modo oscuro</string>
     <string-array name="list_languages">
         <item>Inglés</item>
         <item>Español</item>

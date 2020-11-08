@@ -39,7 +39,8 @@
 
         <activity
             android:name="com.rober.trashlocator.ui.MapsActivity"
-            android:label="@string/title_activity_maps">
+            android:label="@string/title_activity_maps"
+            android:configChanges="locale">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -33,7 +33,7 @@
         <item
             android:id="@+id/settingsFragment"
             android:icon="@drawable/ic_garbage"
-            android:title="@string/drawer_menu_about" />
+            android:title="@string/drawer_menu_settings" />
 
     </group>
 

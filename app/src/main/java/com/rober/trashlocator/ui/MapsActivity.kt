@@ -1,6 +1,10 @@
 package com.rober.trashlocator.ui
 
+import android.content.Context
+import android.content.res.Configuration
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -14,14 +18,28 @@ import com.rober.trashlocator.databinding.ActivityMapsBinding
 import com.rober.trashlocator.utils.Destinations
 import com.rober.trashlocator.utils.closeDrawer
 import com.rober.trashlocator.utils.openDrawer
+import java.util.*
 
 class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+
+    private val TAG = "MainActivity"
 
     private lateinit var binding: ActivityMapsBinding
     lateinit var drawer: DrawerLayout
     private lateinit var navigationView: NavigationView
     private lateinit var navController: NavController
     private var currentDestinationId = -1
+
+    override fun attachBaseContext(newBase: Context?) {
+        val lang = "en" // your language or load from SharedPref
+
+        val locale = Locale(lang)
+        val config = Configuration(newBase!!.resources.configuration)
+        Locale.setDefault(locale)
+        config.setLocale(locale)
+        val base = newBase.createConfigurationContext(config)
+        super.attachBaseContext(base)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,7 +67,6 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 //            }
 //        }
     }
-
 
     private fun setupDrawer() {
         drawer = binding.drawerLayout
@@ -133,5 +150,16 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         } else {
             super.onBackPressed()
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        //Remove getLocaleCompat
+        Log.i("SeeLocale", "Actual Language: " + resources.configuration.getLocaleCompat())
+    }
+
+    @Suppress("DEPRECATION")
+    private fun Configuration.getLocaleCompat(): Locale {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) locales.get(0) else locale
     }
 }

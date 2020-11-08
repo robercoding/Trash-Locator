@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    app:iconSpaceReserved="false">
+
+    <SwitchPreferenceCompat
+        android:key="switch_theme"
+        android:title="@string/settings_dark_theme" />
 
     <ListPreference
-        app:key="list_language"
-        android:title="Select language"
-        app:entries="@string/drawer_menu_about" />
-
+        android:key="list_language"
+        android:title="@string/settings_languages" />
 
 </PreferenceScreen>

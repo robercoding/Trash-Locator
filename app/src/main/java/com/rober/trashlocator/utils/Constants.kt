@@ -8,4 +8,5 @@ object Constants {
     const val CURRENT_ADDRESS_LOCATION = "currentAddressLocation"
 
     const val KEY_LIST_LANGUAGE = "list_language"
+    const val KEY_SWITCH_THEME = "switch_theme"
 }
