@@ -80,4 +80,7 @@ dependencies {
 
     //ThreetenABP
     implementation 'com.jakewharton.threetenabp:threetenabp:1.3.0'
+
+    //Restart app
+    implementation 'com.jakewharton:process-phoenix:2.0.0'
 }

@@ -4,8 +4,10 @@ object Constants {
 
     const val PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 0
 
+    //SharedPreferences
     const val GOOGLE_MAP_CAMERA_POSITION = "currentGoogleMapCameraPosition"
     const val CURRENT_ADDRESS_LOCATION = "currentAddressLocation"
+    const val CURRENT_LANGUAGE = "currentLanguage"
 
     const val KEY_LIST_LANGUAGE = "list_language"
     const val KEY_SWITCH_THEME = "switch_theme"

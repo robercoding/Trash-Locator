@@ -2,9 +2,7 @@ package com.rober.trashlocator.ui
 
 import android.content.Context
 import android.content.res.Configuration
-import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -15,6 +13,7 @@ import androidx.navigation.Navigation
 import com.google.android.material.navigation.NavigationView
 import com.rober.trashlocator.R
 import com.rober.trashlocator.databinding.ActivityMapsBinding
+import com.rober.trashlocator.utils.Constants
 import com.rober.trashlocator.utils.Destinations
 import com.rober.trashlocator.utils.closeDrawer
 import com.rober.trashlocator.utils.openDrawer
@@ -31,13 +30,8 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var currentDestinationId = -1
 
     override fun attachBaseContext(newBase: Context?) {
-        val lang = "en" // your language or load from SharedPref
-
-        val locale = Locale(lang)
-        val config = Configuration(newBase!!.resources.configuration)
-        Locale.setDefault(locale)
-        config.setLocale(locale)
-        val base = newBase.createConfigurationContext(config)
+//        val lang = "en" // your language or load from SharedPref
+        val base = setLocaleLanguage(newBase)
         super.attachBaseContext(base)
     }
 
@@ -152,14 +146,19 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        //Remove getLocaleCompat
-        Log.i("SeeLocale", "Actual Language: " + resources.configuration.getLocaleCompat())
-    }
+    private fun setLocaleLanguage(newBase: Context?): Context? {
+        val sharedPreferences = newBase?.applicationContext?.getSharedPreferences(
+            newBase.packageName + "_preferences",
+            Context.MODE_PRIVATE
+        ) ?: return newBase
 
-    @Suppress("DEPRECATION")
-    private fun Configuration.getLocaleCompat(): Locale {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) locales.get(0) else locale
+        val lang = sharedPreferences.getString(Constants.CURRENT_LANGUAGE, "en")!!
+
+        val locale = Locale(lang)
+        val config = Configuration(newBase.resources.configuration)
+        Locale.setDefault(locale)
+        config.setLocale(locale)
+
+        return newBase.createConfigurationContext(config)
     }
 }
