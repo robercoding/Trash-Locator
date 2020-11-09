@@ -1,11 +1,11 @@
 package com.rober.trashlocator.ui
 
 import android.content.Context
-import android.content.res.Configuration
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.NavController
@@ -13,11 +13,7 @@ import androidx.navigation.Navigation
 import com.google.android.material.navigation.NavigationView
 import com.rober.trashlocator.R
 import com.rober.trashlocator.databinding.ActivityMapsBinding
-import com.rober.trashlocator.utils.Constants
-import com.rober.trashlocator.utils.Destinations
-import com.rober.trashlocator.utils.closeDrawer
-import com.rober.trashlocator.utils.openDrawer
-import java.util.*
+import com.rober.trashlocator.utils.*
 
 class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -31,7 +27,7 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun attachBaseContext(newBase: Context?) {
 //        val lang = "en" // your language or load from SharedPref
-        val base = setLocaleLanguage(newBase)
+        val base = LocaleManager.setLocaleLanguage(newBase)
         super.attachBaseContext(base)
     }
 
@@ -45,6 +41,7 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun setupView() {
+        setupTheme()
         setupNavigationController()
         setupDrawer()
     }
@@ -146,19 +143,15 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
-    private fun setLocaleLanguage(newBase: Context?): Context? {
-        val sharedPreferences = newBase?.applicationContext?.getSharedPreferences(
-            newBase.packageName + "_preferences",
-            Context.MODE_PRIVATE
-        ) ?: return newBase
+    private fun setupTheme() {
+        val sharedPreferences =
+            getSharedPreferences(packageName + "_preferences", Context.MODE_PRIVATE)
 
-        val lang = sharedPreferences.getString(Constants.CURRENT_LANGUAGE, "en")!!
-
-        val locale = Locale(lang)
-        val config = Configuration(newBase.resources.configuration)
-        Locale.setDefault(locale)
-        config.setLocale(locale)
-
-        return newBase.createConfigurationContext(config)
+        val darkTheme = sharedPreferences.getBoolean(Constants.KEY_SWITCH_THEME, false)
+        if (darkTheme) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        }
     }
 }

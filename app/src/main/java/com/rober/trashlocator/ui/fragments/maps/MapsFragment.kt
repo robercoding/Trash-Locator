@@ -66,26 +66,30 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var googleMap: GoogleMap
     private lateinit var clusterManager: ClusterManager<Trash>
-    private lateinit var cameraPosition: CameraPosition
+    private var cameraPosition: CameraPosition? = null
 
-    private lateinit var currentAddressLocation: AddressLocation
+    private var currentAddressLocation: AddressLocation? = null
     private var lastTimeLocationRequested: Long = -1
 
     private lateinit var dialogRequestGps: AlertDialog
     private lateinit var textWatcherListener: TextWatcherListener
 
+    private var hasBeenDetached = false
     private var onRestored = false
     private var listSavedTrash =
         listOf<Trash>() //Only useful when change rotation and restore trash
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         if (savedInstanceState != null) {
             onRestored = true
             currentAddressLocation =
-                savedInstanceState[Constants.CURRENT_ADDRESS_LOCATION] as AddressLocation
+                savedInstanceState[Constants.CURRENT_ADDRESS_LOCATION] as AddressLocation?
             cameraPosition =
-                savedInstanceState[Constants.GOOGLE_MAP_CAMERA_POSITION] as CameraPosition
+                savedInstanceState[Constants.GOOGLE_MAP_CAMERA_POSITION] as CameraPosition?
+
+            hasBeenDetached = savedInstanceState[Constants.IS_DETACHED_VALUE] as Boolean
         }
         locationManager =
             requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -118,11 +122,12 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         locationListener =
             CustomLocationListener(this)
 
-        if (onRestored) {
+        val tempCameraPosition = cameraPosition
+        if (!hasBeenDetached && onRestored && tempCameraPosition != null) {
             googleMap.animateCamera(
                 CameraUpdateFactory.newLatLngZoom(
-                    cameraPosition.target,
-                    cameraPosition.zoom
+                    tempCameraPosition.target,
+                    tempCameraPosition.zoom
                 )
             )
             setCluster(listSavedTrash)
@@ -473,7 +478,11 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
         //Everytime we get their device location we save currentAdressLocation
         currentAddressLocation = AddressLocation()
-        currentAddressLocation.location = location
+        currentAddressLocation?.location = location
+        if (!isAdded) {
+            hasBeenDetached = true
+            return
+        }
         viewModel.setUpdateLocationByLocation(location, requireContext())
     }
 
@@ -512,10 +521,13 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        if (this::currentAddressLocation.isInitialized) {
+        if (currentAddressLocation != null) {
             outState.putParcelable(Constants.CURRENT_ADDRESS_LOCATION, currentAddressLocation)
         }
-        outState.putParcelable(Constants.GOOGLE_MAP_CAMERA_POSITION, googleMap.cameraPosition)
+        if (this::googleMap.isInitialized) {
+            outState.putParcelable(Constants.GOOGLE_MAP_CAMERA_POSITION, googleMap.cameraPosition)
+        }
+        outState.putBoolean(Constants.IS_DETACHED_VALUE, isAdded)
     }
 
     override fun onResume() {

@@ -81,7 +81,7 @@ class CustomClusterRenderer(
 
         //Add shape background and outline to IconGenerator
         val outline = ShapeDrawable(OvalShape())
-        outline.paint.setColor(ContextCompat.getColor(context, R.color.blueLight2))
+        outline.paint.setColor(ContextCompat.getColor(context, R.color.blueLight))
         val background = LayerDrawable(arrayOf<Drawable>(outline, coloredCircleBackground))
         val strokeWidth = (density * 3.0f).toInt()
         background.setLayerInset(1, strokeWidth, strokeWidth, strokeWidth, strokeWidth)

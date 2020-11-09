@@ -3,7 +3,7 @@
     <style name="Theme.TrashLocator" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/purple_500</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorPrimaryVariant">@color/blueLight</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/teal_200</item>
@@ -13,5 +13,30 @@
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <item name="colorControlActivated">@color/grayLight</item>
         <!-- Customize your theme here. -->
+    </style>
+
+    <style name="HeaderDrawer" parent="ThemeOverlay.AppCompat.Dark">
+        <item name="android:background">@color/blueNormal</item>
+    </style>
+
+    <style name="DrawerBody">
+        <item name="background">@color/grayLight</item>
+    </style>
+
+    <style name="LocationToolbar" parent="Widget.MaterialComponents.AppBarLayout.Surface">
+        <item name="backgroundTint">@color/red</item>
+        <item name="backgroundColor">@color/red</item>
+        <item name="background">@color/red</item>
+    </style>
+
+    <style name="LocationToolbarEditText" parent="Widget.AppCompat.EditText">
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textColorHint">@color/grayDark</item>
+        <item name="backgroundColor">@color/background</item>
+        <item name="maxLines">1</item>
+        <item name="android:inputType">none</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:gravity">center_vertical|start</item>
+        <item name="android:hint">@string/search_location_hint</item>
     </style>
 </resources>

@@ -2,10 +2,13 @@ package com.rober.trashlocator.ui.fragments.settings
 
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.ListPreference
 import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.SwitchPreferenceCompat
 import com.jakewharton.processphoenix.ProcessPhoenix
 import com.rober.trashlocator.R
 import com.rober.trashlocator.utils.Constants
@@ -13,6 +16,9 @@ import com.rober.trashlocator.utils.Constants
 class SettingsFragment : PreferenceFragmentCompat() {
 
     private lateinit var listLanguage: ListPreference
+    private lateinit var switchTheme: SwitchPreferenceCompat
+    private lateinit var sharedPreference: SharedPreferences
+
     private val listLocales = listOf("en", "es")
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -28,6 +34,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     private fun initializeVariables() {
         listLanguage = findPreference<ListPreference>(Constants.KEY_LIST_LANGUAGE)!!
+        switchTheme = findPreference(Constants.KEY_SWITCH_THEME)!!
+
+        sharedPreference = requireContext().applicationContext.getSharedPreferences(
+            requireContext().packageName + "_preferences",
+            Context.MODE_PRIVATE
+        )
     }
 
     //Convert a string array to charsequence array and apply to list language of preference fragment
@@ -79,23 +91,32 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     private fun setLocale(locale: String) {
-        val sharedPreference = requireContext().applicationContext.getSharedPreferences(
-            requireContext().packageName + "_preferences",
-            Context.MODE_PRIVATE
-        )
         val sharedPreferenceEditor = sharedPreference.edit()
         sharedPreferenceEditor.putString(Constants.CURRENT_LANGUAGE, locale)
         sharedPreferenceEditor.apply()
         ProcessPhoenix.triggerRebirth(requireContext())
     }
 
-    private fun changeTheme() {
+    private fun changeTheme(darkTheme: Boolean) {
+        if (darkTheme) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        }
 
+        val sharedPreferenceEditor = sharedPreference.edit()
+        sharedPreferenceEditor.putBoolean(Constants.CURRENT_THEME, darkTheme)
+        sharedPreferenceEditor.apply()
     }
 
     private fun setupListeners() {
         listLanguage.setOnPreferenceChangeListener { preference, language ->
             findLocale(language as String)
+            true
+        }
+
+        switchTheme.setOnPreferenceChangeListener { preference, newValue ->
+            changeTheme(newValue as Boolean)
             true
         }
     }
