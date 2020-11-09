@@ -10,6 +10,7 @@ object Constants {
     const val IS_DETACHED_VALUE = "isDetached"
     const val CURRENT_LANGUAGE = "currentLanguage"
     const val CURRENT_THEME = "currentTheme"
+    const val CURRENT_DESTINATION = "currentDestination"
 
     const val KEY_LIST_LANGUAGE = "list_language"
     const val KEY_SWITCH_THEME = "switch_theme"

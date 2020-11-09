@@ -9,7 +9,26 @@
         android:id="@+id/mapsFragment"
         android:name="com.rober.trashlocator.ui.fragments.maps.MapsFragment"
         android:label="maps_fragment"
-        tools:layout="@layout/maps_fragment" />
+        tools:layout="@layout/maps_fragment">
+        <action
+            android:id="@+id/action_mapsFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment"
+            app:popUpTo="@id/mapsFragment"
+            app:popUpToInclusive="false" />
+        <action
+            android:id="@+id/action_mapsFragment_to_trashStatsFragment"
+            app:destination="@id/trashStatsFragment"
+            app:popUpTo="@id/mapsFragment" />
+        <action
+            android:id="@+id/action_mapsFragment_to_notifyErrorsFragment"
+            app:destination="@id/notifyErrorsFragment"
+            app:popUpTo="@id/mapsFragment" />
+        <action
+            android:id="@+id/action_mapsFragment_to_aboutAppFragment"
+            app:destination="@id/aboutAppFragment"
+            app:popUpTo="@id/mapsFragment"
+            app:popUpToInclusive="false" />
+    </fragment>
     <fragment
         android:id="@+id/trashStatsFragment"
         android:name="com.rober.trashlocator.ui.fragments.trashstats.TrashStatsFragment"

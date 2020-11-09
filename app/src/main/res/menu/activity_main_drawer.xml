@@ -6,11 +6,11 @@
         android:checkableBehavior="single">
         <item
             android:id="@+id/mapsFragment"
-            android:icon="@drawable/ic_garbage"
+            android:icon="@drawable/ic_trash"
             android:title="@string/drawer_menu_maps" />
         <item
             android:id="@+id/trashStatsFragment"
-            android:icon="@drawable/ic_garbage"
+            android:icon="@drawable/ic_stats_outline"
             android:title="@string/drawer_menu_trash_stats" />
     </group>
 
@@ -19,11 +19,11 @@
         android:checkableBehavior="single">
         <item
             android:id="@+id/notifyErrorsFragment"
-            android:icon="@drawable/ic_garbage"
+            android:icon="@drawable/ic_error"
             android:title="@string/drawer_menu_errors" />
         <item
             android:id="@+id/aboutAppFragment"
-            android:icon="@drawable/ic_garbage"
+            android:icon="@drawable/ic_about"
             android:title="@string/drawer_menu_about" />
     </group>
 
@@ -32,7 +32,7 @@
         android:checkableBehavior="single">
         <item
             android:id="@+id/settingsFragment"
-            android:icon="@drawable/ic_garbage"
+            android:icon="@drawable/ic_settings"
             android:title="@string/drawer_menu_settings" />
 
     </group>
