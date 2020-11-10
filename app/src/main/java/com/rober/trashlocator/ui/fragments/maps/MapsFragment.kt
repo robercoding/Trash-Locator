@@ -13,7 +13,9 @@ import android.location.LocationManager
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
@@ -84,7 +86,6 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         super.onCreate(savedInstanceState)
 
         if (savedInstanceState != null) {
-            Log.i("SeeMapsFragment", "Oncreate savedinstance")
             onRestored = true
             currentAddressLocation =
                 savedInstanceState[Constants.CURRENT_ADDRESS_LOCATION] as AddressLocation?
@@ -92,12 +93,19 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
                 savedInstanceState[Constants.GOOGLE_MAP_CAMERA_POSITION] as CameraPosition?
 
             hasBeenDetached = savedInstanceState[Constants.IS_DETACHED_VALUE] as Boolean
-        } else {
-            Log.i("SeeMapsFragment", "Oncreate")
         }
         locationManager =
             requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
 //        initializeMaps()
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+
+        return super.onCreateView(inflater, container, savedInstanceState)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -126,19 +134,13 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         locationListener =
             CustomLocationListener(this)
 
-        Log.i("SeeMapsFragment", "OnMapReady lets see")
         val tempCameraPosition = cameraPosition
         if (!hasBeenDetached && onRestored && tempCameraPosition != null) {
-            Log.i("SeeMapsFragment", "Detached")
-            googleMap.animateCamera(
-                CameraUpdateFactory.newLatLngZoom(
-                    tempCameraPosition.target,
-                    tempCameraPosition.zoom
-                )
-            )
+            moveCameraByCameraPosition(tempCameraPosition)
             setCluster(listSavedTrash)
+        } else if (tempCameraPosition != null) {
+            moveCameraByCameraPosition(tempCameraPosition)
         } else if (currentAddressLocation != null) {
-            Log.i("SeeMapsFragment", "currentaddress!")
             val tempCurrentAddressLocation = currentAddressLocation!!
             googleMap.animateCamera(
                 CameraUpdateFactory.newLatLngZoom(
@@ -149,8 +151,6 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
                 )
             )
         } else {
-            Log.i("SeeMapsFragment", "updatleocationui")
-            Log.i("UpdateLocationUi", "on map ready")
             updateLocationUI()
         }
     }
@@ -373,6 +373,15 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         )
     }
 
+    private fun moveCameraByCameraPosition(cameraPosition: CameraPosition) {
+        googleMap.animateCamera(
+            CameraUpdateFactory.newLatLngZoom(
+                cameraPosition.target, cameraPosition.zoom
+            )
+        )
+
+    }
+
     private fun setSearchAdapter(listAddressLocation: List<AddressLocation>) {
         val searchAdapter = SearchLocationAdapter(listAddressLocation, this)
 
@@ -393,7 +402,6 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
     private fun subscribeObservers() {
         viewModel.listTrash.observe(viewLifecycleOwner) { listTrash ->
-            Log.i("SeeMapsFragment", "we observe something listTrash")
             //If not initialized, this means is restoring so we get the latest listTrash
             if (!isGoogleMapInitialized()) {
                 listSavedTrash = listTrash
@@ -403,18 +411,22 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         }
 
         viewModel.listAddressesLocation.observe(viewLifecycleOwner) { listAddressesLocation ->
-            Log.i("SeeMapsFragment", "we observe listaddresses")
             if (listAddressesLocation.isNotEmpty()) {
                 if (!isGoogleMapInitialized()) return@observe
                 setSearchAdapter(listAddressesLocation)
             }
         }
 
-        viewModel.addressLocation.observe(viewLifecycleOwner) { addressLocation ->
-            currentAddressLocation = addressLocation
-            Log.i("SeeMapsFragment", "we observe addresslocation ${addressLocation}")
+        viewModel.addressLocation.observe(viewLifecycleOwner) { eventAddressLocation ->
+            if (eventAddressLocation.hasBeenHandled) return@observe
+            currentAddressLocation = eventAddressLocation.getContentIfNotHandled()
             if (!isGoogleMapInitialized()) return@observe
-            moveCamera(addressLocation)
+            currentAddressLocation?.let { moveCamera(it) }
+        }
+
+        viewModel.userCameraPosition.observe(viewLifecycleOwner) {
+            cameraPosition = it
+            moveCameraByCameraPosition(it)
         }
 
         viewModel.onBackPressed.observe(viewLifecycleOwner) { onBackPressed ->
@@ -532,6 +544,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
             hasBeenDetached = true
             return
         }
+
         viewModel.setUpdateLocationByLocation(location, requireContext())
     }
 
@@ -617,16 +630,25 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         outState.putBoolean(Constants.IS_DETACHED_VALUE, isAdded)
     }
 
+
+    override fun onStart() {
+        super.onStart()
+    }
+
     override fun onResume() {
         super.onResume()
         if (!this::clusterManager.isInitialized) {
             if (currentAddressLocation == null) {
-                Log.i("UpdateLocationUi", "on resume")
                 updateLocationUI()
             }
         }
         checkLocationPermissionAndSettings()
         initializeReceivers()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.setUserCameraPosition(googleMap.cameraPosition)
     }
 
     override fun onDestroy() {

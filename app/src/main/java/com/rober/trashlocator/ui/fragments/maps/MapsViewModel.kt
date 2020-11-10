@@ -8,6 +8,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.data.geojson.GeoJsonLayer
 import com.rober.trashlocator.R
@@ -32,8 +33,11 @@ class MapsViewModel : ViewModel() {
     val listAddressesLocation: LiveData<List<AddressLocation>> get() = _listAddressesLocation
 
     //Observe location to move camera
-    private val _addressLocation = MutableLiveData<AddressLocation>()
-    val addressLocation: LiveData<AddressLocation> get() = _addressLocation
+    private val _addressLocation = MutableLiveData<Event<AddressLocation>>()
+    val addressLocation: LiveData<Event<AddressLocation>> get() = _addressLocation
+
+    private val _userCameraPosition = MutableLiveData<CameraPosition>()
+    val userCameraPosition: LiveData<CameraPosition> get() = _userCameraPosition
 
     private val _onBackPressed = MutableLiveData<Boolean>()
     val onBackPressed: LiveData<Boolean> get() = _onBackPressed
@@ -43,11 +47,9 @@ class MapsViewModel : ViewModel() {
         get() = _message
 
     init {
-        Log.i("SeeMapsFragment", "Init viewmodel")
         _onBackPressed.value = false
     }
 
-    private lateinit var googleMap: GoogleMap
     private var listLocations = mutableListOf<AddressLocation>()
     private var lastNameLocation = ""
 
@@ -237,37 +239,31 @@ class MapsViewModel : ViewModel() {
 
     fun setUpdateLocationByAddressLocation(addressLocation: AddressLocation) {
         listLocations.add(addressLocation)
-        _addressLocation.postValue(addressLocation)
+        _addressLocation.postValue(Event(addressLocation))
     }
 
     fun setUpdateLocationByLocation(location: Location, context: Context) {
         val addressLocation = getSingleAddressLocation(location, context)
         listLocations.add(addressLocation)
-        _addressLocation.postValue(addressLocation)
+        _addressLocation.postValue(Event(addressLocation))
     }
 
     fun getLastLocation() {
         if (listLocations.size > 1) {
             listLocations.removeLast()
             val newAddressLocation = listLocations.last()
-            _addressLocation.value = newAddressLocation
+            _addressLocation.value = Event(newAddressLocation)
         } else {
             _onBackPressed.value = true
         }
     }
 
-    fun setGoogleMap(googleMap: GoogleMap) {
-        this.googleMap = googleMap
-    }
-
-    fun getGoogleMap(): GoogleMap {
-        return googleMap
-    }
-
     override fun onCleared() {
         super.onCleared()
-        Log.i("SeeMapsFragment", "On cleared viewmodel")
     }
 
+    fun setUserCameraPosition(cameraPosition: CameraPosition) {
+        _userCameraPosition.value = cameraPosition
+    }
 
 }
