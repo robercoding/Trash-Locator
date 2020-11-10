@@ -15,6 +15,9 @@
     <string name="trash_no_information">"There's no information about this trash"</string>
     <string name="dataset_not_found">"Sorry, your locality haven't provided any information about the trash location"</string>
 
+    <!--    Information message    -->
+    <string name="dataset_found">"Finding nearest trash around you…"</string>
+
     <!--    Content Description-->
     <string name="toolbar_sandwich">Open the drawer</string>
 

@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -19,6 +20,8 @@ import com.rober.trashlocator.utils.Event
 import com.rober.trashlocator.utils.LocalitesDataset
 import com.rober.trashlocator.utils.Utils
 import com.rober.trashlocator.utils.getStringResources
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MapsViewModel : ViewModel() {
 
@@ -166,48 +169,54 @@ class MapsViewModel : ViewModel() {
         return trashLocation
     }
 
+
     fun getTrashCluster(googleMap: GoogleMap, addressLocation: AddressLocation, context: Context) {
         val raw = getDataset(addressLocation)
 
-        if (raw == -1) {
-            _message.value = Event(context.getStringResources(R.string.dataset_not_found))
+        viewModelScope.launch(Dispatchers.IO) {
+            if (raw == -1) {
+                _message.postValue(Event(context.getStringResources(R.string.dataset_not_found)))
 //            val message = context.resources.getString(R.string.dataset_not_found)
 //            _message.value = Event(message)
-            return
-        }
+                return@launch
+            }
 
-        val layer = GeoJsonLayer(googleMap, raw, context)
+            _message.postValue(Event(context.getStringResources(R.string.dataset_found)))
 
-        val places = mutableListOf<Trash>()
-        for (feature in layer.features) {
+            val layer = GeoJsonLayer(googleMap, raw, context)
 
-            Log.i("MapDeviceLocation", "Calculate")
+            val places = mutableListOf<Trash>()
+            for (feature in layer.features) {
 
-            val latLng = feature.geometry.geometryObject as LatLng
-            val locationPlace = Location("")
-            locationPlace.latitude = latLng.latitude
-            locationPlace.longitude = latLng.longitude
+                Log.i("MapDeviceLocation", "Calculate")
 
-            val distance = addressLocation.location.distanceTo(locationPlace)
-            Log.i("MapDeviceLocation", "${distance}")
+                val latLng = feature.geometry.geometryObject as LatLng
+                val locationPlace = Location("")
+                locationPlace.latitude = latLng.latitude
+                locationPlace.longitude = latLng.longitude
+
+                val distance = addressLocation.location.distanceTo(locationPlace)
+                Log.i("MapDeviceLocation", "${distance}")
 
 //            listDistances.add(distance)
-            if (distance < 100f) {
-                //Get info street name where this trash is.
-                val trashLocation = getSingleTrashLocation(locationPlace, context)
+                if (distance < 100f) {
+                    //Get info street name where this trash is.
+                    val trashLocation = getSingleTrashLocation(locationPlace, context)
 
-                val place = Trash(
-                    latLng.latitude,
-                    latLng.longitude,
-                    "${trashLocation.streetName}${trashLocation.feature}${trashLocation.locality}",
-                    "${distance}m"
-                )
+                    val place = Trash(
+                        latLng.latitude,
+                        latLng.longitude,
+                        "${trashLocation.streetName}${trashLocation.feature}${trashLocation.locality}",
+                        "${distance}m"
+                    )
 
-                places.add(place)
+                    places.add(place)
+                }
             }
+
+            _listTrash.postValue(places)
         }
 
-        _listTrash.value = places
     }
 
 

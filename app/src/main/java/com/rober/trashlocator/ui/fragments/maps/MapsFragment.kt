@@ -126,6 +126,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
+        Log.i("SeeMapsFragment", "OnMapReady")
         this.googleMap = googleMap
         this.googleMap.mapType = GoogleMap.MAP_TYPE_NORMAL
         googleMap.setOnMyLocationButtonClickListener(this)
@@ -136,11 +137,14 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
         val tempCameraPosition = cameraPosition
         if (!hasBeenDetached && onRestored && tempCameraPosition != null) {
+            Log.i("SeeMapsFragment", "Has been detached")
             moveCameraByCameraPosition(tempCameraPosition)
             setCluster(listSavedTrash)
         } else if (tempCameraPosition != null) {
+            Log.i("SeeMapsFragment", "Temp camera position")
             moveCameraByCameraPosition(tempCameraPosition)
         } else if (currentAddressLocation != null) {
+            Log.i("SeeMapsFragment", "current address")
             val tempCurrentAddressLocation = currentAddressLocation!!
             googleMap.animateCamera(
                 CameraUpdateFactory.newLatLngZoom(
@@ -151,6 +155,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
                 )
             )
         } else {
+            Log.i("SeeMapsFragment", "UpdateLocation")
             updateLocationUI()
         }
     }
@@ -165,14 +170,10 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
         try {
             if (locationPermissionGranted && gpsEnabled) {
-                googleMap.isMyLocationEnabled = true
-                googleMap.uiSettings?.isMyLocationButtonEnabled = true
-                Log.i(TAG, "Go to get device location")
+                setMyLocationButton(true)
                 getDeviceLocation()
             } else {
-                Log.i(TAG, "Go to get check location permission")
-                googleMap.isMyLocationEnabled = false
-                googleMap.uiSettings?.isMyLocationButtonEnabled = false
+                setMyLocationButton(false)
                 checkLocationPermission()
             }
         } catch (e: SecurityException) {
@@ -363,7 +364,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
                     addressLocation.location.latitude,
                     addressLocation.location.longitude
                 ), 17f
-            ), 2500, object : GoogleMap.CancelableCallback {
+            ), 2000, object : GoogleMap.CancelableCallback {
                 override fun onFinish() {
                     viewModel.getTrashCluster(googleMap, addressLocation, requireContext())
                 }
@@ -426,7 +427,8 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
         viewModel.userCameraPosition.observe(viewLifecycleOwner) {
             cameraPosition = it
-            moveCameraByCameraPosition(it)
+            Log.i("SeeMapsFragment", "Observe camera position")
+//            moveCameraByCameraPosition(it)
         }
 
         viewModel.onBackPressed.observe(viewLifecycleOwner) { onBackPressed ->
@@ -469,24 +471,28 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         hideKeyBoard()
     }
 
-    private fun activeLocationButton() {
-        if (ActivityCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            requestLocationPermissions()
-            return
+    private fun setMyLocationButton(value: Boolean) {
+        if (value) {
+            if (ActivityCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                requestLocationPermissions()
+                return
+            }
+
+            googleMap.isMyLocationEnabled = true
+            googleMap.uiSettings.isMyLocationButtonEnabled = true
+            googleMap.setOnMyLocationButtonClickListener(this)
+        } else {
+            googleMap.isMyLocationEnabled = false
+            googleMap.uiSettings.isMyLocationButtonEnabled = false
         }
 
-        Log.i("ActivateLocation", "${googleMap.isMyLocationEnabled}")
-        googleMap.isMyLocationEnabled = true
-        googleMap.uiSettings.isMyLocationButtonEnabled = true
-        googleMap.setOnMyLocationButtonClickListener(this)
-        Log.i("ActivateLocation", "${googleMap.isMyLocationEnabled}")
     }
 
     override fun setupListeners() {
@@ -556,7 +562,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         }
         Log.i("LocationTrack", "SingleRequest!")
 
-        googleMap.isMyLocationEnabled = true
+        setMyLocationButton(true)
         googleMap.setOnMyLocationButtonClickListener(this)
         if (currentAddressLocation == null) {
             Log.i("LocationTrack", "Null")
@@ -576,7 +582,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
             )
             binding.textLocationSettings.show()
         } else {
-            activeLocationButton()
+            setMyLocationButton(true)
             binding.textLocationSettings.text = message
             binding.textLocationSettings.setBackgroundColor(
                 ContextCompat.getColor(
@@ -624,7 +630,12 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         if (currentAddressLocation != null) {
             outState.putParcelable(Constants.CURRENT_ADDRESS_LOCATION, currentAddressLocation)
         }
-        if (this::googleMap.isInitialized) {
+        /*
+         * Set currentaddresslocation != null because when dark theme is initialized on the start of the application
+         * If is null it doesn't make sense to get camera position because it's the position by default
+         * if isn't null it's ok, user has already done something in map
+         */
+        if (this::googleMap.isInitialized && currentAddressLocation != null) {
             outState.putParcelable(Constants.GOOGLE_MAP_CAMERA_POSITION, googleMap.cameraPosition)
         }
         outState.putBoolean(Constants.IS_DETACHED_VALUE, isAdded)
@@ -637,6 +648,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
     override fun onResume() {
         super.onResume()
+        Log.i("SeeMapsFragment", "On resume")
         if (!this::clusterManager.isInitialized) {
             if (currentAddressLocation == null) {
                 updateLocationUI()
@@ -648,7 +660,13 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
     override fun onPause() {
         super.onPause()
-        viewModel.setUserCameraPosition(googleMap.cameraPosition)
+        /*
+         * If user got dark theme then currentAddressLocation won't be initialized
+         * so cameraPosition isn't useful when loading again and setting the position
+         */
+        if (currentAddressLocation != null) {
+            viewModel.setUserCameraPosition(googleMap.cameraPosition)
+        }
     }
 
     override fun onDestroy() {

@@ -16,6 +16,9 @@
     <string name="trash_no_information">No hay información de esta papelera</string>
     <string name="dataset_not_found">Lo siento, en tu ciudad no han dado información sobre la ubicación de las papeleras</string>
 
+    <!--    Information message    -->
+    <string name="dataset_found">Encontrando papeleras alrededor tuya…</string>
+
     <!--    Content Description-->
     <string name="toolbar_sandwich">Abre el drawer</string>
 
