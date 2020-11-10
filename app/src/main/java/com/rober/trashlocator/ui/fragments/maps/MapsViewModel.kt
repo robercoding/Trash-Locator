@@ -43,6 +43,7 @@ class MapsViewModel : ViewModel() {
         get() = _message
 
     init {
+        Log.i("SeeMapsFragment", "Init viewmodel")
         _onBackPressed.value = false
     }
 
@@ -262,4 +263,11 @@ class MapsViewModel : ViewModel() {
     fun getGoogleMap(): GoogleMap {
         return googleMap
     }
+
+    override fun onCleared() {
+        super.onCleared()
+        Log.i("SeeMapsFragment", "On cleared viewmodel")
+    }
+
+
 }

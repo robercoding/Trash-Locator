@@ -1,6 +1,7 @@
 package com.rober.trashlocator.ui.fragments.maps
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -83,6 +84,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         super.onCreate(savedInstanceState)
 
         if (savedInstanceState != null) {
+            Log.i("SeeMapsFragment", "Oncreate savedinstance")
             onRestored = true
             currentAddressLocation =
                 savedInstanceState[Constants.CURRENT_ADDRESS_LOCATION] as AddressLocation?
@@ -90,6 +92,8 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
                 savedInstanceState[Constants.GOOGLE_MAP_CAMERA_POSITION] as CameraPosition?
 
             hasBeenDetached = savedInstanceState[Constants.IS_DETACHED_VALUE] as Boolean
+        } else {
+            Log.i("SeeMapsFragment", "Oncreate")
         }
         locationManager =
             requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -98,8 +102,8 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initializeMaps()
         subscribeObservers()
+        initializeMaps()
         checkLocationPermission()
         checkIfLocationGPSIsOn()
     }
@@ -122,8 +126,10 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         locationListener =
             CustomLocationListener(this)
 
+        Log.i("SeeMapsFragment", "OnMapReady lets see")
         val tempCameraPosition = cameraPosition
         if (!hasBeenDetached && onRestored && tempCameraPosition != null) {
+            Log.i("SeeMapsFragment", "Detached")
             googleMap.animateCamera(
                 CameraUpdateFactory.newLatLngZoom(
                     tempCameraPosition.target,
@@ -131,7 +137,20 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
                 )
             )
             setCluster(listSavedTrash)
+        } else if (currentAddressLocation != null) {
+            Log.i("SeeMapsFragment", "currentaddress!")
+            val tempCurrentAddressLocation = currentAddressLocation!!
+            googleMap.animateCamera(
+                CameraUpdateFactory.newLatLngZoom(
+                    LatLng(
+                        tempCurrentAddressLocation.location.latitude,
+                        tempCurrentAddressLocation.location.longitude
+                    ), 17f
+                )
+            )
         } else {
+            Log.i("SeeMapsFragment", "updatleocationui")
+            Log.i("UpdateLocationUi", "on map ready")
             updateLocationUI()
         }
     }
@@ -185,7 +204,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         Log.i(TAG, "location is granted")
 
         checkIfLocationGPSIsOn()
-        if (!gpsEnabled && !dialogRequestGps.isShowing) {
+        if (!gpsEnabled) {
             requestGPSTurnOn()
             return false
         }
@@ -194,13 +213,18 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     }
 
     private fun getDeviceLocation() {
+        checkLocationPermission()
         if (!locationPermissionGranted) {
-            checkLocationPermission()
+            Log.i(TAG, "Location Setting UI to false..")
+            requestLocationPermissions()
             googleMap.uiSettings?.isMyLocationButtonEnabled = false
             return
         }
+
+        checkIfLocationGPSIsOn()
         if (!gpsEnabled) {
-            checkIfLocationGPSIsOn()
+            Log.i(TAG, "GPS Setting UI to false..")
+            requestGPSTurnOn()
             googleMap.uiSettings?.isMyLocationButtonEnabled = false
             return
         }
@@ -250,11 +274,9 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         try {
             gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
         } catch (e: Exception) {
-        }
-
-        Log.i(TAG, "Checking location and is ${gpsEnabled}")
-        if (!gpsEnabled) {
-            requestGPSTurnOn()
+            e.message?.let {
+                Log.e(TAG, it)
+            }
         }
     }
 
@@ -371,6 +393,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
     private fun subscribeObservers() {
         viewModel.listTrash.observe(viewLifecycleOwner) { listTrash ->
+            Log.i("SeeMapsFragment", "we observe something listTrash")
             //If not initialized, this means is restoring so we get the latest listTrash
             if (!isGoogleMapInitialized()) {
                 listSavedTrash = listTrash
@@ -380,6 +403,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         }
 
         viewModel.listAddressesLocation.observe(viewLifecycleOwner) { listAddressesLocation ->
+            Log.i("SeeMapsFragment", "we observe listaddresses")
             if (listAddressesLocation.isNotEmpty()) {
                 if (!isGoogleMapInitialized()) return@observe
                 setSearchAdapter(listAddressesLocation)
@@ -387,6 +411,8 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         }
 
         viewModel.addressLocation.observe(viewLifecycleOwner) { addressLocation ->
+            currentAddressLocation = addressLocation
+            Log.i("SeeMapsFragment", "we observe addresslocation ${addressLocation}")
             if (!isGoogleMapInitialized()) return@observe
             moveCamera(addressLocation)
         }
@@ -409,7 +435,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     private fun initializeReceivers() {
         if (gpsBroadcastReceiver == null) {
             gpsBroadcastReceiver =
-                GPSBroadcastReceiver(binding.textLocationSettings, locationManager, this)
+                GPSBroadcastReceiver(locationManager, this)
             requireActivity().registerReceiver(
                 gpsBroadcastReceiver,
                 IntentFilter("android.location.PROVIDERS_CHANGED")
@@ -429,6 +455,26 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         binding.containerToolbar.requestFocus()
         binding.recyclerLocation.hide()
         hideKeyBoard()
+    }
+
+    private fun activeLocationButton() {
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestLocationPermissions()
+            return
+        }
+
+        Log.i("ActivateLocation", "${googleMap.isMyLocationEnabled}")
+        googleMap.isMyLocationEnabled = true
+        googleMap.uiSettings.isMyLocationButtonEnabled = true
+        googleMap.setOnMyLocationButtonClickListener(this)
+        Log.i("ActivateLocation", "${googleMap.isMyLocationEnabled}")
     }
 
     override fun setupListeners() {
@@ -461,6 +507,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         viewModel.getListAddressesByName(text, requireContext())
     }
 
+    //activated by RecyclerLocationListener
     override fun onAddressLocationClickListener(addressLocation: AddressLocation) {
         //Deactive to don't trigger textWatcher listener to don't trigger onUserStopTyping
         textWatcherListener.setIsSettingText(true)
@@ -470,7 +517,9 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         textWatcherListener.setIsSettingText(false)
     }
 
+    //activated by a SingleRequestLocation
     override fun updateCurrentLocation(location: Location) {
+        Log.i("LocationTrack", "SingleRequest!")
         //Location modified for testing, emulator points out to google headquarters
         //val currentAddressLocationModified = Location("")
         //currentAddressLocationModified.longitude = -16.251763
@@ -486,13 +535,48 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         viewModel.setUpdateLocationByLocation(location, requireContext())
     }
 
+    //Activated when location goes back!
+    @SuppressLint("MissingPermission")
     override fun requestLocationUpdate() {
         if (!Utils.canUserRequestUpdateLocation(lastTimeLocationRequested)) {
             return
         }
+        Log.i("LocationTrack", "SingleRequest!")
 
-        lastTimeLocationRequested = Instant.now().epochSecond
-        getDeviceLocation()
+        googleMap.isMyLocationEnabled = true
+        googleMap.setOnMyLocationButtonClickListener(this)
+        if (currentAddressLocation == null) {
+            Log.i("LocationTrack", "Null")
+            lastTimeLocationRequested = Instant.now().epochSecond
+            getDeviceLocation()
+        }
+    }
+
+    override fun showLocationMessage(message: String, error: Boolean) {
+        if (error) {
+            binding.textLocationSettings.text = message
+            binding.textLocationSettings.setBackgroundColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.red
+                )
+            )
+            binding.textLocationSettings.show()
+        } else {
+            activeLocationButton()
+            binding.textLocationSettings.text = message
+            binding.textLocationSettings.setBackgroundColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.green
+                )
+            )
+            binding.textLocationSettings.show()
+        }
+    }
+
+    override fun hideLocationMessage() {
+        binding.textLocationSettings.hide()
     }
 
     override fun onCameraMoveStarted(p0: Int) {
@@ -513,7 +597,10 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
             Constants.PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     locationPermissionGranted = true
-                    updateLocationUI()
+                    if (currentAddressLocation == null) {
+                        Log.i("UpdateLocationUi", "on request")
+                        updateLocationUI()
+                    }
                 }
             }
         }
@@ -533,9 +620,17 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     override fun onResume() {
         super.onResume()
         if (!this::clusterManager.isInitialized) {
-            updateLocationUI()
+            if (currentAddressLocation == null) {
+                Log.i("UpdateLocationUi", "on resume")
+                updateLocationUI()
+            }
         }
         checkLocationPermissionAndSettings()
         initializeReceivers()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.i("SeeMapsFragment", "Destroy fragment!")
     }
 }

@@ -99,27 +99,40 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun navigateToMapFragment() {
-        navController.navigate(Destinations.mapsFragment)
-        closeDrawer()
+        if (currentDestinationId != Destinations.mapsFragment) {
+            Log.i("SeePopBackStack", "PopBackStack")
+            navController.popBackStack(R.id.mapsFragment, false)
+            currentDestinationId = Destinations.mapsFragment
+            closeDrawer()
+        } else {
+            Log.i("SeePopBackStack", "Close drawer")
+            closeDrawer()
+        }
+//        navController.navigate(Destinations.mapsFragment)
+//        navController.navigate(Destinations.mapsFragment)
     }
 
     private fun navigateToTrashStats() {
-        navController.navigate(R.id.action_mapsFragment_to_trashStatsFragment)
+        navController.navigate(R.id.trashStatsFragment)
+        currentDestinationId = Destinations.trashStatsFragment
         closeDrawer()
     }
 
     private fun navigateToNotifyErrors() {
-        navController.navigate(R.id.action_mapsFragment_to_notifyErrorsFragment)
+        navController.navigate(R.id.notifyErrorsFragment)
+        currentDestinationId = Destinations.notifyErrorsFragment
         closeDrawer()
     }
 
     private fun navigateToAbout() {
-        navController.navigate(R.id.action_mapsFragment_to_aboutAppFragment)
+        navController.navigate(R.id.aboutAppFragment)
+        currentDestinationId = Destinations.aboutAppFragment
         closeDrawer()
     }
 
     private fun navigateToSettings() {
-        navController.navigate(R.id.action_mapsFragment_to_settingsFragment)
+        navController.navigate(R.id.settingsFragment)
+        currentDestinationId = Destinations.settingsFragment
         closeDrawer()
     }
 
@@ -130,7 +143,6 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             return false
         }
 
-        currentDestinationId = id
         when (item.itemId) {
             Destinations.mapsFragment -> navigateToMapFragment()
             Destinations.trashStatsFragment -> navigateToTrashStats()

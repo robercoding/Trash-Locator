@@ -5,13 +5,11 @@ import android.content.Context
 import android.content.Intent
 import android.location.LocationManager
 import android.os.Handler
-import android.widget.TextView
-import androidx.core.content.ContextCompat
+import android.util.Log
 import com.rober.trashlocator.R
 import com.rober.trashlocator.utils.listeners.interfaces.ICustomLocationListener
 
 class GPSBroadcastReceiver(
-    private val messageConnectionTV: TextView,
     private val locationManager: LocationManager,
     private val iCustomLocationListener: ICustomLocationListener
 ) :
@@ -27,36 +25,24 @@ class GPSBroadcastReceiver(
     override fun onReceive(context: Context?, intent: Intent?) {
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
 
-            messageConnectionTV.show()
-            messageConnectionTV.text = context?.getString(R.string.location_works)
-            messageConnectionTV.setBackgroundColor(
-                ContextCompat.getColor(
-                    messageConnectionTV.context,
-                    R.color.green
-                )
-            )
+            Log.i("SeeReceiver", "Connected!")
 
             iCustomLocationListener.requestLocationUpdate()
-            runnable = Runnable { messageConnectionTV.hide() }
+            iCustomLocationListener.showLocationMessage(
+                context?.getString(R.string.location_works)!!,
+                false
+            )
+            runnable = Runnable { iCustomLocationListener.hideLocationMessage() }
             handler?.postDelayed(runnable!!, 3000)
         } else {
+            Log.i("SeeReceiver", "Disconnected!")
             if (runnable != null)
                 handler?.removeCallbacks(runnable!!)
 
-            messageConnectionTV.setBackgroundColor(
-                ContextCompat.getColor(
-                    messageConnectionTV.context,
-                    R.color.red
-                )
+            iCustomLocationListener.showLocationMessage(
+                context?.getString(R.string.location_error)!!,
+                true
             )
-            messageConnectionTV.text = context?.getString(R.string.location_error)
-            messageConnectionTV.setTextColor(
-                ContextCompat.getColor(
-                    messageConnectionTV.context,
-                    R.color.white
-                )
-            )
-            messageConnectionTV.show()
         }
     }
 }
