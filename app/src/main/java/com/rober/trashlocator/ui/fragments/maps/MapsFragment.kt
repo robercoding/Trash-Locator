@@ -138,11 +138,13 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         val tempCameraPosition = cameraPosition
         if (!hasBeenDetached && onRestored && tempCameraPosition != null) {
             Log.i("SeeMapsFragment", "Has been detached")
+            setMyLocationButton(true)
             moveCameraByCameraPosition(tempCameraPosition)
             setCluster(listSavedTrash)
         } else if (tempCameraPosition != null) {
             Log.i("SeeMapsFragment", "Temp camera position")
             moveCameraByCameraPosition(tempCameraPosition)
+            setCluster(listSavedTrash)
         } else if (currentAddressLocation != null) {
             Log.i("SeeMapsFragment", "current address")
             val tempCurrentAddressLocation = currentAddressLocation!!
@@ -341,6 +343,8 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
                     googleMap.cameraPosition.zoom.toInt()
                 )
             )
+
+
             false
         }
 
@@ -380,7 +384,6 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
                 cameraPosition.target, cameraPosition.zoom
             )
         )
-
     }
 
     private fun setSearchAdapter(listAddressLocation: List<AddressLocation>) {
@@ -404,6 +407,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     private fun subscribeObservers() {
         viewModel.listTrash.observe(viewLifecycleOwner) { listTrash ->
             //If not initialized, this means is restoring so we get the latest listTrash
+            Log.i("SeeListTrash", "List trash load")
             if (!isGoogleMapInitialized()) {
                 listSavedTrash = listTrash
                 return@observe
@@ -472,6 +476,8 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     }
 
     private fun setMyLocationButton(value: Boolean) {
+        if (!this::googleMap.isInitialized) return
+
         if (value) {
             if (ActivityCompat.checkSelfPermission(
                     requireContext(),

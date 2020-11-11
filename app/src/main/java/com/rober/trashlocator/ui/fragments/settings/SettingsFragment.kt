@@ -23,6 +23,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private lateinit var switchTheme: SwitchPreferenceCompat
     private lateinit var sharedPreference: SharedPreferences
 
+    private var lang = "en"
     private val listLocales = listOf("en", "es")
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -66,7 +67,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             requireContext().packageName + "_preferences",
             Context.MODE_PRIVATE
         )
-        val lang = sharedPreferences.getString(Constants.CURRENT_LANGUAGE, "en")
+        lang = sharedPreferences.getString(Constants.CURRENT_LANGUAGE, "en")!!
 
         return when (lang) {
             "en" -> 0
@@ -87,6 +88,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 break
             }
             index++
+        }
+
+        if (locale == lang) {
+            return
         }
 
         if (locale.isNotBlank()) {
