@@ -84,7 +84,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        Log.i(TAG, "On Create")
         if (savedInstanceState != null) {
             onRestored = true
             currentAddressLocation =
@@ -633,6 +633,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
+        Log.i(TAG, "OnSaveInstance!")
         if (currentAddressLocation != null) {
             outState.putParcelable(Constants.CURRENT_ADDRESS_LOCATION, currentAddressLocation)
         }
@@ -650,11 +651,11 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
     override fun onStart() {
         super.onStart()
+        Log.i(TAG, "start fragment!")
     }
 
     override fun onResume() {
         super.onResume()
-        Log.i("SeeMapsFragment", "On resume")
         if (!this::clusterManager.isInitialized) {
             if (currentAddressLocation == null) {
                 updateLocationUI()
@@ -666,6 +667,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
     override fun onPause() {
         super.onPause()
+        Log.i(TAG, "Pause fragment!")
         /*
          * If user got dark theme then currentAddressLocation won't be initialized
          * so cameraPosition isn't useful when loading again and setting the position
@@ -677,6 +679,6 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.i("SeeMapsFragment", "Destroy fragment!")
+        Log.i(TAG, "Destroy fragment!")
     }
 }

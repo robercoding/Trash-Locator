@@ -50,6 +50,7 @@ class MapsViewModel : ViewModel() {
         get() = _message
 
     init {
+        Log.i("MapsFragment", "Init viewmodel!")
         _onBackPressed.value = false
     }
 
@@ -269,6 +270,7 @@ class MapsViewModel : ViewModel() {
 
     override fun onCleared() {
         super.onCleared()
+        Log.i("MapsFragment", "Clear viewmodel")
     }
 
     fun setUserCameraPosition(cameraPosition: CameraPosition) {

@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.NavController
-import androidx.navigation.Navigation
+import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.navigation.NavigationView
 import com.rober.trashlocator.R
 import com.rober.trashlocator.databinding.ActivityMapsBinding
@@ -23,7 +23,8 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var binding: ActivityMapsBinding
     lateinit var drawer: DrawerLayout
     private lateinit var navigationView: NavigationView
-    private lateinit var navController: NavController
+    lateinit var navHostFragment: NavHostFragment
+    lateinit var navController: NavController
     var currentDestinationId = -1
 
     override fun attachBaseContext(newBase: Context?) {
@@ -34,7 +35,6 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.i("SeeActivityCreate", "Oncreate!")
         binding = ActivityMapsBinding.inflate(layoutInflater)
         val root = binding.root
         setContentView(root)
@@ -49,16 +49,11 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun setupNavigationController() {
-        navController = Navigation.findNavController(this, R.id.containerFragment)
+        navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.containerFragment) as NavHostFragment
+        navController = navHostFragment.navController
         navController.graph.startDestination = Destinations.mapsFragment
         currentDestinationId = Destinations.mapsFragment
-
-        //Abandoned, it recreates fragment with drawer when is in the same fragment
-//        navController.addOnDestinationChangedListener { controller, destination, arguments ->
-//            when (destination.id) {
-//                Destinations.mapsFragment -> navigateToMapFragment()
-//            }
-//        }
     }
 
     private fun setupDrawer() {
@@ -75,10 +70,6 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         //SetNavigationItemSelected let us control fragment recreation by not calling directly to change destination
         navigationView.setNavigationItemSelectedListener(this)
-
-        navController.removeOnDestinationChangedListener { controller, destination, arguments ->
-            Log.i("SeeActivityCreate", "Someone removed")
-        }
 
         //NavController recreated fragment and we can't control that from DrawerLayout
 //        navigationView.setupWithNavController(navController) //Navigation of drawer now is being listened by navcontroller!
@@ -99,50 +90,41 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun navigateToMapFragment() {
-        if (currentDestinationId != Destinations.mapsFragment) {
-            Log.i("SeePopBackStack", "PopBackStack")
-            navController.popBackStack(R.id.mapsFragment, false)
-            currentDestinationId = Destinations.mapsFragment
-            closeDrawer()
-        } else {
-            Log.i("SeePopBackStack", "Close drawer")
-            closeDrawer()
+        if (!navController.popBackStack(R.id.mapsFragment, false)) {
+            navController.navigate(R.id.mapsFragment)
         }
-//        navController.navigate(Destinations.mapsFragment)
-//        navController.navigate(Destinations.mapsFragment)
+        closeDrawer()
     }
 
     private fun navigateToTrashStats() {
-        navController.navigate(R.id.trashStatsFragment)
-        currentDestinationId = Destinations.trashStatsFragment
+        if (!navController.popBackStack(R.id.trashStatsFragment, false)) {
+            navController.navigate(R.id.trashStatsFragment)
+        }
         closeDrawer()
     }
 
     private fun navigateToNotifyErrors() {
-        navController.navigate(R.id.notifyErrorsFragment)
-        currentDestinationId = Destinations.notifyErrorsFragment
+        if (!navController.popBackStack(R.id.notifyErrorsFragment, false)) {
+            navController.navigate(R.id.notifyErrorsFragment)
+        }
         closeDrawer()
     }
 
     private fun navigateToAbout() {
-        navController.navigate(R.id.aboutAppFragment)
-        currentDestinationId = Destinations.aboutAppFragment
+        if (!navController.popBackStack(R.id.aboutAppFragment, false)) {
+            navController.navigate(R.id.aboutAppFragment)
+        }
         closeDrawer()
     }
 
     private fun navigateToSettings() {
-        navController.navigate(R.id.settingsFragment)
-        currentDestinationId = Destinations.settingsFragment
+        if (!navController.popBackStack(R.id.settingsFragment, false)) {
+            navController.navigate(R.id.settingsFragment)
+        }
         closeDrawer()
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-        if (id == currentDestinationId) {
-            closeDrawer()
-            return false
-        }
-
         when (item.itemId) {
             Destinations.mapsFragment -> navigateToMapFragment()
             Destinations.trashStatsFragment -> navigateToTrashStats()
@@ -155,7 +137,7 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onBackPressed() {
         if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START)
+            closeDrawer()
         } else {
             super.onBackPressed()
         }
@@ -172,16 +154,32 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         }
+    }
 
+    override fun onPause() {
+        Log.i(TAG, "On Pause activity")
+        super.onPause()
+    }
+
+    override fun onStop() {
+        Log.i(TAG, "On Stop activity")
+        super.onStop()
+    }
+
+    override fun onDestroy() {
+        Log.i(TAG, "On Pause activity")
+        super.onDestroy()
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
+        Log.i(TAG, "RestoreInstance")
         currentDestinationId = savedInstanceState.getInt(Constants.CURRENT_DESTINATION)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
+        Log.i(TAG, "SaveInstance")
         outState.putInt(Constants.CURRENT_DESTINATION, currentDestinationId)
     }
 }

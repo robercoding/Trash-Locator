@@ -13,9 +13,7 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 import com.jakewharton.processphoenix.ProcessPhoenix
 import com.rober.trashlocator.R
-import com.rober.trashlocator.ui.MapsActivity
 import com.rober.trashlocator.utils.Constants
-import com.rober.trashlocator.utils.Destinations
 
 class SettingsFragment : PreferenceFragmentCompat() {
 
@@ -116,13 +114,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
         } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         }
-//        requireActivity().recreate()
-//        findNavController().navigate(R.id.settingsFragment)
-//        if(sharedPreference.getBoolean(Constants.CURRENT_THEME, false) == darkTheme){
-//            ProcessPhoenix.triggerRebirth(requireContext())
-//        }else{
-//
-//        }
     }
 
     private fun setupListeners() {
@@ -140,8 +131,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    (requireActivity() as MapsActivity).currentDestinationId =
-                        Destinations.mapsFragment
                     findNavController().popBackStack()
                 }
             })
