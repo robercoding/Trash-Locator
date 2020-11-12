@@ -16,7 +16,7 @@
     </style>
 
     <style name="HeaderDrawer" parent="ThemeOverlay.AppCompat.Dark">
-        <item name="android:background">@color/blueNormal</item>
+        <item name="android:background">@color/blueLight</item>
     </style>
 
     <style name="DrawerBody">

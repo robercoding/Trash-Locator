@@ -18,9 +18,9 @@
         android:id="@+id/groupInformation"
         android:checkableBehavior="single">
         <item
-            android:id="@+id/notifyErrorsFragment"
-            android:icon="@drawable/ic_error"
-            android:title="@string/drawer_menu_errors" />
+            android:id="@+id/contactFragment"
+            android:icon="@drawable/ic_contact"
+            android:title="@string/drawer_menu_contact" />
         <item
             android:id="@+id/aboutAppFragment"
             android:icon="@drawable/ic_about"

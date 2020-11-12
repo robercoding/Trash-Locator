@@ -28,6 +28,7 @@
     <color name="grayWhite">#E7ECF0</color>
 
     <color name="background">@color/white</color>
+    <color name="backgroundPressed">@color/whiteGrayPressed</color>
     <color name="primaryText">@color/black</color>
 
 </resources>

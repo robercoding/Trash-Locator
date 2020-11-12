@@ -15,12 +15,18 @@
     <string name="location_permission_error">No tenemos permisos para obtener tu actual ubicación, así que no podemos ayudarte a encontrar las papeleras más cercas de manera automática :(</string>
     <string name="trash_no_information">No hay información de esta papelera</string>
     <string name="dataset_not_found">Lo siento, en tu ciudad no han dado información sobre la ubicación de las papeleras</string>
+    <string name="twitter_not_found">No hemos podido encontrar la app de Twitter</string>
+    <string name="gmail_not_found">No hemos podido encontrar la app de Gmail</string>
+
 
     <!--    Information message    -->
     <string name="dataset_found">Encontrando papeleras alrededor tuya…</string>
+    <string name="contact_message">Hola,\n\nPuedes usar Gmail o Twitter para contactarme para añadir alguna caracteristca o informarme de un error sobre TrashLocator o alguna petición que quieras hacer.\n\nGracias.</string>
 
     <!--    Content Description-->
     <string name="toolbar_sandwich">Abre el drawer</string>
+    <string name="gmail_contact">Gmail Icono</string>
+    <string name="twitter_contact">Twitter Icono</string>
 
     <string name="mock_text_short">Mock test, just testing</string>
     <string name="mock_text_long">Mock test, just testing, hope you like this, well, it just a mock to test if everything is right, hope is as long as the developer(me) needs for its mock text!</string>
@@ -28,7 +34,7 @@
     <!--    Menu items names    -->
     <string name="drawer_menu_maps">Maps</string>
     <string name="drawer_menu_trash_stats">Estadisticas</string>
-    <string name="drawer_menu_errors">Notificar error</string>
+    <string name="drawer_menu_contact">Contacta conmigo</string>
     <string name="drawer_menu_about">Sobre la app</string>
     <string name="drawer_menu_settings">Configuración</string>
 

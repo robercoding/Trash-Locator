@@ -103,9 +103,9 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         closeDrawer()
     }
 
-    private fun navigateToNotifyErrors() {
-        if (!navController.popBackStack(R.id.notifyErrorsFragment, false)) {
-            navController.navigate(R.id.notifyErrorsFragment)
+    private fun navigateToContact() {
+        if (!navController.popBackStack(R.id.contactFragment, false)) {
+            navController.navigate(R.id.contactFragment)
         }
         closeDrawer()
     }
@@ -128,7 +128,7 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         when (item.itemId) {
             Destinations.mapsFragment -> navigateToMapFragment()
             Destinations.trashStatsFragment -> navigateToTrashStats()
-            Destinations.notifyErrorsFragment -> navigateToNotifyErrors()
+            Destinations.contactFragment -> navigateToContact()
             Destinations.aboutAppFragment -> navigateToAbout()
             Destinations.settingsFragment -> navigateToSettings()
         }

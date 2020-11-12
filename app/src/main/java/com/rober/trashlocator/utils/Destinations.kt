@@ -6,6 +6,6 @@ object Destinations {
     const val mapsFragment = R.id.mapsFragment
     const val trashStatsFragment = R.id.trashStatsFragment
     const val aboutAppFragment = R.id.aboutAppFragment
-    const val notifyErrorsFragment = R.id.notifyErrorsFragment
+    const val contactFragment = R.id.contactFragment
     const val settingsFragment = R.id.settingsFragment
 }

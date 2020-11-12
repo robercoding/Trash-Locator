@@ -14,12 +14,17 @@
     <string name="location_permission_error">"We don't have permissions to get your current location, so we can't help to find automatically nearest trash around you :("</string>
     <string name="trash_no_information">"There's no information about this trash"</string>
     <string name="dataset_not_found">"Sorry, your locality haven't provided any information about the trash location"</string>
+    <string name="twitter_not_found">"We couldn't find the twitter app"</string>
+    <string name="gmail_not_found">"We couldn't find the gmail app"</string>
 
     <!--    Information message    -->
     <string name="dataset_found">"Finding nearest trash around you…"</string>
+    <string name="contact_message">Dear user,\n\nYou can use Gmail or Twitter to contact me for any feature or error about TrashLocator or any request you want from me.\n\nThank you.</string>
 
     <!--    Content Description-->
     <string name="toolbar_sandwich">Open the drawer</string>
+    <string name="gmail_contact">Gmail Icon</string>
+    <string name="twitter_contact">Twitter Icon</string>
 
     <string name="mock_text_short">Mock test, just testing</string>
     <string name="mock_text_long">Mock test, just testing, hope you like this, well, it just a mock to test if everything is right, hope is as long as the developer(me) needs for its mock text!</string>
@@ -27,7 +32,7 @@
     <!--    Menu items names    -->
     <string name="drawer_menu_maps">Maps</string>
     <string name="drawer_menu_trash_stats">Trash stats</string>
-    <string name="drawer_menu_errors">Notify error</string>
+    <string name="drawer_menu_contact">Contact me</string>
     <string name="drawer_menu_about">About app</string>
     <string name="drawer_menu_settings">Settings</string>
 
