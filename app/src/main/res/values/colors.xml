@@ -9,6 +9,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="green">#32CD32</color>
     <color name="red">#FF0000</color>
+    <color name="orange">#FFA500</color>
 
     <color name="whiteGrayPressed">#E7ECF0</color>
     <color name="graySuperLight">#A5A5A5</color>
@@ -30,5 +31,4 @@
     <color name="background">@color/white</color>
     <color name="backgroundPressed">@color/whiteGrayPressed</color>
     <color name="primaryText">@color/black</color>
-
 </resources>

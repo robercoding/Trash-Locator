@@ -17,7 +17,7 @@ import com.rober.trashlocator.models.AddressLocation
 import com.rober.trashlocator.models.Trash
 import com.rober.trashlocator.models.TrashLocation
 import com.rober.trashlocator.utils.Event
-import com.rober.trashlocator.utils.LocalitesDataset
+import com.rober.trashlocator.utils.LocalitiesDataset
 import com.rober.trashlocator.utils.Utils
 import com.rober.trashlocator.utils.getStringResources
 import kotlinx.coroutines.Dispatchers
@@ -56,6 +56,35 @@ class MapsViewModel : ViewModel() {
 
     private var listLocations = mutableListOf<AddressLocation>()
     private var lastNameLocation = ""
+
+    fun countGeoJson(googleMap: GoogleMap, context: Context) {
+
+        viewModelScope.launch(Dispatchers.IO) {
+            val caceres = GeoJsonLayer(googleMap, R.raw.trash_caceres, context)
+
+            var index = 0
+            for (trash in caceres.features) {
+                index++
+            }
+            Log.i("SeeCount", "Caceres = $index")
+
+            val santacruz = GeoJsonLayer(googleMap, R.raw.trash_santa_cruz_de_tenerife, context)
+
+            index = 0
+            for (trash in santacruz.features) {
+                index++
+            }
+            Log.i("SeeCount", "SantaCruz = $index")
+
+            val washingtondc = GeoJsonLayer(googleMap, R.raw.trash_washingon_dc, context)
+
+            index = 0
+            for (trash in washingtondc.features) {
+                index++
+            }
+            Log.i("SeeCount", "washingtondc = $index")
+        }
+    }
 
     //Get list addresses of addresses by name location and set on MutableLiveData
     fun getListAddressesByName(nameLocation: String, context: Context) {
@@ -225,7 +254,7 @@ class MapsViewModel : ViewModel() {
         var raw = -1
 
         //Try to find the dataset in file Object LocalitiesDataset
-        loopLocalityDataset@ for (localityDataset in LocalitesDataset.listLocalityDataset) {
+        loopLocalityDataset@ for (localityDataset in LocalitiesDataset.listLocalityDataset) {
             //Some localities are with "" so they directly go to check the admin area
             if (addressLocation.localityName != "") {
                 if (localityDataset.localityName != addressLocation.localityName) continue@loopLocalityDataset

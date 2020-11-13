@@ -38,4 +38,9 @@
         <item name="android:gravity">center_vertical|start</item>
         <item name="android:hint">@string/search_location_hint</item>
     </style>
+
+    <style name="PieChartTheme">
+        <item name="background">@color/background</item>
+        <item name="backgroundColor">@color/background</item>
+    </style>
 </resources>

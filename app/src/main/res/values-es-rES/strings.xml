@@ -22,6 +22,7 @@
     <!--    Information message    -->
     <string name="dataset_found">Encontrando papeleras alrededor tuya…</string>
     <string name="contact_message">Hola,\n\nPuedes usar Gmail o Twitter para contactarme para añadir alguna caracteristca o informarme de un error sobre TrashLocator o alguna petición que quieras hacer.\n\nGracias.</string>
+    <string name="trash_message">"Se muestra la cantidad de papeleras que cada localidad tiene, por ahora solo hay 3 localidades.."</string>
 
     <!--    Content Description-->
     <string name="toolbar_sandwich">Abre el drawer</string>

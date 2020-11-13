@@ -2,8 +2,9 @@ package com.rober.trashlocator.utils
 
 import com.rober.trashlocator.R
 import com.rober.trashlocator.models.LocalityDataset
+import com.rober.trashlocator.models.LocalityTrashQuantity
 
-object LocalitesDataset {
+object LocalitiesDataset {
     val listLocalityDataset = listOf<LocalityDataset>(
         LocalityDataset(
             "Santa Cruz de Tenerife",
@@ -12,5 +13,11 @@ object LocalitesDataset {
         ),
         LocalityDataset("Washington", "District of Columbia", R.raw.trash_washingon_dc),
         LocalityDataset("Cáceres\u200E", "Extremadura", R.raw.trash_caceres)
+    )
+
+    val listTrashQuantity = listOf<LocalityTrashQuantity>(
+        LocalityTrashQuantity("Santa Cruz de Tenerife", 6955f),
+        LocalityTrashQuantity("Washington, DC", 5265f),
+        LocalityTrashQuantity("Cáceres", 4050f)
     )
 }

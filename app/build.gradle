@@ -83,4 +83,7 @@ dependencies {
 
     //Restart app
     implementation 'com.jakewharton:process-phoenix:2.0.0'
+
+    //Show charts
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 }

@@ -135,6 +135,8 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         locationListener =
             CustomLocationListener(this)
 
+        viewModel.countGeoJson(googleMap, requireContext())
+
         val tempCameraPosition = cameraPosition
         if (!hasBeenDetached && onRestored && tempCameraPosition != null) {
             Log.i("SeeMapsFragment", "Has been detached")
@@ -667,7 +669,6 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
     override fun onPause() {
         super.onPause()
-        Log.i(TAG, "Pause fragment!")
         /*
          * If user got dark theme then currentAddressLocation won't be initialized
          * so cameraPosition isn't useful when loading again and setting the position
@@ -675,10 +676,5 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         if (currentAddressLocation != null) {
             viewModel.setUserCameraPosition(googleMap.cameraPosition)
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.i(TAG, "Destroy fragment!")
     }
 }

@@ -21,11 +21,12 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private val TAG = "MainActivity"
 
     private lateinit var binding: ActivityMapsBinding
-    lateinit var drawer: DrawerLayout
+    private lateinit var drawer: DrawerLayout
     private lateinit var navigationView: NavigationView
-    lateinit var navHostFragment: NavHostFragment
-    lateinit var navController: NavController
-    var currentDestinationId = -1
+    private lateinit var navHostFragment: NavHostFragment
+    private lateinit var navController: NavController
+
+    private var isNightMode = false
 
     override fun attachBaseContext(newBase: Context?) {
 //        val lang = "en" // your language or load from SharedPref
@@ -53,7 +54,6 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             supportFragmentManager.findFragmentById(R.id.containerFragment) as NavHostFragment
         navController = navHostFragment.navController
         navController.graph.startDestination = Destinations.mapsFragment
-        currentDestinationId = Destinations.mapsFragment
     }
 
     private fun setupDrawer() {
@@ -150,36 +150,44 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val darkTheme = sharedPreferences.getBoolean(Constants.KEY_SWITCH_THEME, false)
         Log.i("AppTheme", "Is dark theme? ${darkTheme}")
         if (darkTheme) {
+            isNightMode = true
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         } else {
+            isNightMode = false
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         }
     }
 
+    fun isNightModeSet(): Boolean {
+        return isNightMode
+    }
+
+    fun findNavHostFragment(): NavHostFragment {
+        return navHostFragment
+    }
+
     override fun onPause() {
-        Log.i(TAG, "On Pause activity")
         super.onPause()
+        Log.i(TAG, "On Pause activity")
     }
 
     override fun onStop() {
-        Log.i(TAG, "On Stop activity")
         super.onStop()
+        Log.i(TAG, "On Stop activity")
     }
 
     override fun onDestroy() {
-        Log.i(TAG, "On Pause activity")
         super.onDestroy()
+        Log.i(TAG, "On Destroy activity")
+
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        Log.i(TAG, "RestoreInstance")
-        currentDestinationId = savedInstanceState.getInt(Constants.CURRENT_DESTINATION)
+
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        Log.i(TAG, "SaveInstance")
-        outState.putInt(Constants.CURRENT_DESTINATION, currentDestinationId)
     }
 }

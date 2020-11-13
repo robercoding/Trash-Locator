@@ -20,6 +20,7 @@
     <!--    Information message    -->
     <string name="dataset_found">"Finding nearest trash around you…"</string>
     <string name="contact_message">Dear user,\n\nYou can use Gmail or Twitter to contact me for any feature or error about TrashLocator or any request you want from me.\n\nThank you.</string>
+    <string name="trash_message">"Here it displays the quantity of trash that each locality has, for now we only have 3 localities."</string>
 
     <!--    Content Description-->
     <string name="toolbar_sandwich">Open the drawer</string>
