@@ -1,5 +1,7 @@
 <resources>
+    <!--    Application Information    -->
     <string name="app_name">Trash Locator</string>
+    <string name="app_version">Version 0.0.1-alpha</string>
     <string name="title_activity_maps">Map</string>
 
     <string name="location_works">Location is back!</string>
