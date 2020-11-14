@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.findNavController
 import androidx.preference.ListPreference
 import androidx.preference.PreferenceFragmentCompat
@@ -32,6 +33,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         super.onViewCreated(view, savedInstanceState)
         initializeVariables()
         setupListeners()
+        setupTheme()
         fillListLanguage()
     }
 
@@ -134,5 +136,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     findNavController().popBackStack()
                 }
             })
+    }
+
+    private fun setupTheme() {
+        listView.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.background))
     }
 }
