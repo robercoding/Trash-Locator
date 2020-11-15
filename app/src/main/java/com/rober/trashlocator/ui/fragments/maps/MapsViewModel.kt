@@ -141,6 +141,7 @@ class MapsViewModel : ViewModel() {
         geoCoder = Geocoder(context)
 
         val address = geoCoder.getFromLocation(location.latitude, location.longitude, 1)[0]
+        Log.i("SeeAddress", "$address")
 
         val addressLocation = AddressLocation()
         addressLocation.localityName = address.locality
@@ -253,13 +254,15 @@ class MapsViewModel : ViewModel() {
     private fun getDataset(addressLocation: AddressLocation): Int {
         var raw = -1
 
+        Log.i("SeeAddress", "Trying to get -> $addressLocation")
         //Try to find the dataset in file Object LocalitiesDataset
         loopLocalityDataset@ for (localityDataset in LocalitiesDataset.listLocalityDataset) {
             //Some localities are with "" so they directly go to check the admin area
-            if (addressLocation.localityName != "") {
-                if (localityDataset.localityName != addressLocation.localityName) continue@loopLocalityDataset
-            }
+//            if (addressLocation.localityName != "") {
+//                if (localityDataset.localityName != addressLocation.localityName) continue@loopLocalityDataset
+//            }
 
+            if (localityDataset.localityName != addressLocation.localityName) continue@loopLocalityDataset
             /*
              * Split by comma because admin areas can have
              * different names example = "Canary Islands" == "Canarias"
@@ -272,6 +275,7 @@ class MapsViewModel : ViewModel() {
                 }
             }
         }
+
 
         return raw
     }
