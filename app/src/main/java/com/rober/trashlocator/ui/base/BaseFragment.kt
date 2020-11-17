@@ -112,6 +112,6 @@ abstract class BaseFragment<VM : ViewModel>(view: Int) : Fragment(view) {
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.i(TAG, "On Resume")
+        Log.i(TAG, "On Destroy")
     }
 }

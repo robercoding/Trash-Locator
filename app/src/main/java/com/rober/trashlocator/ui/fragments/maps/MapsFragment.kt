@@ -74,7 +74,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     private var currentAddressLocation: AddressLocation? = null
     private var lastTimeLocationRequested: Long = -1
 
-    private lateinit var dialogRequestGps: AlertDialog
+    private var dialogRequestGps: AlertDialog? = null
     private lateinit var textWatcherListener: TextWatcherListener
 
     private var hasBeenDetached = false
@@ -286,7 +286,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     }
 
     private fun requestGPSTurnOn() {
-        if (this::dialogRequestGps.isInitialized && dialogRequestGps.isShowing) {
+        if(dialogRequestGps?.isShowing == true){
             return
         }
 
@@ -568,6 +568,11 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         if (!Utils.canUserRequestUpdateLocation(lastTimeLocationRequested)) {
             return
         }
+
+        if(!this::googleMap.isInitialized){
+            initializeMaps()
+            return
+        }
         Log.i("LocationTrack", "SingleRequest!")
 
         setMyLocationButton(true)
@@ -580,6 +585,8 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     }
 
     override fun showLocationMessage(message: String, error: Boolean) {
+
+
         if (error) {
             binding.textLocationSettings.text = message
             binding.textLocationSettings.setBackgroundColor(
@@ -676,5 +683,12 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         if (currentAddressLocation != null) {
             viewModel.setUserCameraPosition(googleMap.cameraPosition)
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        dialogRequestGps?.dismiss()
+        requireActivity().unregisterReceiver(gpsBroadcastReceiver)
+        Log.i(TAG, "OnDestroy")
     }
 }

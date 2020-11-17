@@ -162,6 +162,10 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         return isNightMode
     }
 
+    fun findNavController() : NavController {
+        return navController
+    }
+
     fun findNavHostFragment(): NavHostFragment {
         return navHostFragment
     }
