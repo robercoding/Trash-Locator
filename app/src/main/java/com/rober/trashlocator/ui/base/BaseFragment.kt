@@ -33,7 +33,9 @@ abstract class BaseFragment<VM : ViewModel>(view: Int) : Fragment(view) {
         Log.i(TAG, "On View Created")
         setupListeners()
         setupView()
-        mapsActivity = requireActivity() as MapsActivity
+        if(requireActivity() is MapsActivity){
+            mapsActivity = requireActivity() as MapsActivity
+        }
     }
 
     override fun onCreateView(

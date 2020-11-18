@@ -500,7 +500,6 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
             googleMap.isMyLocationEnabled = false
             googleMap.uiSettings.isMyLocationButtonEnabled = false
         }
-
     }
 
     override fun setupListeners() {

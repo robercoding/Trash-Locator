@@ -310,4 +310,6 @@ class MapsViewModel : ViewModel() {
         _userCameraPosition.value = cameraPosition
     }
 
+
+
 }
