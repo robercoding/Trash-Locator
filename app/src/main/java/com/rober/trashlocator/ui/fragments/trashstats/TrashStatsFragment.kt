@@ -10,7 +10,9 @@ import com.rober.trashlocator.databinding.TrashStatsFragmentBinding
 import com.rober.trashlocator.ui.base.BaseFragment
 import com.rober.trashlocator.ui.base.viewBinding
 import com.rober.trashlocator.utils.LocalitiesDataset
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class TrashStatsFragment : BaseFragment<TrashStatsViewModel>(R.layout.trash_stats_fragment) {
 
     override val viewModel: TrashStatsViewModel by viewModels()

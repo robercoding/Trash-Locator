@@ -15,7 +15,9 @@ import androidx.preference.SwitchPreferenceCompat
 import com.jakewharton.processphoenix.ProcessPhoenix
 import com.rober.trashlocator.R
 import com.rober.trashlocator.utils.Constants
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class SettingsFragment : PreferenceFragmentCompat() {
 
     private lateinit var listLanguage: ListPreference

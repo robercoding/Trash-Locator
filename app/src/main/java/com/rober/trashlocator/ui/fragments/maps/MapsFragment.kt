@@ -47,8 +47,10 @@ import com.rober.trashlocator.utils.listeners.TextWatcherListener
 import com.rober.trashlocator.utils.listeners.interfaces.ICustomLocationListener
 import com.rober.trashlocator.utils.listeners.interfaces.RecyclerAddressLocationClickListener
 import com.rober.trashlocator.utils.listeners.interfaces.TextListener
+import dagger.hilt.android.AndroidEntryPoint
 import org.threeten.bp.Instant
 
+@AndroidEntryPoint
 class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapReadyCallback,
     ICustomLocationListener, TextListener, RecyclerAddressLocationClickListener,
     GoogleMap.OnCameraMoveStartedListener, GoogleMap.OnMyLocationButtonClickListener {
@@ -135,8 +137,6 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         locationListener =
             CustomLocationListener(this)
 
-        viewModel.countGeoJson(googleMap, requireContext())
-
         val tempCameraPosition = cameraPosition
         if (!hasBeenDetached && onRestored && tempCameraPosition != null) {
             Log.i("SeeMapsFragment", "Has been detached")
@@ -161,6 +161,10 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         } else {
             Log.i("SeeMapsFragment", "UpdateLocation")
             updateLocationUI()
+
+            //
+            viewModel.setGoogleMap(googleMap)
+            viewModel.updateLocationUI()
         }
     }
 
@@ -286,7 +290,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     }
 
     private fun requestGPSTurnOn() {
-        if(dialogRequestGps?.isShowing == true){
+        if (dialogRequestGps?.isShowing == true) {
             return
         }
 
@@ -568,7 +572,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
             return
         }
 
-        if(!this::googleMap.isInitialized){
+        if (!this::googleMap.isInitialized) {
             initializeMaps()
             return
         }
@@ -584,8 +588,6 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     }
 
     override fun showLocationMessage(message: String, error: Boolean) {
-
-
         if (error) {
             binding.textLocationSettings.text = message
             binding.textLocationSettings.setBackgroundColor(
@@ -629,11 +631,12 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         when (requestCode) {
             Constants.PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    locationPermissionGranted = true
-                    if (currentAddressLocation == null) {
-                        Log.i("UpdateLocationUi", "on request")
-                        updateLocationUI()
-                    }
+                    viewModel.setLocationPermissionsGranted(true)
+                    viewModel.updateLocationUI()
+//                    if (currentAddressLocation == null) {
+//                        Log.i("UpdateLocationUi", "on request")
+//                        updateLocationUI()
+//                    }
                 }
             }
         }

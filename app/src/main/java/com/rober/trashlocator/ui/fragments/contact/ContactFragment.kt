@@ -13,8 +13,10 @@ import com.rober.trashlocator.R
 import com.rober.trashlocator.databinding.ContactFragmentBinding
 import com.rober.trashlocator.ui.base.BaseFragment
 import com.rober.trashlocator.ui.base.viewBinding
+import dagger.hilt.android.AndroidEntryPoint
 
 
+@AndroidEntryPoint
 class ContactFragment : BaseFragment<ContactViewModel>(R.layout.contact_fragment) {
     override val viewModel: ContactViewModel by viewModels()
     private val binding: ContactFragmentBinding by viewBinding(ContactFragmentBinding::bind)

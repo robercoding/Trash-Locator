@@ -4,15 +4,15 @@ import android.content.Context
 import android.location.Geocoder
 import android.location.Location
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.hilt.lifecycle.ViewModelInject
+import androidx.lifecycle.*
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.data.geojson.GeoJsonLayer
 import com.rober.trashlocator.R
+import com.rober.trashlocator.data.repository.maps.MapsRepositoryImpl
+import com.rober.trashlocator.data.repository.permissions.PermissionsRepositoryImpl
 import com.rober.trashlocator.models.AddressLocation
 import com.rober.trashlocator.models.Trash
 import com.rober.trashlocator.models.TrashLocation
@@ -23,7 +23,16 @@ import com.rober.trashlocator.utils.getStringResources
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class MapsViewModel : ViewModel() {
+class MapsViewModel @ViewModelInject constructor(
+    private val mapsRepositoryImpl: MapsRepositoryImpl,
+    private val permissionsRepositoryImpl: PermissionsRepositoryImpl
+) : ViewModel() {
+
+    //    private val _location = MutableLiveData<Location>(mapsRepositoryImpl.location)
+//    val location :LiveData<Location> get() = _location
+    private val _location = MediatorLiveData<Location>().apply {
+
+    }
 
     lateinit var geoCoder: Geocoder
 
@@ -56,35 +65,6 @@ class MapsViewModel : ViewModel() {
 
     private var listLocations = mutableListOf<AddressLocation>()
     private var lastNameLocation = ""
-
-    fun countGeoJson(googleMap: GoogleMap, context: Context) {
-
-        viewModelScope.launch(Dispatchers.IO) {
-            val caceres = GeoJsonLayer(googleMap, R.raw.trash_caceres, context)
-
-            var index = 0
-            for (trash in caceres.features) {
-                index++
-            }
-            Log.i("SeeCount", "Caceres = $index")
-
-            val santacruz = GeoJsonLayer(googleMap, R.raw.trash_santa_cruz_de_tenerife, context)
-
-            index = 0
-            for (trash in santacruz.features) {
-                index++
-            }
-            Log.i("SeeCount", "SantaCruz = $index")
-
-            val washingtondc = GeoJsonLayer(googleMap, R.raw.trash_washingon_dc, context)
-
-            index = 0
-            for (trash in washingtondc.features) {
-                index++
-            }
-            Log.i("SeeCount", "washingtondc = $index")
-        }
-    }
 
     //Get list addresses of addresses by name location and set on MutableLiveData
     fun getListAddressesByName(nameLocation: String, context: Context) {
@@ -153,25 +133,25 @@ class MapsViewModel : ViewModel() {
 
     //I'm not using this yet
     //Get by information of addresses by location and return a list of custom object TrashLocation
-    private fun getListAddressLocation(location: Location, context: Context): List<TrashLocation> {
-        geoCoder = Geocoder(context)
-
-        val addresses = geoCoder.getFromLocation(location.latitude, location.longitude, 4)
-
-        val mutableListTrashLocation = mutableListOf<TrashLocation>()
-        for (address in addresses) {
-            val trashLocation = TrashLocation()
-            trashLocation.streetName = address.thoroughfare
-            trashLocation.locality = address.locality
-            if (Utils.isNumber(address.featureName)) {
-                trashLocation.feature = trashLocation.feature
-            }
-
-            mutableListTrashLocation.add(trashLocation)
-        }
-
-        return mutableListTrashLocation.toList()
-    }
+//    private fun getListAddressLocation(location: Location, context: Context): List<TrashLocation> {
+//        geoCoder = Geocoder(context)
+//
+//        val addresses = geoCoder.getFromLocation(location.latitude, location.longitude, 4)
+//
+//        val mutableListTrashLocation = mutableListOf<TrashLocation>()
+//        for (address in addresses) {
+//            val trashLocation = TrashLocation()
+//            trashLocation.streetName = address.thoroughfare
+//            trashLocation.locality = address.locality
+//            if (Utils.isNumber(address.featureName)) {
+//                trashLocation.feature = trashLocation.feature
+//            }
+//
+//            mutableListTrashLocation.add(trashLocation)
+//        }
+//
+//        return mutableListTrashLocation.toList()
+//    }
 
     /*
      * Format TrashLocation object
@@ -250,7 +230,6 @@ class MapsViewModel : ViewModel() {
 
     }
 
-
     private fun getDataset(addressLocation: AddressLocation): Int {
         var raw = -1
 
@@ -312,4 +291,9 @@ class MapsViewModel : ViewModel() {
 
 
 
+
+    //NEW CHANGES
+    fun setGoogleMap(googleMap: GoogleMap) = mapsRepositoryImpl.setGoogleMap(googleMap)
+    fun updateLocationUI() = mapsRepositoryImpl.updateLocationUI()
+    fun setLocationPermissionsGranted(isLocationPermissionsGranted : Boolean) = permissionsRepositoryImpl.setLocationPermissionsGranted(isLocationPermissionsGranted)
 }

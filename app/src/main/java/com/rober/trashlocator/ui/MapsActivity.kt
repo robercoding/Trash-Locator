@@ -15,7 +15,9 @@ import com.google.android.material.navigation.NavigationView
 import com.rober.trashlocator.R
 import com.rober.trashlocator.databinding.ActivityMapsBinding
 import com.rober.trashlocator.utils.*
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private val TAG = "MainActivity"

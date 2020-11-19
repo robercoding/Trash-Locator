@@ -9,29 +9,53 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.util.Log
 import androidx.core.app.ActivityCompat
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.model.CameraPosition
+import com.rober.trashlocator.models.AddressLocation
 import com.rober.trashlocator.utils.listeners.CustomLocationListener
 import com.rober.trashlocator.utils.listeners.interfaces.ICustomLocationListener
 
 class MapsManager constructor(
     private val context: Context,
-    private val googleMap: GoogleMap,
     private val permissionsManager: PermissionsManager,
     private val gpsManager: GPSManager,
     private val locationManager: LocationManager
-) : GoogleMap.OnMyLocationButtonClickListener, ICustomLocationListener{
+) : GoogleMap.OnMyLocationButtonClickListener, ICustomLocationListener {
     private val TAG = "MapsManager"
 
-    private var locationListener: LocationListener = CustomLocationListener(this)
+    var location : Location? = null
+    private var googleMap: GoogleMap? = null
 
-    private fun updateLocationUI() {
+    //    private var locationListener: LocationListener? = null
+    private var locationListener: LocationListener? = CustomLocationListener(this)
+
+    //    fun setGoogleMapAndLocationListener(googleMap: GoogleMap, customLocationListener: CustomLocationListener){
+//        this.googleMap = googleMap
+//        locationListener = customLocationListener
+//    }
+    fun setGoogleMap(googleMap: GoogleMap) {
+        this.googleMap = googleMap
+    }
+
+    fun updateLocationUI() {
 //        if (!isGoogleMapInitialized()) return
+        val isLocationPermissionsOk = permissionsManager.checkLocationPermissionAndSettings()
+        val isGPSEnabled = gpsManager.checkIfLocationGPSIsEnabled()
+        if (!isLocationPermissionsOk){
+            permissionsManager.requestLocationPermissions()
+            setMyLocationButton(false)
+            return
+        }
 
-        val isLocationOk = permissionsManager.checkLocationPermissionAndSettings()
-        if (!isLocationOk) return
+        if(!isGPSEnabled){
+            gpsManager.requestGPSEnable()
+            setMyLocationButton(false)
+            return
+        }
 
         try {
-            if (permissionsManager.locationPermissionGranted && gpsManager.isGPSEnabled()) {
+            if (isLocationPermissionsOk && isGPSEnabled) {
                 setMyLocationButton(true)
                 getDeviceLocation()
             } else {
@@ -57,29 +81,28 @@ class MapsManager constructor(
                 return
             }
 
-            googleMap.isMyLocationEnabled = true
-            googleMap.uiSettings.isMyLocationButtonEnabled = true
-            googleMap.setOnMyLocationButtonClickListener(this)
+            googleMap?.isMyLocationEnabled = true
+            googleMap?.uiSettings?.isMyLocationButtonEnabled = true
+            googleMap?.setOnMyLocationButtonClickListener(this)
         } else {
-            googleMap.isMyLocationEnabled = false
-            googleMap.uiSettings.isMyLocationButtonEnabled = false
+            googleMap?.isMyLocationEnabled = false
+            googleMap?.uiSettings?.isMyLocationButtonEnabled = false
         }
     }
 
     private fun getDeviceLocation() {
-        permissionsManager.checkLocationPermission()
-        if (!permissionsManager.locationPermissionGranted) {
-            Log.i(TAG, "Location Setting UI to false..")
+        val isLocationPermissionsOk = permissionsManager.checkLocationPermission()
+        if (!isLocationPermissionsOk) {
             permissionsManager.requestLocationPermissions()
-            googleMap.uiSettings?.isMyLocationButtonEnabled = false
+            setMyLocationButton(false)
             return
         }
 
-        gpsManager.checkIfLocationGPSIsOn()
-        if (!gpsManager.isGPSEnabled()) {
+        val isGPSEnabled = gpsManager.checkIfLocationGPSIsEnabled()
+        if (!isGPSEnabled) {
             Log.i(TAG, "GPS Setting UI to false..")
-            gpsManager.requestGPSTurnOn()
-            googleMap.uiSettings?.isMyLocationButtonEnabled = false
+            gpsManager.requestGPSEnable()
+            setMyLocationButton(false)
             return
         }
 
@@ -102,11 +125,27 @@ class MapsManager constructor(
         }
     }
 
+    private fun moveCameraByCameraPosition(cameraPosition: CameraPosition) {
+        googleMap?.animateCamera(
+            CameraUpdateFactory.newLatLngZoom(
+                cameraPosition.target, cameraPosition.zoom
+            )
+        )
+    }
+
     override fun onMyLocationButtonClick(): Boolean {
-        return false
+        getDeviceLocation()
+        return true
     }
 
     override fun updateCurrentLocation(location: Location) {
+        val currentAddressLocation = AddressLocation()
+        currentAddressLocation.location = location
+
+//        if (!isAdded) {
+//            hasBeenDetached = true
+//            return
+//        }
 
     }
 

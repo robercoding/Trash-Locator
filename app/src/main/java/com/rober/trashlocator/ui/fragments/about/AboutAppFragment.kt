@@ -12,8 +12,10 @@ import com.rober.trashlocator.databinding.AboutAppFragmentBinding
 import com.rober.trashlocator.ui.base.BaseFragment
 import com.rober.trashlocator.ui.base.viewBinding
 import com.rober.trashlocator.utils.Constants
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.about_app_fragment.*
 
+@AndroidEntryPoint
 class AboutAppFragment : BaseFragment<AboutAppViewModel>(R.layout.about_app_fragment) {
 
     override val viewModel: AboutAppViewModel by viewModels()
