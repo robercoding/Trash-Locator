@@ -33,7 +33,7 @@ class TrashLocationUtils(private val context: Context) {
         return trashLocation
     }
 
-    private fun getDataset(addressLocation: AddressLocation): Int {
+    fun getDataset(addressLocation: AddressLocation): Int {
         var raw = -1
 
         Log.i("SeeAddress", "Trying to get -> $addressLocation")

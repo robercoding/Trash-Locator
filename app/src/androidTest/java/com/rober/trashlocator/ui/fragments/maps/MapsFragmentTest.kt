@@ -16,21 +16,21 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 
-@LargeTest
-@RunWith(AndroidJUnit4::class)
-class MapsFragmentTest {
-
-//    @get:Rule
-    val fragmentScenario = launchFragmentInContainer<MapsFragment>(null, R.style.Theme_TrashLocator)
-
-    @Test
-    fun testInitializeMapsFragment_GoogleMapsIsInitialized() {
-//        Log.i("MapsFragment", "Test!")
-//        val scenario = fragmentScenario
-//        scenario.onFragment {
+//@LargeTest
+//@RunWith(AndroidJUnit4::class)
+//class MapsFragmentTest {
 //
-//        }
-//        val uiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
-        Truth.assertThat(true).isEqualTo(true)
-    }
-}
+////    @get:Rule
+//    val fragmentScenario = launchFragmentInContainer<MapsFragment>(null, R.style.Theme_TrashLocator)
+//
+//    @Test
+//    fun testInitializeMapsFragment_GoogleMapsIsInitialized() {
+////        Log.i("MapsFragment", "Test!")
+////        val scenario = fragmentScenario
+////        scenario.onFragment {
+////
+////        }
+////        val uiDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+//        Truth.assertThat(true).isEqualTo(true)
+//    }
+//}

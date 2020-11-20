@@ -27,11 +27,15 @@ class MapsViewModel @ViewModelInject constructor(
     private val mapsRepositoryImpl: MapsRepositoryImpl,
     private val permissionsRepositoryImpl: PermissionsRepositoryImpl
 ) : ViewModel() {
-
+    private val TAG ="MapsViewModel"
     //    private val _location = MutableLiveData<Location>(mapsRepositoryImpl.location)
 //    val location :LiveData<Location> get() = _location
-    private val _location = MediatorLiveData<Location>().apply {
 
+    private val __addressLocation = MediatorLiveData<AddressLocation>().apply {
+        addSource(mapsRepositoryImpl.addressLocation) {
+            listLocations.add(it)
+            Log.i(TAG, "We see AddressLocation = ${it}")
+        }
     }
 
     lateinit var geoCoder: Geocoder
@@ -227,7 +231,6 @@ class MapsViewModel @ViewModelInject constructor(
 
             _listTrash.postValue(places)
         }
-
     }
 
     private fun getDataset(addressLocation: AddressLocation): Int {

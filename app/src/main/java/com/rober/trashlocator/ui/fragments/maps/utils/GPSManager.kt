@@ -7,12 +7,17 @@ import android.provider.Settings
 import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.rober.trashlocator.ui.MapsActivity
+import dagger.hilt.android.qualifiers.ActivityContext
+import dagger.hilt.android.scopes.ActivityScoped
+import javax.inject.Inject
 
-class GPSManager constructor(
-    private val context: Context,
+@ActivityScoped
+class GPSManager  @Inject constructor(
+    @ActivityContext private val context: Context,
     private val locationManager: LocationManager
 ){
-    private val TAG = "GPSManager"
+    private val TAG = javaClass.simpleName
 //    var replyDialogRequest =
 
     private var dialogRequestGps : AlertDialog? = null
@@ -34,7 +39,9 @@ class GPSManager constructor(
             return
         }
 
-        dialogRequestGps = MaterialAlertDialogBuilder(context)
+        val mapsActivity = if(context is MapsActivity) context else return
+
+        dialogRequestGps = MaterialAlertDialogBuilder(mapsActivity)
             .setTitle("GPS is off")
             .setMessage("Do you want to enable GPS, so we display the nearest trash around you?")
             .setPositiveButton("Yes") { dialog, which ->

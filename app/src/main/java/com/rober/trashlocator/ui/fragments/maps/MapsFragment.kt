@@ -139,30 +139,30 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
         val tempCameraPosition = cameraPosition
         if (!hasBeenDetached && onRestored && tempCameraPosition != null) {
-            Log.i("SeeMapsFragment", "Has been detached")
-            setMyLocationButton(true)
-            moveCameraByCameraPosition(tempCameraPosition)
-            setCluster(listSavedTrash)
+//            Log.i("SeeMapsFragment", "Has been detached")
+//            setMyLocationButton(true)
+//            moveCameraByCameraPosition(tempCameraPosition)
+//            setCluster(listSavedTrash)
         } else if (tempCameraPosition != null) {
-            Log.i("SeeMapsFragment", "Temp camera position")
-            moveCameraByCameraPosition(tempCameraPosition)
-            setCluster(listSavedTrash)
+//            Log.i("SeeMapsFragment", "Temp camera position")
+//            moveCameraByCameraPosition(tempCameraPosition)
+//            setCluster(listSavedTrash)
         } else if (currentAddressLocation != null) {
-            Log.i("SeeMapsFragment", "current address")
-            val tempCurrentAddressLocation = currentAddressLocation!!
-            googleMap.animateCamera(
-                CameraUpdateFactory.newLatLngZoom(
-                    LatLng(
-                        tempCurrentAddressLocation.location.latitude,
-                        tempCurrentAddressLocation.location.longitude
-                    ), 17f
-                )
-            )
+//            Log.i("SeeMapsFragment", "current address")
+//            val tempCurrentAddressLocation = currentAddressLocation!!
+//            googleMap.animateCamera(
+//                CameraUpdateFactory.newLatLngZoom(
+//                    LatLng(
+//                        tempCurrentAddressLocation.location.latitude,
+//                        tempCurrentAddressLocation.location.longitude
+//                    ), 17f
+//                )
+//            )
         } else {
             Log.i("SeeMapsFragment", "UpdateLocation")
-            updateLocationUI()
-
-            //
+//            updateLocationUI()
+//
+//            //
             viewModel.setGoogleMap(googleMap)
             viewModel.updateLocationUI()
         }
@@ -672,8 +672,8 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
                 updateLocationUI()
             }
         }
-        checkLocationPermissionAndSettings()
-        initializeReceivers()
+//        checkLocationPermissionAndSettings()
+//        initializeReceivers()
     }
 
     override fun onPause() {
@@ -690,7 +690,8 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     override fun onDestroy() {
         super.onDestroy()
         dialogRequestGps?.dismiss()
-        requireActivity().unregisterReceiver(gpsBroadcastReceiver)
+        gpsBroadcastReceiver?.let {requireActivity().unregisterReceiver(it)}
+//        requireActivity().unregisterReceiver(gpsBroadcastReceiver)
         Log.i(TAG, "OnDestroy")
     }
 }
