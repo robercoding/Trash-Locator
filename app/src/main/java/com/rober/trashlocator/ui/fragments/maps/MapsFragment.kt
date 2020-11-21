@@ -4,7 +4,6 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.location.Criteria
 import android.location.Location
@@ -456,15 +455,11 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         }
     }
 
+    /*
+    * We register receivers so Android notifies us of changes in the runtime
+    */
     private fun initializeReceivers() {
-        if (gpsBroadcastReceiver == null) {
-            gpsBroadcastReceiver =
-                GPSBroadcastReceiver(locationManager, this)
-            requireActivity().registerReceiver(
-                gpsBroadcastReceiver,
-                IntentFilter("android.location.PROVIDERS_CHANGED")
-            )
-        }
+        viewModel.registerReceiver(GPSBroadcastReceiver(locationManager, this))
     }
 
     private fun isGoogleMapInitialized(): Boolean {
@@ -610,8 +605,15 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         }
     }
 
+    /*
+     * Check for view since this function is called from a runnable that doesn't know about view
+     * User could've destroyed the view by changing the theme and this would crash the app
+     */
     override fun hideLocationMessage() {
-        binding.textLocationSettings.hide()
+        if (view != null) {
+            Log.i(TAG, "Hiding..")
+            binding.textLocationSettings.hide()
+        }
     }
 
     override fun onCameraMoveStarted(p0: Int) {
@@ -673,7 +675,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
             }
         }
 //        checkLocationPermissionAndSettings()
-//        initializeReceivers()
+        initializeReceivers()
     }
 
     override fun onPause() {
@@ -685,13 +687,12 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         if (currentAddressLocation != null) {
             viewModel.setUserCameraPosition(googleMap.cameraPosition)
         }
+        viewModel.unregisterReceiver()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         dialogRequestGps?.dismiss()
-        gpsBroadcastReceiver?.let {requireActivity().unregisterReceiver(it)}
-//        requireActivity().unregisterReceiver(gpsBroadcastReceiver)
         Log.i(TAG, "OnDestroy")
     }
 }

@@ -1,5 +1,6 @@
 package com.rober.trashlocator.data.repository.maps
 
+import android.content.BroadcastReceiver
 import android.location.Location
 import androidx.lifecycle.LiveData
 import com.google.android.gms.maps.GoogleMap
@@ -16,4 +17,8 @@ class MapsRepositoryImpl @Inject constructor(
     override fun setGoogleMap(googleMap: GoogleMap) = mapsManager.setGoogleMap(googleMap)
 
     override fun updateLocationUI() = mapsManager.updateLocationUI()
+
+    override fun registerReceiver(broadcastReceiver: BroadcastReceiver) = mapsManager.registerReceiver(broadcastReceiver)
+
+    override fun unregisterReceiver() = mapsManager.unregisterReceiver()
 }

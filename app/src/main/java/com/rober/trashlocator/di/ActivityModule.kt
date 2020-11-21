@@ -56,6 +56,6 @@ object ActivityModule {
     @Provides fun provideTrashLocationUtils(@ActivityContext context: Context) = TrashLocationUtils(context)
 
     @Provides
-    fun provideLocationManager(@ApplicationContext context: Context): LocationManager =
+    fun provideLocationManager(@ActivityContext context: Context): LocationManager =
         context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 }

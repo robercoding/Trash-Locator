@@ -1,5 +1,6 @@
 package com.rober.trashlocator.data.repository.maps
 
+import android.content.BroadcastReceiver
 import android.location.Location
 import androidx.lifecycle.LiveData
 import com.google.android.gms.maps.GoogleMap
@@ -11,4 +12,7 @@ interface IMapsRepository {
     fun setGoogleMap(googleMap: GoogleMap)
 
     fun updateLocationUI()
+
+    fun registerReceiver(broadcastReceiver: BroadcastReceiver)
+    fun unregisterReceiver()
 }

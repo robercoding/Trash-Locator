@@ -1,5 +1,6 @@
 package com.rober.trashlocator.ui.fragments.maps
 
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.location.Geocoder
 import android.location.Location
@@ -292,11 +293,14 @@ class MapsViewModel @ViewModelInject constructor(
         _userCameraPosition.value = cameraPosition
     }
 
-
-
-
     //NEW CHANGES
+    //MapsRepository
     fun setGoogleMap(googleMap: GoogleMap) = mapsRepositoryImpl.setGoogleMap(googleMap)
     fun updateLocationUI() = mapsRepositoryImpl.updateLocationUI()
+
+    fun registerReceiver(broadcastReceiver: BroadcastReceiver) = mapsRepositoryImpl.registerReceiver(broadcastReceiver)
+    fun unregisterReceiver() = mapsRepositoryImpl.unregisterReceiver()
+
+    //PermissionsRepository
     fun setLocationPermissionsGranted(isLocationPermissionsGranted : Boolean) = permissionsRepositoryImpl.setLocationPermissionsGranted(isLocationPermissionsGranted)
 }

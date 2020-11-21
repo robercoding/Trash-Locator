@@ -1,7 +1,9 @@
 package com.rober.trashlocator.ui.fragments.maps.utils
 
 import android.Manifest
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.location.Criteria
 import android.location.Location
@@ -40,8 +42,8 @@ class MapsManager constructor(
     private var googleMap: GoogleMap? = null
     private lateinit var clusterManager: ClusterManager<Trash>
 
-    //    private var locationListener: LocationListener? = null
     private var locationListener: LocationListener? = CustomLocationListener(this)
+    private var receiver : BroadcastReceiver? = null
 
     //    fun setGoogleMapAndLocationListener(googleMap: GoogleMap, customLocationListener: CustomLocationListener){
 //        this.googleMap = googleMap
@@ -255,5 +257,14 @@ class MapsManager constructor(
     }
 
     override fun hideLocationMessage() {
+    }
+
+    fun registerReceiver(receiver : BroadcastReceiver){
+        this.receiver = receiver
+        context.registerReceiver(receiver, IntentFilter("android.location.PROVIDERS_CHANGED"))
+    }
+
+    fun unregisterReceiver(){
+        receiver?.let {context.unregisterReceiver(it)}
     }
 }
