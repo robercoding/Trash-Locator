@@ -32,12 +32,11 @@ class MapsViewModel @ViewModelInject constructor(
     //    private val _location = MutableLiveData<Location>(mapsRepositoryImpl.location)
 //    val location :LiveData<Location> get() = _location
 
-    private val __addressLocation = MediatorLiveData<AddressLocation>().apply {
-        addSource(mapsRepositoryImpl.addressLocation) {
-            listLocations.add(it)
-            Log.i(TAG, "We see AddressLocation = ${it}")
-        }
-    }
+
+    private val ___addressLocation = mapsRepositoryImpl.addressLocation.observeForever(Observer {
+        Log.i("SeeAddressLocation", "Add ObserveForever!!")
+        listLocations.add(it)
+    })
 
     lateinit var geoCoder: Geocoder
 
@@ -263,10 +262,10 @@ class MapsViewModel @ViewModelInject constructor(
         return raw
     }
 
-    fun setUpdateLocationByAddressLocation(addressLocation: AddressLocation) {
-        listLocations.add(addressLocation)
-        _addressLocation.postValue(Event(addressLocation))
-    }
+//    fun setUpdateLocationByAddressLocation(addressLocation: AddressLocation) {
+//        listLocations.add(addressLocation)
+//        _addressLocation.postValue(Event(addressLocation))
+//    }
 
     fun setUpdateLocationByLocation(location: Location, context: Context) {
         val addressLocation = getSingleAddressLocation(location, context)
@@ -275,10 +274,12 @@ class MapsViewModel @ViewModelInject constructor(
     }
 
     fun getLastLocation() {
+        Log.i("SeeListLocation", "listLocation = ${listLocations.size}")
         if (listLocations.size > 1) {
             listLocations.removeLast()
-            val newAddressLocation = listLocations.last()
-            _addressLocation.value = Event(newAddressLocation)
+            Log.i("SeeListLocation", "listLocation removed...= ${listLocations.size}")
+
+            mapsRepositoryImpl.setUpdateLocationByAddressLocation(listLocations.last(), false)
         } else {
             _onBackPressed.value = true
         }
@@ -296,7 +297,11 @@ class MapsViewModel @ViewModelInject constructor(
     //NEW CHANGES
     //MapsRepository
     fun setGoogleMap(googleMap: GoogleMap) = mapsRepositoryImpl.setGoogleMap(googleMap)
+    fun setGoogleMapAndConfiguration(googleMap: GoogleMap) = mapsRepositoryImpl.setGoogleMapAndConfiguration(googleMap)
+
     fun updateLocationUI() = mapsRepositoryImpl.updateLocationUI()
+    fun setUpdateLocationByAddressLocation(addressLocation: AddressLocation) = mapsRepositoryImpl.setUpdateLocationByAddressLocation(addressLocation, true)
+    fun requestLocationUpdate() = mapsRepositoryImpl.requestLocationUpdate()
 
     fun registerReceiver(broadcastReceiver: BroadcastReceiver) = mapsRepositoryImpl.registerReceiver(broadcastReceiver)
     fun unregisterReceiver() = mapsRepositoryImpl.unregisterReceiver()

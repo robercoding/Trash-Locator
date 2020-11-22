@@ -10,8 +10,11 @@ interface IMapsRepository {
     var addressLocation: LiveData<AddressLocation>
 
     fun setGoogleMap(googleMap: GoogleMap)
+    fun setGoogleMapAndConfiguration(googleMap: GoogleMap)
 
     fun updateLocationUI()
+    fun setUpdateLocationByAddressLocation(addressLocation: AddressLocation, addToLiveData : Boolean)
+    fun requestLocationUpdate()
 
     fun registerReceiver(broadcastReceiver: BroadcastReceiver)
     fun unregisterReceiver()

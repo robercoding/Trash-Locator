@@ -46,7 +46,7 @@ class TextWatcherListener(val textListener: TextListener) : TextWatcher {
         }, 600)
     }
 
-    fun setIsSettingText(settingText: Boolean) {
+    fun isSettingText(settingText: Boolean) {
         isSettingText = settingText
     }
 }

@@ -1,4 +1,4 @@
-package com.rober.trashlocator.ui.fragments.maps.utils
+package com.rober.trashlocator.ui.fragments.maps.utils.mapsmanager
 
 import android.Manifest
 import android.content.BroadcastReceiver
@@ -21,6 +21,9 @@ import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.clustering.ClusterManager
 import com.rober.trashlocator.models.AddressLocation
 import com.rober.trashlocator.models.Trash
+import com.rober.trashlocator.ui.fragments.maps.utils.gpsmanager.GPSManager
+import com.rober.trashlocator.ui.fragments.maps.utils.mapsmanager.extensionutility.MapsExtensionUtilityManager
+import com.rober.trashlocator.ui.fragments.maps.utils.permissions.PermissionsManager
 import com.rober.trashlocator.utils.CustomClusterRenderer
 import com.rober.trashlocator.utils.listeners.CustomLocationListener
 import com.rober.trashlocator.utils.listeners.interfaces.ICustomLocationListener
@@ -33,7 +36,7 @@ class MapsManager constructor(
     private val gpsManager: GPSManager,
     private val mapsExtensionUtilityManager: MapsExtensionUtilityManager,
     private val locationManager: LocationManager
-) : GoogleMap.OnMyLocationButtonClickListener, ICustomLocationListener {
+) : GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnCameraMoveStartedListener, ICustomLocationListener {
     private val TAG = "MapsManager"
 
     private val _addressLocation = MutableLiveData<AddressLocation>()
@@ -52,6 +55,14 @@ class MapsManager constructor(
     fun setGoogleMap(googleMap: GoogleMap) {
         this.googleMap = googleMap
         clusterManager = ClusterManager(context, googleMap)
+    }
+
+    fun setGoogleMapAndConfiguration(googleMap: GoogleMap) {
+        this.googleMap = googleMap
+        clusterManager = ClusterManager(context, googleMap)
+        this.googleMap?.mapType = GoogleMap.MAP_TYPE_NORMAL
+        this.googleMap?.setOnMyLocationButtonClickListener(this)
+        this.googleMap?.setOnCameraMoveStartedListener(this)
     }
 
     fun updateLocationUI() {
@@ -81,6 +92,13 @@ class MapsManager constructor(
         } catch (e: SecurityException) {
             Log.e("Exception: %s", e.message, e)
         }
+    }
+
+    fun setUpdateLocationByAddressLocation(addressLocation: AddressLocation, addToLiveData : Boolean) {
+        if(addToLiveData){
+            _addressLocation.value = addressLocation
+        }
+        moveCamera(addressLocation)
     }
 
     private fun setMyLocationButton(value: Boolean) {
@@ -231,6 +249,9 @@ class MapsManager constructor(
         )
     }
 
+    override fun onCameraMoveStarted(p0: Int) {
+
+    }
 
     override fun onMyLocationButtonClick(): Boolean {
         getDeviceLocation()
@@ -240,23 +261,15 @@ class MapsManager constructor(
     override fun updateCurrentLocation(location: Location) {
         val currentAddressLocation = AddressLocation()
         currentAddressLocation.location = location
-
-//        if (!isAdded) {
-//            hasBeenDetached = true
-//            return
-//        }
-        setUpdateLocationByLocation(location)
+        setUpdateLocationByAddressLocation(currentAddressLocation, true)
     }
 
     override fun requestLocationUpdate() {
-
-    }
-
-    override fun showLocationMessage(message: String, error: Boolean) {
-
-    }
-
-    override fun hideLocationMessage() {
+        setMyLocationButton(true)
+        googleMap?.setOnMyLocationButtonClickListener(this)
+        if(addressLocation.value == null) {
+            getDeviceLocation()
+        }
     }
 
     fun registerReceiver(receiver : BroadcastReceiver){

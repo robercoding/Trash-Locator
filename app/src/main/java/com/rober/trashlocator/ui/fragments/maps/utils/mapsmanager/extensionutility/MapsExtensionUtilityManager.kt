@@ -1,22 +1,18 @@
-package com.rober.trashlocator.ui.fragments.maps.utils
+package com.rober.trashlocator.ui.fragments.maps.utils.mapsmanager.extensionutility
 
 import android.content.Context
 import android.location.Geocoder
 import android.location.Location
 import android.util.Log
-import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.data.geojson.GeoJsonLayer
-import com.rober.trashlocator.R
 import com.rober.trashlocator.models.AddressLocation
 import com.rober.trashlocator.models.Trash
 import com.rober.trashlocator.models.TrashLocation
-import com.rober.trashlocator.utils.Event
+import com.rober.trashlocator.ui.fragments.maps.utils.TrashLocationUtils
 import com.rober.trashlocator.utils.Utils
-import com.rober.trashlocator.utils.getStringResources
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class MapsExtensionUtilityManager constructor(

@@ -92,6 +92,10 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun navigateToMapFragment() {
+        if(navController.currentDestination?.id == Destinations.mapsFragment){
+            closeDrawer()
+            return
+        }
         if (!navController.popBackStack(R.id.mapsFragment, false)) {
             navController.navigate(R.id.mapsFragment)
         }
@@ -127,6 +131,12 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        val destinationId = item.itemId
+        if(isDestinationSameAsCurrentDestination(destinationId)){
+            closeDrawer()
+            return false
+        }
+
         when (item.itemId) {
             Destinations.mapsFragment -> navigateToMapFragment()
             Destinations.trashStatsFragment -> navigateToTrashStats()
@@ -135,6 +145,10 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             Destinations.settingsFragment -> navigateToSettings()
         }
         return false
+    }
+
+    private fun isDestinationSameAsCurrentDestination(destinationId : Int) : Boolean{
+        return destinationId == navController.currentDestination?.id
     }
 
     override fun onBackPressed() {

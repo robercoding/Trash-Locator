@@ -7,11 +7,11 @@ import android.location.LocationManager
 import android.os.Handler
 import android.util.Log
 import com.rober.trashlocator.R
-import com.rober.trashlocator.utils.listeners.interfaces.ICustomLocationListener
+import com.rober.trashlocator.ui.fragments.maps.utils.IGPSReceiverListener
 
 class GPSBroadcastReceiver(
     private val locationManager: LocationManager,
-    private val iCustomLocationListener: ICustomLocationListener
+    private val mGPSReceiverListener: IGPSReceiverListener
 ) :
     BroadcastReceiver() {
 
@@ -27,19 +27,18 @@ class GPSBroadcastReceiver(
 
             Log.i("SeeReceiver", "Connected!")
 
-            iCustomLocationListener.requestLocationUpdate()
-            iCustomLocationListener.showLocationMessage(
+            mGPSReceiverListener.showLocationMessage(
                 context?.getString(R.string.location_works)!!,
                 false
             )
-            runnable = Runnable { iCustomLocationListener.hideLocationMessage() }
+            runnable = Runnable { mGPSReceiverListener.hideLocationMessage() }
             handler?.postDelayed(runnable!!, 3000)
         } else {
             Log.i("SeeReceiver", "Disconnected!")
             if (runnable != null)
                 handler?.removeCallbacks(runnable!!)
 
-            iCustomLocationListener.showLocationMessage(
+            mGPSReceiverListener.showLocationMessage(
                 context?.getString(R.string.location_error)!!,
                 true
             )

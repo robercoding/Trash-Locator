@@ -1,17 +1,13 @@
-package com.rober.trashlocator.ui.fragments.maps.utils
+package com.rober.trashlocator.ui.fragments.maps.utils.permissions
 
 import android.Manifest
-import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
-import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.rober.trashlocator.R
 import com.rober.trashlocator.ui.MapsActivity
+import com.rober.trashlocator.ui.fragments.maps.utils.gpsmanager.GPSManager
 import com.rober.trashlocator.utils.Constants
-import com.rober.trashlocator.utils.hide
-import com.rober.trashlocator.utils.show
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
 

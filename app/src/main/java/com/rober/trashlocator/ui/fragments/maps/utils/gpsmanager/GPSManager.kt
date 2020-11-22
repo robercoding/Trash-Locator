@@ -1,4 +1,4 @@
-package com.rober.trashlocator.ui.fragments.maps.utils
+package com.rober.trashlocator.ui.fragments.maps.utils.gpsmanager
 
 import android.content.Context
 import android.content.Intent
