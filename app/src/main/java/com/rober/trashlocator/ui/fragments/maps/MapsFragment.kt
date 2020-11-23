@@ -2,13 +2,10 @@ package com.rober.trashlocator.ui.fragments.maps
 
 import android.content.Context
 import android.content.pm.PackageManager
-import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
@@ -16,32 +13,28 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.LatLngBounds
-import com.google.maps.android.clustering.ClusterManager
 import com.rober.trashlocator.R
 import com.rober.trashlocator.databinding.MapsFragmentBinding
 import com.rober.trashlocator.models.AddressLocation
-import com.rober.trashlocator.models.Trash
 import com.rober.trashlocator.ui.MapsActivity
 import com.rober.trashlocator.ui.base.BaseFragment
 import com.rober.trashlocator.ui.base.viewBinding
 import com.rober.trashlocator.ui.fragments.maps.utils.IGPSReceiverListener
-import com.rober.trashlocator.utils.*
+import com.rober.trashlocator.utils.Constants
+import com.rober.trashlocator.utils.GPSBroadcastReceiver
+import com.rober.trashlocator.utils.hide
 import com.rober.trashlocator.utils.listeners.TextWatcherListener
-import com.rober.trashlocator.utils.listeners.interfaces.ICustomLocationListener
 import com.rober.trashlocator.utils.listeners.interfaces.RecyclerAddressLocationClickListener
 import com.rober.trashlocator.utils.listeners.interfaces.TextListener
+import com.rober.trashlocator.utils.show
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapReadyCallback,
-     TextListener, RecyclerAddressLocationClickListener, IGPSReceiverListener {
+    TextListener, RecyclerAddressLocationClickListener, IGPSReceiverListener {
 
     private val TAG = "MapsFragment"
 
@@ -51,11 +44,6 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
     private lateinit var locationManager: LocationManager
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
-    private lateinit var googleMap: GoogleMap
-    private lateinit var clusterManager: ClusterManager<Trash>
-    private var cameraPosition: CameraPosition? = null
-
-    private var currentAddressLocation: AddressLocation? = null
 
     private lateinit var textWatcherListener: TextWatcherListener
 
@@ -71,15 +59,6 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         }
         locationManager =
             requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-
-        return super.onCreateView(inflater, container, savedInstanceState)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -111,28 +90,6 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         isFirstTimeEnter = false
     }
 
-    private fun moveCamera(addressLocation: AddressLocation) {
-        /*
-         * Zoom doesnt work!
-         * To make animate Camera work we have to add the lapse 2500
-         * To don't lag and provide a good UI experience I look for trash after finishing
-         */
-        googleMap.animateCamera(
-            CameraUpdateFactory.newLatLngZoom(
-                LatLng(
-                    addressLocation.location.latitude,
-                    addressLocation.location.longitude
-                ), 17f
-            ), 2000, object : GoogleMap.CancelableCallback {
-                override fun onFinish() {
-                    viewModel.getTrashCluster(googleMap, addressLocation, requireContext())
-                }
-
-                override fun onCancel() {}
-            }
-        )
-    }
-
     private fun setSearchAdapter(listAddressLocation: List<AddressLocation>) {
         val searchAdapter = SearchLocationAdapter(listAddressLocation, this)
 
@@ -152,28 +109,11 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     }
 
     private fun subscribeObservers() {
-        viewModel.listTrash.observe(viewLifecycleOwner) { listTrash ->
-            //If not initialized, this means is restoring so we get the latest listTrash
-//            setCluster(listTrash)
-        }
+        viewModel.listAddressesLocation.observe(viewLifecycleOwner){listAddressesLocation ->
+            if(listAddressesLocation.isEmpty()) return@observe
 
-        viewModel.listAddressesLocation.observe(viewLifecycleOwner) { listAddressesLocation ->
-            if (listAddressesLocation.isNotEmpty()) {
-                setSearchAdapter(listAddressesLocation)
-            }
+            setSearchAdapter(listAddressesLocation)
         }
-
-        viewModel.addressLocation.observe(viewLifecycleOwner) { eventAddressLocation ->
-            if (eventAddressLocation.hasBeenHandled) return@observe
-            currentAddressLocation = eventAddressLocation.getContentIfNotHandled()
-            currentAddressLocation?.let { moveCamera(it) }
-        }
-
-        viewModel.userCameraPosition.observe(viewLifecycleOwner) {
-            cameraPosition = it
-//            moveCameraByCameraPosition(it)
-        }
-
         viewModel.onBackPressed.observe(viewLifecycleOwner) { onBackPressed ->
             if (!onBackPressed) {
                 return@observe

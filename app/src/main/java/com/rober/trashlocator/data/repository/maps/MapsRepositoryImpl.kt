@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import com.google.android.gms.maps.GoogleMap
 import com.rober.trashlocator.models.AddressLocation
 import com.rober.trashlocator.ui.fragments.maps.utils.mapsmanager.MapsManager
+import com.rober.trashlocator.utils.Event
 import javax.inject.Inject
 
 class MapsRepositoryImpl @Inject constructor(
@@ -12,6 +13,7 @@ class MapsRepositoryImpl @Inject constructor(
 ) : IMapsRepository {
 
     override var addressLocation: LiveData<AddressLocation> = mapsManager.addressLocation
+    override var message: LiveData<Event<String>> = mapsManager.message
 
     override fun setGoogleMap(googleMap: GoogleMap) = mapsManager.setGoogleMap(googleMap)
     override fun setGoogleMapAndConfiguration(googleMap: GoogleMap) = mapsManager.setGoogleMapAndConfiguration(googleMap)

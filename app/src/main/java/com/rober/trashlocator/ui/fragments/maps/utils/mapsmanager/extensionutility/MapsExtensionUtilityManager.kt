@@ -49,6 +49,10 @@ class MapsExtensionUtilityManager constructor(
         return trashLocation
     }
 
+    override suspend fun existsDataSet(addressLocation: AddressLocation): Boolean {
+        return trashLocationUtils.getDataset(addressLocation) > -1
+    }
+
     override suspend fun getTrashCluster(googleMap: GoogleMap, addressLocation: AddressLocation) : List<Trash>{
         val raw = trashLocationUtils.getDataset(addressLocation)
 

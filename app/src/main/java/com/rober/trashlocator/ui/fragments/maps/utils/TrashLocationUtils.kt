@@ -57,8 +57,6 @@ class TrashLocationUtils(private val context: Context) {
                 }
             }
         }
-
-
         return raw
     }
 }

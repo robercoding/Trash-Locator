@@ -19,14 +19,17 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.clustering.ClusterManager
+import com.rober.trashlocator.R
 import com.rober.trashlocator.models.AddressLocation
 import com.rober.trashlocator.models.Trash
 import com.rober.trashlocator.ui.fragments.maps.utils.gpsmanager.GPSManager
 import com.rober.trashlocator.ui.fragments.maps.utils.mapsmanager.extensionutility.MapsExtensionUtilityManager
 import com.rober.trashlocator.ui.fragments.maps.utils.permissions.PermissionsManager
 import com.rober.trashlocator.utils.CustomClusterRenderer
+import com.rober.trashlocator.utils.Event
 import com.rober.trashlocator.utils.listeners.CustomLocationListener
 import com.rober.trashlocator.utils.listeners.interfaces.ICustomLocationListener
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -36,17 +39,21 @@ class MapsManager constructor(
     private val gpsManager: GPSManager,
     private val mapsExtensionUtilityManager: MapsExtensionUtilityManager,
     private val locationManager: LocationManager
-) : GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnCameraMoveStartedListener, ICustomLocationListener {
+) : GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnCameraMoveStartedListener,
+    ICustomLocationListener {
     private val TAG = "MapsManager"
 
     private val _addressLocation = MutableLiveData<AddressLocation>()
     val addressLocation: LiveData<AddressLocation> get() = _addressLocation
 
+    private val _message = MutableLiveData<Event<String>>()
+    val message: LiveData<Event<String>> get() = _message
+
     private var googleMap: GoogleMap? = null
     private lateinit var clusterManager: ClusterManager<Trash>
 
     private var locationListener: LocationListener? = CustomLocationListener(this)
-    private var receiver : BroadcastReceiver? = null
+    private var receiver: BroadcastReceiver? = null
 
     //    fun setGoogleMapAndLocationListener(googleMap: GoogleMap, customLocationListener: CustomLocationListener){
 //        this.googleMap = googleMap
@@ -94,8 +101,11 @@ class MapsManager constructor(
         }
     }
 
-    fun setUpdateLocationByAddressLocation(addressLocation: AddressLocation, addToLiveData : Boolean) {
-        if(addToLiveData){
+    fun setUpdateLocationByAddressLocation(
+        addressLocation: AddressLocation,
+        addToLiveData: Boolean
+    ) {
+        if (addToLiveData) {
             _addressLocation.value = addressLocation
         }
         moveCamera(addressLocation)
@@ -160,7 +170,8 @@ class MapsManager constructor(
     }
 
     private fun setCluster(listTrash: List<Trash>) {
-            //Clear to don't duplicate the cluster that was loaded before
+
+        //Clear to don't duplicate the cluster that was loaded before
         clusterManager.run {
             googleMap?.clear()
             clearItems()
@@ -219,6 +230,19 @@ class MapsManager constructor(
          * To make animate Camera work we have to add the lapse 2500
          * To don't lag and provide a good UI experience I look for trash after finishing
          */
+        var foundDataSet = false
+        runBlocking {
+            launch(Dispatchers.IO) {
+                foundDataSet = mapsExtensionUtilityManager.existsDataSet(addressLocation)
+
+                if (foundDataSet) {
+                    _message.postValue(Event(context.getString(R.string.dataset_found)))
+                } else {
+                    _message.postValue(Event(context.getString(R.string.dataset_not_found)))
+                }
+            }
+        }
+
         googleMap?.animateCamera(
             CameraUpdateFactory.newLatLngZoom(
                 LatLng(
@@ -227,26 +251,36 @@ class MapsManager constructor(
                 ), 17f
             ), 2000, object : GoogleMap.CancelableCallback {
                 override fun onFinish() {
-
+                    var trashCluster = emptyList<Trash>()
                     runBlocking {
-                        launch {
-                            googleMap?.let { verifiedGoogleMap ->
-                                val trashCluster = mapsExtensionUtilityManager.getTrashCluster(
-                                    verifiedGoogleMap,
-                                    addressLocation
-                                )
-                                //TODO if empty show toast we couldn't find
-                                //TODO if contains show we are loading
-                                setCluster(trashCluster)
+                        val job = launch(Dispatchers.IO) {
+                            if (!foundDataSet) return@launch
+                            trashCluster = getTrashCluster(addressLocation)
+                            if(trashCluster.isEmpty()){
+                                _message.postValue(Event(context.getString(R.string.dataset_found)))
                             }
                         }
+                        job.join()
+                        if (!foundDataSet || trashCluster.isEmpty()){
+                            return@runBlocking
+                        }
+                        setCluster(trashCluster)
                     }
-
                 }
-
                 override fun onCancel() {}
             }
         )
+    }
+
+    private suspend fun getTrashCluster(
+        addressLocation: AddressLocation
+    ): List<Trash> {
+        return googleMap?.let {verifiedGoogleMap ->
+            mapsExtensionUtilityManager.getTrashCluster(
+                verifiedGoogleMap,
+                addressLocation
+            )
+        }?: kotlin.run { emptyList()}
     }
 
     override fun onCameraMoveStarted(p0: Int) {
@@ -267,17 +301,17 @@ class MapsManager constructor(
     override fun requestLocationUpdate() {
         setMyLocationButton(true)
         googleMap?.setOnMyLocationButtonClickListener(this)
-        if(addressLocation.value == null) {
+        if (addressLocation.value == null) {
             getDeviceLocation()
         }
     }
 
-    fun registerReceiver(receiver : BroadcastReceiver){
+    fun registerReceiver(receiver: BroadcastReceiver) {
         this.receiver = receiver
         context.registerReceiver(receiver, IntentFilter("android.location.PROVIDERS_CHANGED"))
     }
 
-    fun unregisterReceiver(){
-        receiver?.let {context.unregisterReceiver(it)}
+    fun unregisterReceiver() {
+        receiver?.let { context.unregisterReceiver(it) }
     }
 }
