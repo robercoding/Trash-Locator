@@ -170,7 +170,6 @@ class MapsManager constructor(
     }
 
     private fun setCluster(listTrash: List<Trash>) {
-
         //Clear to don't duplicate the cluster that was loaded before
         clusterManager.run {
             googleMap?.clear()
@@ -179,10 +178,14 @@ class MapsManager constructor(
         }
 
         val verifiedGoogleMap = googleMap ?: return
-        clusterManager.renderer = CustomClusterRenderer(context, verifiedGoogleMap, clusterManager)
+        clusterManager = ClusterManager<Trash>(context, googleMap)
+        clusterManager.renderer = CustomClusterRenderer(context, googleMap!!, clusterManager)
         //Click listener that zooms the selected cluster trash
         clusterManager.setOnClusterClickListener { clusterTrash ->
             val builder = LatLngBounds.builder()
+//            for (trash in clusterTrash.items) {
+//                builder.include(trash.position)
+//            }
             clusterTrash.items.forEach {
                 builder.include(it.position)
             }
@@ -191,14 +194,14 @@ class MapsManager constructor(
 //            googleMap.animateCamera(CameraUpdateFactory.zoomTo(100f))
 
             val bounds = builder.build()
-            googleMap?.let {
-                it.moveCamera(
-                    CameraUpdateFactory.newLatLngBounds(
-                        bounds,
-                        it.cameraPosition.zoom.toInt()
-                    )
+
+            verifiedGoogleMap.moveCamera(
+                CameraUpdateFactory.newLatLngBounds(
+                    bounds,
+                    verifiedGoogleMap.cameraPosition.zoom.toInt()
                 )
-            }
+            )
+
             false
         }
 
@@ -256,17 +259,18 @@ class MapsManager constructor(
                         val job = launch(Dispatchers.IO) {
                             if (!foundDataSet) return@launch
                             trashCluster = getTrashCluster(addressLocation)
-                            if(trashCluster.isEmpty()){
+                            if (trashCluster.isEmpty()) {
                                 _message.postValue(Event(context.getString(R.string.dataset_found)))
                             }
                         }
                         job.join()
-                        if (!foundDataSet || trashCluster.isEmpty()){
+                        if (!foundDataSet || trashCluster.isEmpty()) {
                             return@runBlocking
                         }
                         setCluster(trashCluster)
                     }
                 }
+
                 override fun onCancel() {}
             }
         )
@@ -275,12 +279,12 @@ class MapsManager constructor(
     private suspend fun getTrashCluster(
         addressLocation: AddressLocation
     ): List<Trash> {
-        return googleMap?.let {verifiedGoogleMap ->
+        return googleMap?.let { verifiedGoogleMap ->
             mapsExtensionUtilityManager.getTrashCluster(
                 verifiedGoogleMap,
                 addressLocation
             )
-        }?: kotlin.run { emptyList()}
+        } ?: kotlin.run { emptyList() }
     }
 
     override fun onCameraMoveStarted(p0: Int) {
