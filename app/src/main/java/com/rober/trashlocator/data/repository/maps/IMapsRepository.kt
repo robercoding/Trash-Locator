@@ -9,6 +9,7 @@ import com.rober.trashlocator.utils.Event
 
 interface IMapsRepository {
     var addressLocation: LiveData<AddressLocation>
+    var cameraMove : LiveData<Event<Boolean>>
     var message: LiveData<Event<String>>
 
     fun setGoogleMap(googleMap: GoogleMap)

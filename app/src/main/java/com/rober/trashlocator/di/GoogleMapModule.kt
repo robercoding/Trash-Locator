@@ -2,7 +2,10 @@ package com.rober.trashlocator.di
 
 import android.content.Context
 import android.location.Geocoder
+import android.location.Location
 import android.location.LocationManager
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.rober.trashlocator.data.repository.maps.MapsRepositoryImpl
 import com.rober.trashlocator.data.repository.permissions.PermissionsRepositoryImpl
 import com.rober.trashlocator.ui.fragments.maps.utils.*
@@ -19,7 +22,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 
 @Module
 @InstallIn(ActivityComponent::class)
-object ActivityModule {
+object GoogleMapModule {
 
     @Provides fun provideMapsManager(
         @ActivityContext context: Context,
@@ -58,4 +61,7 @@ object ActivityModule {
     @Provides
     fun provideLocationManager(@ActivityContext context: Context): LocationManager =
         context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
+    @Provides
+    fun provideFusedLocationProvider(@ActivityContext context: Context) = LocationServices.getFusedLocationProviderClient(context)
 }

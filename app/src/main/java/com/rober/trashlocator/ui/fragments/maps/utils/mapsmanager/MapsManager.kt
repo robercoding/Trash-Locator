@@ -46,6 +46,9 @@ class MapsManager constructor(
     private val _addressLocation = MutableLiveData<AddressLocation>()
     val addressLocation: LiveData<AddressLocation> get() = _addressLocation
 
+    private val _cameraMove = MutableLiveData<Event<Boolean>>()
+    val cameraMove : LiveData<Event<Boolean>> = _cameraMove
+
     private val _message = MutableLiveData<Event<String>>()
     val message: LiveData<Event<String>> get() = _message
 
@@ -213,19 +216,19 @@ class MapsManager constructor(
         clusterManager.setAnimation(true)
     }
 
-    private fun moveCameraByCameraPosition(cameraPosition: CameraPosition) {
-        googleMap?.animateCamera(
-            CameraUpdateFactory.newLatLngZoom(
-                cameraPosition.target, cameraPosition.zoom
-            )
-        )
-    }
-
-    private fun setUpdateLocationByLocation(location: Location) {
-        val addressLocation = mapsExtensionUtilityManager.getSingleAddressLocation(location)
-        _addressLocation.value = addressLocation
-        moveCamera(addressLocation)
-    }
+//    private fun moveCameraByCameraPosition(cameraPosition: CameraPosition) {
+//        googleMap?.animateCamera(
+//            CameraUpdateFactory.newLatLngZoom(
+//                cameraPosition.target, cameraPosition.zoom
+//            )
+//        )
+//    }
+//
+//    private fun setUpdateLocationByLocation(location: Location) {
+//        val addressLocation = mapsExtensionUtilityManager.getSingleAddressLocation(location)
+//        _addressLocation.value = addressLocation
+//        moveCamera(addressLocation)
+//    }
 
     private fun moveCamera(addressLocation: AddressLocation) {
         /*
@@ -288,7 +291,7 @@ class MapsManager constructor(
     }
 
     override fun onCameraMoveStarted(p0: Int) {
-
+        _cameraMove.value = Event(true)
     }
 
     override fun onMyLocationButtonClick(): Boolean {

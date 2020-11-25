@@ -1,6 +1,5 @@
 package com.rober.trashlocator.ui.fragments.maps
 
-import android.content.Context
 import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Bundle
@@ -12,7 +11,6 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
@@ -31,6 +29,7 @@ import com.rober.trashlocator.utils.listeners.interfaces.RecyclerAddressLocation
 import com.rober.trashlocator.utils.listeners.interfaces.TextListener
 import com.rober.trashlocator.utils.show
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapReadyCallback,
@@ -39,11 +38,13 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     private val TAG = "MapsFragment"
 
     override val viewModel: MapsViewModel by viewModels()
-
     private val binding: MapsFragmentBinding by viewBinding(MapsFragmentBinding::bind)
 
-    private lateinit var locationManager: LocationManager
-    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    @Inject
+    lateinit var locationManager: LocationManager
+
+    @Inject
+    lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
     private lateinit var textWatcherListener: TextWatcherListener
 
@@ -57,8 +58,6 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
             isFirstTimeEnter = savedInstanceState[Constants.IS_FIRST_TIME_ENTER] as Boolean
             hasBeenDetached = savedInstanceState[Constants.IS_DETACHED_VALUE] as Boolean
         }
-        locationManager =
-            requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -72,8 +71,6 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         val mapFragment =
             childFragmentManager.findFragmentById(R.id.mapsContainer) as SupportMapFragment
         mapFragment.getMapAsync(this)
-        fusedLocationProviderClient =
-            LocationServices.getFusedLocationProviderClient(requireContext())
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -109,11 +106,16 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     }
 
     private fun subscribeObservers() {
-        viewModel.listAddressesLocation.observe(viewLifecycleOwner){listAddressesLocation ->
-            if(listAddressesLocation.isEmpty()) return@observe
-
+        viewModel.listAddressesLocation.observe(viewLifecycleOwner) { listAddressesLocation ->
+            if (listAddressesLocation.isEmpty()) return@observe
             setSearchAdapter(listAddressesLocation)
         }
+
+        viewModel.cameraMove.observe(viewLifecycleOwner) {
+            if (it.hasBeenHandled) return@observe
+            clearFocusSearchToolbar()
+        }
+
         viewModel.onBackPressed.observe(viewLifecycleOwner) { onBackPressed ->
             if (!onBackPressed) {
                 return@observe
@@ -121,7 +123,6 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
             defaultOnBackPressed()
         }
-
         viewModel.message.observe(viewLifecycleOwner) { eventMessage ->
             eventMessage.getContentIfNotHandled()?.let {
                 displayToast(it)
@@ -172,6 +173,12 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     override fun onUserStopTyping(text: String) {
 //        displayToast("Stopped ")
         viewModel.getListAddressesByName(text, requireContext())
+    }
+
+    //This function is executed in background thread from TextListener, so we need main thread to update UI
+    override fun onUserStopTypingIsEmpty() {
+        requireActivity().runOnUiThread { setSearchAdapter(emptyList()) }
+        viewModel.setLastNameLocationEmpty()
     }
 
     //activated by RecyclerLocationListener
@@ -263,10 +270,6 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
     override fun onPause() {
         super.onPause()
-        /*
-         * If user got dark theme then currentAddressLocation won't be initialized
-         * so cameraPosition isn't useful when loading again and setting the position
-         */
         viewModel.unregisterReceiver()
     }
 

@@ -13,6 +13,7 @@ class MapsRepositoryImpl @Inject constructor(
 ) : IMapsRepository {
 
     override var addressLocation: LiveData<AddressLocation> = mapsManager.addressLocation
+    override var cameraMove: LiveData<Event<Boolean>> = mapsManager.cameraMove
     override var message: LiveData<Event<String>> = mapsManager.message
 
     override fun setGoogleMap(googleMap: GoogleMap) = mapsManager.setGoogleMap(googleMap)

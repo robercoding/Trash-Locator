@@ -30,6 +30,7 @@ class TextWatcherListener(val textListener: TextListener) : TextWatcher {
                 val text = s?.trim().toString()
 
                 if (text.isEmpty()) {
+                    textListener.onUserStopTypingIsEmpty()
                     return
                 }
 

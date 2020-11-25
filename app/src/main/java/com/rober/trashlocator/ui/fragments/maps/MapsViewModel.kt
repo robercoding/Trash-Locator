@@ -36,6 +36,9 @@ class MapsViewModel @ViewModelInject constructor(
     private val _listAddressesLocation = MutableLiveData<List<AddressLocation>>()
     val listAddressesLocation: LiveData<List<AddressLocation>> get() = _listAddressesLocation
 
+    private val _cameraMove = MutableLiveData<Event<Boolean>>()
+    val cameraMove : LiveData<Event<Boolean>> = _cameraMove
+
     private val _onBackPressed = MutableLiveData<Boolean>()
     val onBackPressed: LiveData<Boolean> get() = _onBackPressed
 
@@ -53,12 +56,17 @@ class MapsViewModel @ViewModelInject constructor(
     private var lastNameLocation = ""
 
     private fun subscribeObservers(){
-        mapsRepositoryImpl.addressLocation.observeForever(Observer {
+        mapsRepositoryImpl.addressLocation.observeForever{
             Log.i("SeeAddressLocation", "Add addressLOCATION")
             listLocations.add(it)
-        })
+        }
 
-        mapsRepositoryImpl.message.observeForever {
+        mapsRepositoryImpl.cameraMove.observeForever{
+            if(it.hasBeenHandled) return@observeForever
+            _cameraMove.value = it
+        }
+
+        mapsRepositoryImpl.message.observeForever{
             if(it.hasBeenHandled) return@observeForever
 
             Log.i("SeeAddressLocation", "Add message")
@@ -68,7 +76,7 @@ class MapsViewModel @ViewModelInject constructor(
 
     //Get list addresses of addresses by name location and set on MutableLiveData
     fun getListAddressesByName(nameLocation: String, context: Context) {
-        if ((nameLocation == lastNameLocation) || nameLocation.isBlank()) {
+        if ((nameLocation == lastNameLocation)) {
             return
         }
         lastNameLocation = nameLocation
@@ -93,6 +101,10 @@ class MapsViewModel @ViewModelInject constructor(
         }
 
         _listAddressesLocation.postValue(mutableListAddressesLocation.toList())
+    }
+
+    fun setLastNameLocationEmpty(){
+        lastNameLocation = ""
     }
 
     fun getLastLocation() {
