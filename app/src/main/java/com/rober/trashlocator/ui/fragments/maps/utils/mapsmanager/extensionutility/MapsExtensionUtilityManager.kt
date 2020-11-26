@@ -53,7 +53,10 @@ class MapsExtensionUtilityManager constructor(
         return trashLocationUtils.getDataset(addressLocation) > -1
     }
 
-    override suspend fun getTrashCluster(googleMap: GoogleMap, addressLocation: AddressLocation) : List<Trash>{
+    override suspend fun getTrashCluster(
+        googleMap: GoogleMap,
+        addressLocation: AddressLocation
+    ): List<Trash> {
         val raw = trashLocationUtils.getDataset(addressLocation)
 
         val places = mutableListOf<Trash>()
@@ -100,5 +103,26 @@ class MapsExtensionUtilityManager constructor(
 //            _listTrash.postValue(places)
         }
         return places
+    }
+
+    override suspend fun getListAddressesByName(nameLocation: String): List<AddressLocation> {
+        val addresses = geoCoder.getFromLocationName(nameLocation, 5)
+        val listAddressesLocation = mutableListOf<AddressLocation>()
+
+        for (address in addresses) {
+            val location = AddressLocation()
+
+            val addressLine = address.getAddressLine(0)
+
+            location.streetName = addressLine
+            location.location.latitude = address.latitude
+            location.location.longitude = address.longitude
+            location.localityName = if (address.locality == null) "" else address.locality
+            location.localityAdminAreaName =
+                if (address.adminArea == null) "" else address.adminArea
+
+            listAddressesLocation.add(location)
+        }
+        return listAddressesLocation
     }
 }

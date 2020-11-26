@@ -13,6 +13,7 @@ class MapsRepositoryImpl @Inject constructor(
 ) : IMapsRepository {
 
     override var addressLocation: LiveData<AddressLocation> = mapsManager.addressLocation
+    override var listAddressesLocation: LiveData<Event<List<AddressLocation>>> = mapsManager.addressesLocation
     override var cameraMove: LiveData<Event<Boolean>> = mapsManager.cameraMove
     override var message: LiveData<Event<String>> = mapsManager.message
 
@@ -22,6 +23,8 @@ class MapsRepositoryImpl @Inject constructor(
     override fun updateLocationUI() = mapsManager.updateLocationUI()
     override fun setUpdateLocationByAddressLocation(addressLocation: AddressLocation, addToLiveData : Boolean) = mapsManager.setUpdateLocationByAddressLocation(addressLocation, addToLiveData)
     override fun requestLocationUpdate() = mapsManager.requestLocationUpdate()
+
+    override suspend fun getListAddressesByName(nameLocation: String)  = mapsManager.getListAddressesByName(nameLocation)
 
     override fun registerReceiver(broadcastReceiver: BroadcastReceiver) = mapsManager.registerReceiver(broadcastReceiver)
 

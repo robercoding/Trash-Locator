@@ -9,6 +9,7 @@ import com.rober.trashlocator.utils.Event
 
 interface IMapsRepository {
     var addressLocation: LiveData<AddressLocation>
+    var listAddressesLocation: LiveData<Event<List<AddressLocation>>>
     var cameraMove : LiveData<Event<Boolean>>
     var message: LiveData<Event<String>>
 
@@ -18,6 +19,8 @@ interface IMapsRepository {
     fun updateLocationUI()
     fun setUpdateLocationByAddressLocation(addressLocation: AddressLocation, addToLiveData : Boolean)
     fun requestLocationUpdate()
+
+    suspend fun getListAddressesByName(nameLocation: String)
 
     fun registerReceiver(broadcastReceiver: BroadcastReceiver)
     fun unregisterReceiver()

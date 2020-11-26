@@ -106,9 +106,8 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     }
 
     private fun subscribeObservers() {
-        viewModel.listAddressesLocation.observe(viewLifecycleOwner) { listAddressesLocation ->
-            if (listAddressesLocation.isEmpty()) return@observe
-            setSearchAdapter(listAddressesLocation)
+        viewModel.listAddressesLocation.observe(viewLifecycleOwner) { eventListAddressesLocation ->
+            setSearchAdapter(eventListAddressesLocation.getContentIfNotHandled() ?: return@observe)
         }
 
         viewModel.cameraMove.observe(viewLifecycleOwner) {
@@ -124,9 +123,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
             defaultOnBackPressed()
         }
         viewModel.message.observe(viewLifecycleOwner) { eventMessage ->
-            eventMessage.getContentIfNotHandled()?.let {
-                displayToast(it)
-            }
+            displayToast(eventMessage.getContentIfNotHandled() ?: return@observe)
         }
     }
 
