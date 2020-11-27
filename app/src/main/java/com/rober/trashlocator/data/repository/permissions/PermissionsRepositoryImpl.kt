@@ -4,6 +4,7 @@ import com.rober.trashlocator.ui.fragments.maps.utils.permissions.PermissionsMan
 
 class PermissionsRepositoryImpl constructor(
     private val permissionsManager: PermissionsManager
-) : IPermissionsRepository{
-    override fun setLocationPermissionsGranted(isLocationPermissionsGranted: Boolean) = permissionsManager.setLocationPermissionGranted(isLocationPermissionsGranted)
+) : IPermissionsRepository {
+    override fun setLocationPermissionsGranted(isLocationPermissionsGranted: Boolean) =
+        permissionsManager.setLocationPermissionGranted(isLocationPermissionsGranted)
 }

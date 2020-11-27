@@ -15,19 +15,20 @@ class PermissionsManager @Inject constructor(
     @ActivityScoped private val context: Context,
     private val gpsManager: GPSManager
 ) {
-    private val TAG ="PermissionsManager"
+    private val TAG = "PermissionsManager"
     var gpsEnabled = false
 
     private var locationPermissionGranted = false
     var alreadyRequestLocationPermission = false
 
-    fun checkLocationPermission() : Boolean{
+    fun checkLocationPermission(): Boolean {
         return (ContextCompat.checkSelfPermission(
             context,
             Manifest.permission.ACCESS_FINE_LOCATION
         )
                 == PackageManager.PERMISSION_GRANTED)
     }
+
     fun checkLocationPermissionAndSettings(): Boolean {
         locationPermissionGranted = checkLocationPermission()
         if (!locationPermissionGranted && !alreadyRequestLocationPermission) {
@@ -61,7 +62,8 @@ class PermissionsManager @Inject constructor(
     }
 
     fun requestLocationPermissions() {
-        val activity = if(context is MapsActivity) context else throw Exception("Can't get instance of MapsActivity")
+        val activity =
+            if (context is MapsActivity) context else throw Exception("Can't get instance of MapsActivity")
 
         ActivityCompat.requestPermissions(
             activity,
@@ -73,7 +75,7 @@ class PermissionsManager @Inject constructor(
         )
     }
 
-    fun isLocationPermissionGranted() : Boolean {
+    fun isLocationPermissionGranted(): Boolean {
         return isLocationPermissionGranted()
     }
 

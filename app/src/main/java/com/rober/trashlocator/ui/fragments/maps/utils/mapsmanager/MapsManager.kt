@@ -5,14 +5,16 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.location.*
+import android.location.Criteria
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.clustering.ClusterManager
@@ -44,10 +46,10 @@ class MapsManager constructor(
     val addressLocation: LiveData<AddressLocation> get() = _addressLocation
 
     private val _addressesLocation = MutableLiveData<Event<List<AddressLocation>>>()
-    val addressesLocation :LiveData<Event<List<AddressLocation>>> = _addressesLocation
+    val addressesLocation: LiveData<Event<List<AddressLocation>>> = _addressesLocation
 
     private val _cameraMove = MutableLiveData<Event<Boolean>>()
-    val cameraMove : LiveData<Event<Boolean>> = _cameraMove
+    val cameraMove: LiveData<Event<Boolean>> = _cameraMove
 
     private val _message = MutableLiveData<Event<String>>()
     val message: LiveData<Event<String>> get() = _message
@@ -116,7 +118,8 @@ class MapsManager constructor(
 
     //Get list addresses of addresses by name location and set on MutableLiveData
     suspend fun getListAddressesByName(nameLocation: String) {
-        _addressesLocation.value = Event(mapsExtensionUtilityManager.getListAddressesByName(nameLocation))
+        _addressesLocation.value =
+            Event(mapsExtensionUtilityManager.getListAddressesByName(nameLocation))
     }
 
     private fun setMyLocationButton(value: Boolean) {

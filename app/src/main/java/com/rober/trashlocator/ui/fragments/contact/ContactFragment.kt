@@ -28,10 +28,6 @@ class ContactFragment : BaseFragment<ContactViewModel>(R.layout.contact_fragment
         return inflater.inflate(R.layout.contact_fragment, container, false)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-    }
-
     private fun openTwitter() {
         val twitterIntent = buildTweetIntent()
 

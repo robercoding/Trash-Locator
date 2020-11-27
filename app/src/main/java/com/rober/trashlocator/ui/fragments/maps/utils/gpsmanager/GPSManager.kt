@@ -13,19 +13,19 @@ import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
 
 @ActivityScoped
-class GPSManager  @Inject constructor(
+class GPSManager @Inject constructor(
     @ActivityContext private val context: Context,
     private val locationManager: LocationManager
-){
+) {
     private val TAG = javaClass.simpleName
 //    var replyDialogRequest =
 
-    private var dialogRequestGps : AlertDialog? = null
+    private var dialogRequestGps: AlertDialog? = null
     private var isGPSEnabled = false
 
-    fun checkIfLocationGPSIsEnabled() : Boolean{
+    fun checkIfLocationGPSIsEnabled(): Boolean {
         try {
-             isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+            isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
         } catch (e: Exception) {
             e.message?.let {
                 Log.e(TAG, it)
@@ -34,12 +34,12 @@ class GPSManager  @Inject constructor(
         return isGPSEnabled
     }
 
-    fun requestGPSEnable(){
-        if(dialogRequestGps?.isShowing == true){
+    fun requestGPSEnable() {
+        if (dialogRequestGps?.isShowing == true) {
             return
         }
 
-        val mapsActivity = if(context is MapsActivity) context else return
+        val mapsActivity = if (context is MapsActivity) context else return
 
         dialogRequestGps = MaterialAlertDialogBuilder(mapsActivity)
             .setTitle("GPS is off")
@@ -71,7 +71,7 @@ class GPSManager  @Inject constructor(
             .show()
     }
 
-    fun isGPSEnabled() : Boolean{
+    fun isGPSEnabled(): Boolean {
         return isGPSEnabled
     }
 }

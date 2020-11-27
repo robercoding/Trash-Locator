@@ -2,13 +2,11 @@ package com.rober.trashlocator.di
 
 import android.content.Context
 import android.location.Geocoder
-import android.location.Location
 import android.location.LocationManager
-import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.rober.trashlocator.data.repository.maps.MapsRepositoryImpl
 import com.rober.trashlocator.data.repository.permissions.PermissionsRepositoryImpl
-import com.rober.trashlocator.ui.fragments.maps.utils.*
+import com.rober.trashlocator.ui.fragments.maps.utils.TrashLocationUtils
 import com.rober.trashlocator.ui.fragments.maps.utils.gpsmanager.GPSManager
 import com.rober.trashlocator.ui.fragments.maps.utils.mapsmanager.MapsManager
 import com.rober.trashlocator.ui.fragments.maps.utils.mapsmanager.extensionutility.MapsExtensionUtilityManager
@@ -24,18 +22,22 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 @InstallIn(ActivityComponent::class)
 object GoogleMapModule {
 
-    @Provides fun provideMapsManager(
+    @Provides
+    fun provideMapsManager(
         @ActivityContext context: Context,
         permissionsManager: PermissionsManager,
         gpsManager: GPSManager,
         geoCoderManager: MapsExtensionUtilityManager,
         locationManager: LocationManager
-    ): MapsManager = MapsManager(context, permissionsManager, gpsManager,geoCoderManager,  locationManager)
+    ): MapsManager =
+        MapsManager(context, permissionsManager, gpsManager, geoCoderManager, locationManager)
 
     @Provides
     fun provideMapsRepository(mapsManager: MapsManager) = MapsRepositoryImpl(mapsManager)
 
-    @Provides fun providePermissionsRepository(permissionsManager: PermissionsManager) = PermissionsRepositoryImpl(permissionsManager)
+    @Provides
+    fun providePermissionsRepository(permissionsManager: PermissionsManager) =
+        PermissionsRepositoryImpl(permissionsManager)
 
     @Provides
     fun providePermissionsManager(
@@ -54,14 +56,17 @@ object GoogleMapModule {
         trashLocationUtils: TrashLocationUtils
     ) = MapsExtensionUtilityManager(context, geoCoder, trashLocationUtils)
 
-    @Provides fun provideGeoCoder(@ActivityContext context: Context) = Geocoder(context)
+    @Provides
+    fun provideGeoCoder(@ActivityContext context: Context) = Geocoder(context)
 
-    @Provides fun provideTrashLocationUtils(@ActivityContext context: Context) = TrashLocationUtils(context)
+    @Provides
+    fun provideTrashLocationUtils(@ActivityContext context: Context) = TrashLocationUtils(context)
 
     @Provides
     fun provideLocationManager(@ActivityContext context: Context): LocationManager =
         context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
     @Provides
-    fun provideFusedLocationProvider(@ActivityContext context: Context) = LocationServices.getFusedLocationProviderClient(context)
+    fun provideFusedLocationProvider(@ActivityContext context: Context) =
+        LocationServices.getFusedLocationProviderClient(context)
 }

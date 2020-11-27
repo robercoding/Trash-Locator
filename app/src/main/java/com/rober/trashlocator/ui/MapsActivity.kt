@@ -23,10 +23,10 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private val TAG = "MainActivity"
 
     private lateinit var binding: ActivityMapsBinding
-    private lateinit var drawer: DrawerLayout
     private lateinit var navigationView: NavigationView
     private lateinit var navHostFragment: NavHostFragment
     private lateinit var navController: NavController
+    private var drawer: DrawerLayout? = null
 
     private var isNightMode = false
 
@@ -67,7 +67,7 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.string.navigation_drawer_open,
             R.string.navigation_drawer_close
         )
-        drawer.addDrawerListener(toggle)
+        drawer?.addDrawerListener(toggle)
         toggle.syncState()
 
         //SetNavigationItemSelected let us control fragment recreation by not calling directly to change destination
@@ -78,21 +78,15 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     fun openDrawer() {
-        if (!this::drawer.isInitialized)
-            return
-
-        drawer.openDrawer()
+        drawer?.openDrawer()
     }
 
     fun closeDrawer() {
-        if (!this::drawer.isInitialized)
-            return
-
-        drawer.closeDrawer()
+        drawer?.closeDrawer()
     }
 
     private fun navigateToMapFragment() {
-        if(navController.currentDestination?.id == Destinations.mapsFragment){
+        if (navController.currentDestination?.id == Destinations.mapsFragment) {
             closeDrawer()
             return
         }
@@ -132,7 +126,7 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         val destinationId = item.itemId
-        if(isDestinationSameAsCurrentDestination(destinationId)){
+        if (isDestinationSameAsCurrentDestination(destinationId)) {
             closeDrawer()
             return false
         }
@@ -147,15 +141,16 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         return false
     }
 
-    private fun isDestinationSameAsCurrentDestination(destinationId : Int) : Boolean{
+    private fun isDestinationSameAsCurrentDestination(destinationId: Int): Boolean {
         return destinationId == navController.currentDestination?.id
     }
 
     override fun onBackPressed() {
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            closeDrawer()
-        } else {
-            super.onBackPressed()
+        drawer?.let {
+            if (it.isDrawerOpen(GravityCompat.START))
+                closeDrawer()
+            else
+                super.onBackPressed()
         }
     }
 
@@ -178,7 +173,7 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         return isNightMode
     }
 
-    fun findNavController() : NavController {
+    fun findNavController(): NavController {
         return navController
     }
 
@@ -200,14 +195,5 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         super.onDestroy()
         Log.i(TAG, "On Destroy activity")
 
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
     }
 }

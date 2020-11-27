@@ -33,7 +33,7 @@ abstract class BaseFragment<VM : ViewModel>(view: Int) : Fragment(view) {
         Log.i(TAG, "On View Created")
         setupListeners()
         setupView()
-        if(requireActivity() is MapsActivity){
+        if (requireActivity() is MapsActivity) {
             mapsActivity = requireActivity() as MapsActivity
         }
     }

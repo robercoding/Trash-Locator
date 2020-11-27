@@ -37,13 +37,6 @@ class TextWatcherListener(val textListener: TextListener) : TextWatcher {
                 textListener.onUserStopTyping(text)
             }
 
-            override fun cancel(): Boolean {
-                return super.cancel()
-            }
-
-            override fun scheduledExecutionTime(): Long {
-                return super.scheduledExecutionTime()
-            }
         }, 600)
     }
 

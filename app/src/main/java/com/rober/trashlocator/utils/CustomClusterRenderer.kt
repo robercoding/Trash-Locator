@@ -42,7 +42,7 @@ class CustomClusterRenderer(
 
         val checkClusterSize = clusterSizes.get(bucket)
 
-        if(checkClusterSize == null){
+        if (checkClusterSize == null) {
             makeIconDesign(cluster)
             val descriptor = icons.get(bucket)
             markerOptions.icon(descriptor)
@@ -81,14 +81,14 @@ class CustomClusterRenderer(
 
         //Add shape background and outline to IconGenerator
         val outline = ShapeDrawable(OvalShape())
-        outline.paint.setColor(ContextCompat.getColor(context, R.color.blueLight))
+        outline.paint.color = ContextCompat.getColor(context, R.color.blueLight)
         val background = LayerDrawable(arrayOf<Drawable>(outline, coloredCircleBackground))
         val strokeWidth = (density * 3.0f).toInt()
         background.setLayerInset(1, strokeWidth, strokeWidth, strokeWidth, strokeWidth)
         iconGenerator.setBackground(background)
 
         val bucket = getBucket(cluster)
-        coloredCircleBackground.paint.setColor(getColor(bucket))
+        coloredCircleBackground.paint.color = getColor(bucket)
 //        coloredCircleBackground.paint.setColor(ContextCompat.getColor(context, R.color.green))
         val descriptor = BitmapDescriptorFactory.fromBitmap(iconGenerator.makeIcon())
 
@@ -113,7 +113,7 @@ class CustomClusterRenderer(
         val bucket = getBucket(cluster)
         val clusterSize = clusterSizes.get(bucket)
 
-        if(clusterSize != null){
+        if (clusterSize != null) {
 
             return
         }

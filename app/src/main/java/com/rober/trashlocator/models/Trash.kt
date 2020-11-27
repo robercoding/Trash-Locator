@@ -11,9 +11,9 @@ class Trash(
     snippet: String
 ) : ClusterItem {
 
-    private val position: LatLng
-    private val title: String
-    private val snippet: String
+    private val position: LatLng = LatLng(lat, lng)
+    private val title: String = title
+    private val snippet: String = snippet
 
     override fun getPosition(): LatLng {
         return position
@@ -27,9 +27,4 @@ class Trash(
         return snippet
     }
 
-    init {
-        position = LatLng(lat, lng)
-        this.title = title
-        this.snippet = snippet
-    }
 }
