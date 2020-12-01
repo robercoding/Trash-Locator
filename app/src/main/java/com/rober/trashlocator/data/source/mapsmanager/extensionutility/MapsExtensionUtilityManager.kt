@@ -1,4 +1,4 @@
-package com.rober.trashlocator.ui.fragments.maps.utils.mapsmanager.extensionutility
+package com.rober.trashlocator.data.source.mapsmanager.extensionutility
 
 import android.content.Context
 import android.location.Geocoder
@@ -10,7 +10,7 @@ import com.google.maps.android.data.geojson.GeoJsonLayer
 import com.rober.trashlocator.models.AddressLocation
 import com.rober.trashlocator.models.Trash
 import com.rober.trashlocator.models.TrashLocation
-import com.rober.trashlocator.ui.fragments.maps.utils.TrashLocationUtils
+import com.rober.trashlocator.data.source.mapsmanager.utils.TrashLocationUtils
 import com.rober.trashlocator.utils.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

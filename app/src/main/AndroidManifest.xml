@@ -7,6 +7,9 @@
         android:name="com.pkg.map.permission.MAPS_RECEIVE"
         android:protectionLevel="signature" />
 
+    <permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <permission android:name="android.permission.ACCESS_GPS" />
 
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use

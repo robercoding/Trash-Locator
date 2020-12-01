@@ -3,6 +3,7 @@ package com.rober.trashlocator.utils.listeners
 import android.location.Location
 import android.location.LocationListener
 import android.os.Bundle
+import android.util.Log
 import com.rober.trashlocator.utils.listeners.interfaces.ICustomLocationListener
 
 
@@ -11,6 +12,7 @@ class CustomLocationListener(
 ) : LocationListener {
 
     override fun onLocationChanged(location: Location?) {
+        println("heyy")
         if (location == null) {
             return
         }

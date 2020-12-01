@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver
 import androidx.lifecycle.LiveData
 import com.google.android.gms.maps.GoogleMap
 import com.rober.trashlocator.models.AddressLocation
-import com.rober.trashlocator.ui.fragments.maps.utils.mapsmanager.MapsManager
+import com.rober.trashlocator.data.source.mapsmanager.MapsManager
 import com.rober.trashlocator.utils.Event
 import javax.inject.Inject
 

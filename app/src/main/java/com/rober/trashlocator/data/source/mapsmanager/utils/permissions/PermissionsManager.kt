@@ -1,4 +1,4 @@
-package com.rober.trashlocator.ui.fragments.maps.utils.permissions
+package com.rober.trashlocator.data.source.mapsmanager.utils.permissions
 
 import android.Manifest
 import android.content.Context
@@ -6,7 +6,7 @@ import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.rober.trashlocator.ui.MapsActivity
-import com.rober.trashlocator.ui.fragments.maps.utils.gpsmanager.GPSManager
+import com.rober.trashlocator.data.source.mapsmanager.utils.gpsmanager.GPSManager
 import com.rober.trashlocator.utils.Constants
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
@@ -14,14 +14,14 @@ import javax.inject.Inject
 class PermissionsManager @Inject constructor(
     @ActivityScoped private val context: Context,
     private val gpsManager: GPSManager
-) {
+) : IPermissionsManager {
     private val TAG = "PermissionsManager"
-    var gpsEnabled = false
+    override var gpsEnabled = false
 
     private var locationPermissionGranted = false
-    var alreadyRequestLocationPermission = false
+    override var alreadyRequestLocationPermission = false
 
-    fun checkLocationPermission(): Boolean {
+    override fun checkLocationPermission(): Boolean {
         return (ContextCompat.checkSelfPermission(
             context,
             Manifest.permission.ACCESS_FINE_LOCATION
@@ -29,7 +29,7 @@ class PermissionsManager @Inject constructor(
                 == PackageManager.PERMISSION_GRANTED)
     }
 
-    fun checkLocationPermissionAndSettings(): Boolean {
+    override fun checkLocationPermissionAndSettings(): Boolean {
         locationPermissionGranted = checkLocationPermission()
         if (!locationPermissionGranted && !alreadyRequestLocationPermission) {
             requestLocationPermissions()
@@ -61,7 +61,7 @@ class PermissionsManager @Inject constructor(
         return true
     }
 
-    fun requestLocationPermissions() {
+    override fun requestLocationPermissions() {
         val activity =
             if (context is MapsActivity) context else throw Exception("Can't get instance of MapsActivity")
 
@@ -75,11 +75,11 @@ class PermissionsManager @Inject constructor(
         )
     }
 
-    fun isLocationPermissionGranted(): Boolean {
+    override fun isLocationPermissionGranted(): Boolean {
         return isLocationPermissionGranted()
     }
 
-    fun setLocationPermissionGranted(isLocationPermissionGranted: Boolean) {
+    override fun setLocationPermissionGranted(isLocationPermissionGranted: Boolean) {
         locationPermissionGranted = isLocationPermissionGranted
     }
 }

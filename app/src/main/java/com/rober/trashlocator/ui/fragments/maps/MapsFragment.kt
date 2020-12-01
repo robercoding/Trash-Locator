@@ -20,7 +20,7 @@ import com.rober.trashlocator.models.AddressLocation
 import com.rober.trashlocator.ui.MapsActivity
 import com.rober.trashlocator.ui.base.BaseFragment
 import com.rober.trashlocator.ui.base.viewBinding
-import com.rober.trashlocator.ui.fragments.maps.utils.IGPSReceiverListener
+import com.rober.trashlocator.data.source.mapsmanager.utils.IGPSReceiverListener
 import com.rober.trashlocator.utils.Constants
 import com.rober.trashlocator.utils.GPSBroadcastReceiver
 import com.rober.trashlocator.utils.hide

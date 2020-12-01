@@ -1,4 +1,4 @@
-package com.rober.trashlocator.ui.fragments.maps.utils.gpsmanager
+package com.rober.trashlocator.data.source.mapsmanager.utils.gpsmanager
 
 import android.content.Context
 import android.content.Intent
@@ -16,14 +16,14 @@ import javax.inject.Inject
 class GPSManager @Inject constructor(
     @ActivityContext private val context: Context,
     private val locationManager: LocationManager
-) {
+) : IGPSManager {
     private val TAG = javaClass.simpleName
 //    var replyDialogRequest =
 
     private var dialogRequestGps: AlertDialog? = null
     private var isGPSEnabled = false
 
-    fun checkIfLocationGPSIsEnabled(): Boolean {
+    override fun checkIfLocationGPSIsEnabled(): Boolean {
         try {
             isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
         } catch (e: Exception) {
@@ -34,7 +34,7 @@ class GPSManager @Inject constructor(
         return isGPSEnabled
     }
 
-    fun requestGPSEnable() {
+    override fun requestGPSEnable() {
         if (dialogRequestGps?.isShowing == true) {
             return
         }
@@ -71,7 +71,7 @@ class GPSManager @Inject constructor(
             .show()
     }
 
-    fun isGPSEnabled(): Boolean {
+    override fun isGPSEnabled(): Boolean {
         return isGPSEnabled
     }
 }

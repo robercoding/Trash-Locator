@@ -6,11 +6,12 @@ import android.location.LocationManager
 import com.google.android.gms.location.LocationServices
 import com.rober.trashlocator.data.repository.maps.MapsRepositoryImpl
 import com.rober.trashlocator.data.repository.permissions.PermissionsRepositoryImpl
-import com.rober.trashlocator.ui.fragments.maps.utils.TrashLocationUtils
-import com.rober.trashlocator.ui.fragments.maps.utils.gpsmanager.GPSManager
-import com.rober.trashlocator.ui.fragments.maps.utils.mapsmanager.MapsManager
-import com.rober.trashlocator.ui.fragments.maps.utils.mapsmanager.extensionutility.MapsExtensionUtilityManager
-import com.rober.trashlocator.ui.fragments.maps.utils.permissions.PermissionsManager
+import com.rober.trashlocator.data.source.mapsmanager.utils.TrashLocationUtils
+import com.rober.trashlocator.data.source.mapsmanager.utils.gpsmanager.GPSManager
+import com.rober.trashlocator.data.source.mapsmanager.MapsManager
+import com.rober.trashlocator.data.source.mapsmanager.extensionutility.MapsExtensionUtilityManager
+import com.rober.trashlocator.data.source.mapsmanager.utils.CustomLocationManager
+import com.rober.trashlocator.data.source.mapsmanager.utils.permissions.PermissionsManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,7 +29,7 @@ object GoogleMapModule {
         permissionsManager: PermissionsManager,
         gpsManager: GPSManager,
         geoCoderManager: MapsExtensionUtilityManager,
-        locationManager: LocationManager
+        locationManager: CustomLocationManager
     ): MapsManager =
         MapsManager(context, permissionsManager, gpsManager, geoCoderManager, locationManager)
 
@@ -61,6 +62,9 @@ object GoogleMapModule {
 
     @Provides
     fun provideTrashLocationUtils(@ActivityContext context: Context) = TrashLocationUtils(context)
+
+    @Provides
+    fun provideCustomLocationManager(locationManager: LocationManager) = CustomLocationManager(locationManager)
 
     @Provides
     fun provideLocationManager(@ActivityContext context: Context): LocationManager =

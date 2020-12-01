@@ -1,4 +1,4 @@
-package com.rober.trashlocator.ui.fragments.maps.utils.mapsmanager.extensionutility
+package com.rober.trashlocator.data.source.mapsmanager.extensionutility
 
 import android.location.Location
 import com.google.android.gms.maps.GoogleMap

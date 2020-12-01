@@ -12,16 +12,21 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
 import com.rober.trashlocator.R
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
+@HiltAndroidTest
 class MapsActivityTest {
     @get:Rule
     var activityScenarioRule = ActivityScenarioRule(MapsActivity::class.java)
 
+    @get:Rule
+    var hiltRule = HiltAndroidRule(this)
 
     @Test
     fun startApp_WithMapsFragmentAsStartDestination() {
@@ -106,5 +111,10 @@ class MapsActivityTest {
         onView(withId(R.id.settingsFragment)).perform(click())
 
         assertThat(navcontroller?.currentDestination?.id).isEqualTo(R.id.settingsFragment)
+    }
+
+    @Test
+    fun clickOnDrawerSSDS(){
+
     }
 }
