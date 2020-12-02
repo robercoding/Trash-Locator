@@ -7,9 +7,8 @@ import com.rober.trashlocator.models.Trash
 import com.rober.trashlocator.models.TrashLocation
 
 interface IMapsExtensionUtilityManager {
-    fun getSingleAddressLocation(location: Location): AddressLocation
     fun getSingleTrashLocation(location: Location): TrashLocation
     suspend fun getListAddressesByName(nameLocation: String): List<AddressLocation>
     suspend fun existsDataSet(addressLocation: AddressLocation): Boolean
-    suspend fun getTrashCluster(googleMap: GoogleMap, addressLocation: AddressLocation): List<Trash>
+    suspend fun getTrashCluster(googleMap: GoogleMap?, addressLocation: AddressLocation): List<Trash>
 }

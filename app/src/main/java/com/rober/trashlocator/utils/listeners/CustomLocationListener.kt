@@ -12,7 +12,6 @@ class CustomLocationListener(
 ) : LocationListener {
 
     override fun onLocationChanged(location: Location?) {
-        println("heyy")
         if (location == null) {
             return
         }

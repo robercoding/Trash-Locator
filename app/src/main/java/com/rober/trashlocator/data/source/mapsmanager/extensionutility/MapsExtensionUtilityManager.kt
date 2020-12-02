@@ -21,27 +21,29 @@ class MapsExtensionUtilityManager constructor(
     private val trashLocationUtils: TrashLocationUtils
 ) : IMapsExtensionUtilityManager {
 
-    override fun getSingleAddressLocation(location: Location): AddressLocation {
-        val address = geoCoder.getFromLocation(location.latitude, location.longitude, 1)[0]
-        Log.i("SeeAddress", "$address")
-
-        val addressLocation = AddressLocation()
-        addressLocation.localityName = address.locality
-        addressLocation.localityAdminAreaName = address.adminArea
-        addressLocation.location = location
-
-        return addressLocation
-    }
+    //Function not being used in the app
+//    fun getSingleAddressLocation(location: Location): AddressLocation {
+//        val address = geoCoder.getFromLocation(location.latitude, location.longitude, 1)[0]
+//        Log.i("SeeAddress", "$address")
+//
+//        val addressLocation = AddressLocation()
+//        addressLocation.localityName = address.locality
+//        addressLocation.localityAdminAreaName = address.adminArea
+//        addressLocation.location = location
+//
+//        return addressLocation
+//    }
 
     override fun getSingleTrashLocation(location: Location): TrashLocation {
         val address = geoCoder.getFromLocation(location.latitude, location.longitude, 4)[0]
+        Log.i("SeeAddress", "$address")
 
         var trashLocation = TrashLocation()
 
         trashLocation.streetName = if (address.thoroughfare == null) "" else address.thoroughfare
         trashLocation.locality = if (address.locality == null) "" else address.locality
 
-        val isFeatureNameNumber = Utils.isNumber(address.featureName)
+        val isFeatureNameNumber = if(address.featureName == null) false else Utils.isNumber(address.featureName)
         if (isFeatureNameNumber)
             trashLocation.feature = address.featureName
 
@@ -54,7 +56,7 @@ class MapsExtensionUtilityManager constructor(
     }
 
     override suspend fun getTrashCluster(
-        googleMap: GoogleMap,
+        googleMap: GoogleMap?,
         addressLocation: AddressLocation
     ): List<Trash> {
         val raw = trashLocationUtils.getDataset(addressLocation)
@@ -62,13 +64,8 @@ class MapsExtensionUtilityManager constructor(
         val places = mutableListOf<Trash>()
         withContext(Dispatchers.IO) {
             if (raw == -1) {
-//                _message.postValue(Event(context.getStringResources(R.string.dataset_not_found)))
-//            val message = context.resources.getString(R.string.dataset_not_found)
-//            _message.value = Event(message)
                 return@withContext
             }
-
-//            _message.postValue(Event(context.getStringResources(R.string.dataset_found)))
 
             val layer = GeoJsonLayer(googleMap, raw, context)
 

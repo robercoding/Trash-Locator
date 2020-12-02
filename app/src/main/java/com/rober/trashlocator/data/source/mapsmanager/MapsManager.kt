@@ -87,13 +87,10 @@ class MapsManager constructor(
             setMyLocationButton(false)
             return
         }
-        println("Lets get it!")
-
 
         try {
             if (isLocationPermissionsOk && isGPSEnabled) {
                 setMyLocationButton(true)
-                println("Lets get the device location!")
                 getDeviceLocation()
             } else {
                 setMyLocationButton(false)
@@ -169,7 +166,6 @@ class MapsManager constructor(
             criteria.horizontalAccuracy = Criteria.ACCURACY_HIGH
             criteria.verticalAccuracy = Criteria.ACCURACY_HIGH
 
-            println("Requesting now!")
             locationListener?.let { locationManager.requestSingleUpdate(it) } ?: _message.postValue(Event("Error trying to request a single update"))
         } catch (e: Exception) {
             val errorMessage = e.message
@@ -222,20 +218,6 @@ class MapsManager constructor(
         clusterManager.cluster()
         clusterManager.setAnimation(true)
     }
-
-//    private fun moveCameraByCameraPosition(cameraPosition: CameraPosition) {
-//        googleMap?.animateCamera(
-//            CameraUpdateFactory.newLatLngZoom(
-//                cameraPosition.target, cameraPosition.zoom
-//            )
-//        )
-//    }
-//
-//    private fun setUpdateLocationByLocation(location: Location) {
-//        val addressLocation = mapsExtensionUtilityManager.getSingleAddressLocation(location)
-//        _addressLocation.value = addressLocation
-//        moveCamera(addressLocation)
-//    }
 
     private fun moveCamera(addressLocation: AddressLocation) {
         /*
