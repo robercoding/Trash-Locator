@@ -46,6 +46,14 @@ android {
         returnDefaultValues = true
     }
 
+    packagingOptions {
+        // pickFirst "META-INF/DEPENDENCIES"
+        exclude 'META-INF/AL2.0'
+        exclude 'META-INF/LGPL2.1'
+        exclude "META-INF/DEPENDENCIES"
+        exclude 'project.properties'
+        exclude 'META-INF/INDEX.LIST'
+    }
 }
 
 dependencies {
@@ -115,7 +123,7 @@ dependencies {
     androidTestImplementation "com.google.truth:truth:1.1"
     androidTestImplementation "androidx.navigation:navigation-testing:$nav_version"
     androidTestImplementation 'org.mockito:mockito-android:2.24.5'
-//    androidTestImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.4.2'
+    androidTestImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.4.2'
 
 //    debugImplementation "androidx.fragment:fragment-testing:$fragment_version"
     debugImplementation ('androidx.fragment:fragment-testing:1.2.5') {

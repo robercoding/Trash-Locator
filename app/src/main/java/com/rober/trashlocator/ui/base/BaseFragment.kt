@@ -59,8 +59,8 @@ abstract class BaseFragment<VM : ViewModel>(view: Int) : Fragment(view) {
         imm.hideSoftInputFromWindow(requireView().windowToken, 0)
     }
 
-    fun displayToast(message: String, time: Int = Toast.LENGTH_LONG) {
-        Toast.makeText(requireContext(), message, time).show()
+    fun displayToast(message: String, time: Int = Toast.LENGTH_LONG) = activity?.runOnUiThread{
+            Toast.makeText(requireContext(), message, time).show()
     }
 
     open fun detectOnBackPressed() {

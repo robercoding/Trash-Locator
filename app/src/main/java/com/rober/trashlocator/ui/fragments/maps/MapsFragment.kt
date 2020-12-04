@@ -87,7 +87,8 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         isFirstTimeEnter = false
     }
 
-    private fun setSearchAdapter(listAddressLocation: List<AddressLocation>) {
+    //runOnUiThread because InstrumentationNeeds can't access to Ui staff since they are on a different thread
+    private fun setSearchAdapter(listAddressLocation: List<AddressLocation>) = activity?.runOnUiThread{
         val searchAdapter = SearchLocationAdapter(listAddressLocation, this)
 
         binding.recyclerLocation.apply {
