@@ -1,16 +1,14 @@
 package com.rober.trashlocator.ui.fragments.maps
 
-import android.location.Location
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.rober.trashlocator.data.repository.maps.MapsRepositoryImpl
-import com.rober.trashlocator.data.repository.permissions.PermissionsRepositoryImpl
+import com.rober.trashlocator.data.repository.permissions.PermissionsManagerImpl
 import com.rober.trashlocator.models.AddressLocation
 import com.rober.trashlocator.data.source.mapsmanager.MapsManager
 import com.rober.trashlocator.utils.Event
 import org.junit.Before
 import org.junit.Rule
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
@@ -24,7 +22,7 @@ class MapsViewModelTest {
     private lateinit var viewmodel : MapsViewModel
 
     @Mock lateinit var mapsRepositoryImpl: MapsRepositoryImpl
-    @Mock lateinit var permissionsRepositoryImpl: PermissionsRepositoryImpl
+    @Mock lateinit var permissionsRepositoryImpl: PermissionsManagerImpl
     @Mock lateinit var mapsManager : MapsManager
 
     @Mock lateinit var listAddressesObserver: Observer<Event<List<AddressLocation>>>

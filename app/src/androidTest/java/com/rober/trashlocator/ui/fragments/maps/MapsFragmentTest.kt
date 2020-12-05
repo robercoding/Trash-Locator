@@ -1,5 +1,6 @@
 package com.rober.trashlocator.ui.fragments.maps
 
+import android.app.Activity
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
@@ -10,8 +11,10 @@ import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnitRunner
 import com.rober.trashlocator.R
+import com.rober.trashlocator.ToastMatcher
 import com.rober.trashlocator.launchFragmentInHiltContainer
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -49,9 +52,10 @@ class MapsFragmentTest : AndroidJUnitRunner() {
     }
 
     @Test
-    fun writeOnSearchPlace_clickOnRecyclerView_moveCameraPosition() = runBlockingTest {
+    fun writeOnSearchPlace_clickOnRecyclerView_moveCameraPosition_displaysToastNotFoundDataSet() = runBlockingTest {
         //Given
-        launchFragmentInHiltContainer<MapsFragment>()
+        var activity : Activity? = null
+        launchFragmentInHiltContainer<MapsFragment>(){activity = requireActivity()}
         val stringToTest = "Madrid"
         onView(withId(R.id.ETsearchLocation)).perform(TypeTextAction(stringToTest))
 
@@ -65,5 +69,33 @@ class MapsFragmentTest : AndroidJUnitRunner() {
                 hasDescendant(withSubstring("Madrid")), click()
             )
         )
+        Thread.sleep(1500)
+
+        onView(withText(InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.dataset_not_found))).inRoot(ToastMatcher()).check(matches(
+            isDisplayed()))
+    }
+
+    @Test
+    fun writeOnSearchPlace_clickOnRecyclerView_moveCameraPosition_displaysToastFoundDataSet() = runBlockingTest {
+        //Given
+        var activity : Activity? = null
+        launchFragmentInHiltContainer<MapsFragment>(){activity = requireActivity()}
+        val stringToTest = "Santa Cruz de tenerife"
+        onView(withId(R.id.ETsearchLocation)).perform(TypeTextAction(stringToTest))
+
+        //When
+        onView(withId(R.id.ETsearchLocation)).check(matches(withText(stringToTest)))
+        Thread.sleep(5000) //Waiting for geocoder response
+
+        //Then
+        onView(withId(R.id.recyclerLocation)).perform(
+            RecyclerViewActions.actionOnItem<RecyclerView.ViewHolder>(
+                hasDescendant(withSubstring("Santa Cruz de Tenerife")), click()
+            )
+        )
+        Thread.sleep(1500)
+
+        onView(withText(InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.dataset_found))).inRoot(ToastMatcher()).check(matches(
+            isDisplayed()))
     }
 }
