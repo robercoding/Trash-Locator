@@ -1,8 +1,6 @@
 package com.rober.trashlocator.data.source.mapsmanager.utils.gpsmanager
 
-import com.rober.trashlocator.data.source.mapsmanager.utils.gpsmanager.IGPSManager
-
-class FakeGPSManager : IGPSManager {
+class FakeGPSManager : GPSManager {
     var isGpsOn = true
 
     override fun checkIfLocationGPSIsEnabled(): Boolean {

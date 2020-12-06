@@ -1,5 +1,5 @@
 package com.rober.trashlocator.data.source.mapsmanager.utils.permissions
 
-interface IPermissionsManagerListener {
+interface PermissionsManagerListener {
     fun showError()
 }

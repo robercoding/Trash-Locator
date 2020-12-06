@@ -3,9 +3,9 @@ package com.rober.trashlocator.ui.fragments.maps
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.rober.trashlocator.data.repository.maps.MapsRepositoryImpl
-import com.rober.trashlocator.data.repository.permissions.PermissionsManagerImpl
+import com.rober.trashlocator.data.source.mapsmanager.MapsManagerImpl
+import com.rober.trashlocator.data.source.mapsmanager.utils.permissions.PermissionsManagerImpl
 import com.rober.trashlocator.models.AddressLocation
-import com.rober.trashlocator.data.source.mapsmanager.MapsManager
 import com.rober.trashlocator.utils.Event
 import org.junit.Before
 import org.junit.Rule
@@ -16,33 +16,26 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 class MapsViewModelTest {
-    @Rule @JvmField
+    @Rule
+    @JvmField
     val rule = InstantTaskExecutorRule()
 
-    private lateinit var viewmodel : MapsViewModel
+    private lateinit var viewmodel: MapsViewModel
 
-    @Mock lateinit var mapsRepositoryImpl: MapsRepositoryImpl
-    @Mock lateinit var permissionsRepositoryImpl: PermissionsManagerImpl
-    @Mock lateinit var mapsManager : MapsManager
+    @Mock
+    lateinit var mapsRepositoryImpl: MapsRepositoryImpl
+    @Mock
+    lateinit var permissionsManagerImpl: PermissionsManagerImpl
+    @Mock
+    lateinit var mapsManager: MapsManagerImpl
 
-    @Mock lateinit var listAddressesObserver: Observer<Event<List<AddressLocation>>>
-    @Mock lateinit var observer : Observer<Event<List<AddressLocation>>>
-
+    @Mock
+    lateinit var listAddressesObserver: Observer<Event<List<AddressLocation>>>
 
     @Before
-    fun setup(){
-//        permissionsRepositoryImpl = mock(PermissionsRepositoryImpl::class.java)
-//        mapsManager = mock(MapsManager::class.java)
-//        mapsManager = MapsManager()
+    fun setup() {
         mapsRepositoryImpl = MapsRepositoryImpl(mapsManager)
-        viewmodel = MapsViewModel(mapsRepositoryImpl, permissionsRepositoryImpl)
+        viewmodel = MapsViewModel(mapsRepositoryImpl, permissionsManagerImpl)
         viewmodel.listAddressesLocation.observeForever(listAddressesObserver)
     }
-
-//    @Test
-//    fun checkObservers(){
-//        launchFragmentInContainer<MapsFragment>()
-//        val addressLocation = Event(listOf<AddressLocation>(AddressLocation("testviewmodel", "test", "mapsrepository", Location(""))))
-//        mapsRepositoryImpl..value = addressLocation
-//    }
 }

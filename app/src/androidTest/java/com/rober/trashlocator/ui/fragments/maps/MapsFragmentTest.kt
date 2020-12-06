@@ -52,50 +52,61 @@ class MapsFragmentTest : AndroidJUnitRunner() {
     }
 
     @Test
-    fun writeOnSearchPlace_clickOnRecyclerView_moveCameraPosition_displaysToastNotFoundDataSet() = runBlockingTest {
-        //Given
-        var activity : Activity? = null
-        launchFragmentInHiltContainer<MapsFragment>(){activity = requireActivity()}
-        val stringToTest = "Madrid"
-        onView(withId(R.id.ETsearchLocation)).perform(TypeTextAction(stringToTest))
+    fun writeOnSearchPlace_clickOnRecyclerView_moveCameraPosition_displaysToastNotFoundDataSet() =
+        runBlockingTest {
+            //Given
+            launchFragmentInHiltContainer<MapsFragment>()
+            val stringToTest = "Madrid"
+            onView(withId(R.id.ETsearchLocation)).perform(TypeTextAction(stringToTest))
 
-        //When
-        onView(withId(R.id.ETsearchLocation)).check(matches(withText(stringToTest)))
-        Thread.sleep(5000) //Waiting for geocoder response
+            //When
+            onView(withId(R.id.ETsearchLocation)).check(matches(withText(stringToTest)))
+            Thread.sleep(5000) //Waiting for geocoder response
 
-        //Then
-        onView(withId(R.id.recyclerLocation)).perform(
-            RecyclerViewActions.actionOnItem<RecyclerView.ViewHolder>(
-                hasDescendant(withSubstring("Madrid")), click()
+            //Then
+            onView(withId(R.id.recyclerLocation)).perform(
+                RecyclerViewActions.actionOnItem<RecyclerView.ViewHolder>(
+                    hasDescendant(withSubstring("Madrid")), click()
+                )
             )
-        )
-        Thread.sleep(1500)
+            Thread.sleep(1500)
 
-        onView(withText(InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.dataset_not_found))).inRoot(ToastMatcher()).check(matches(
-            isDisplayed()))
-    }
+            onView(withText(InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.dataset_not_found))).inRoot(
+                ToastMatcher()
+            ).check(
+                matches(
+                    isDisplayed()
+                )
+            )
+        }
 
     @Test
-    fun writeOnSearchPlace_clickOnRecyclerView_moveCameraPosition_displaysToastFoundDataSet() = runBlockingTest {
-        //Given
-        var activity : Activity? = null
-        launchFragmentInHiltContainer<MapsFragment>(){activity = requireActivity()}
-        val stringToTest = "Santa Cruz de tenerife"
-        onView(withId(R.id.ETsearchLocation)).perform(TypeTextAction(stringToTest))
+    fun writeOnSearchPlace_clickOnRecyclerView_moveCameraPosition_displaysToastFoundDataSet() =
+        runBlockingTest {
+            //Given
+            var activity: Activity? = null
+            launchFragmentInHiltContainer<MapsFragment> { activity = requireActivity() }
+            val stringToTest = "Santa Cruz de tenerife"
+            onView(withId(R.id.ETsearchLocation)).perform(TypeTextAction(stringToTest))
 
-        //When
-        onView(withId(R.id.ETsearchLocation)).check(matches(withText(stringToTest)))
-        Thread.sleep(5000) //Waiting for geocoder response
+            //When
+            onView(withId(R.id.ETsearchLocation)).check(matches(withText(stringToTest)))
+            Thread.sleep(5000) //Waiting for geocoder response
 
-        //Then
-        onView(withId(R.id.recyclerLocation)).perform(
-            RecyclerViewActions.actionOnItem<RecyclerView.ViewHolder>(
-                hasDescendant(withSubstring("Santa Cruz de Tenerife")), click()
+            //Then
+            onView(withId(R.id.recyclerLocation)).perform(
+                RecyclerViewActions.actionOnItem<RecyclerView.ViewHolder>(
+                    hasDescendant(withSubstring("Santa Cruz de Tenerife")), click()
+                )
             )
-        )
-        Thread.sleep(1500)
+            Thread.sleep(1500)
 
-        onView(withText(InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.dataset_found))).inRoot(ToastMatcher()).check(matches(
-            isDisplayed()))
-    }
+            onView(withText(InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.dataset_found))).inRoot(
+                ToastMatcher()
+            ).check(
+                matches(
+                    isDisplayed()
+                )
+            )
+        }
 }

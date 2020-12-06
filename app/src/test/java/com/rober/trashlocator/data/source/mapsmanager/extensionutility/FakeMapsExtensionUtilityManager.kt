@@ -14,7 +14,7 @@ import kotlin.collections.LinkedHashMap
 
 class FakeMapsExtensionUtilityManager(
     private val trashLocationUtils: TrashLocationUtils
-) : IMapsExtensionUtilityManager {
+) : MapsExtensionUtilityManager {
 
     val listLocations = listOf<String>("Madrid", "Valencia")
     val listAddressLocation: LinkedHashMap<String, AddressLocation> = LinkedHashMap()

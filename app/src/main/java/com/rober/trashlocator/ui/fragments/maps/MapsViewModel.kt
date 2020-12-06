@@ -10,14 +10,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.GoogleMap
 import com.rober.trashlocator.data.repository.maps.MapsRepositoryImpl
-import com.rober.trashlocator.data.repository.permissions.PermissionsManagerImpl
+import com.rober.trashlocator.data.source.mapsmanager.utils.permissions.PermissionsManager
+import com.rober.trashlocator.data.source.mapsmanager.utils.permissions.PermissionsManagerImpl
 import com.rober.trashlocator.models.AddressLocation
 import com.rober.trashlocator.utils.Event
 import kotlinx.coroutines.launch
 
 class MapsViewModel @ViewModelInject constructor(
     private val mapsRepositoryImpl: MapsRepositoryImpl,
-    private val permissionsRepositoryImpl: PermissionsManagerImpl
+    private val permissionsManager: PermissionsManagerImpl
 ) : ViewModel() {
     private val TAG = "MapsViewModel"
 
@@ -110,9 +111,8 @@ class MapsViewModel @ViewModelInject constructor(
 
     fun unregisterReceiver() = mapsRepositoryImpl.unregisterReceiver()
 
-    //PermissionsRepository
     fun setLocationPermissionsGranted(isLocationPermissionsGranted: Boolean) =
-        permissionsRepositoryImpl.setLocationPermissionsGranted(isLocationPermissionsGranted)
+        permissionsManager.setLocationPermissionGranted(isLocationPermissionsGranted)
 
 
     override fun onCleared() {

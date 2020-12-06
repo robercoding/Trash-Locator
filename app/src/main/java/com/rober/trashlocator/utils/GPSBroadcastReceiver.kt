@@ -7,11 +7,11 @@ import android.location.LocationManager
 import android.os.Handler
 import android.util.Log
 import com.rober.trashlocator.R
-import com.rober.trashlocator.data.source.mapsmanager.utils.IGPSReceiverListener
+import com.rober.trashlocator.data.source.mapsmanager.utils.GPSReceiverListener
 
 class GPSBroadcastReceiver(
     private val locationManager: LocationManager,
-    private val mGPSReceiverListener: IGPSReceiverListener
+    private val mGPSReceiverListener: GPSReceiverListener
 ) :
     BroadcastReceiver() {
 

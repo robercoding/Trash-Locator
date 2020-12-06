@@ -6,7 +6,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.rober.trashlocator.models.AddressLocation
 import com.rober.trashlocator.utils.Event
 
-interface IMapsRepository {
+interface MapsRepository {
     var addressLocation: LiveData<AddressLocation>
     var listAddressesLocation: LiveData<Event<List<AddressLocation>>>
     var cameraMove: LiveData<Event<Boolean>>

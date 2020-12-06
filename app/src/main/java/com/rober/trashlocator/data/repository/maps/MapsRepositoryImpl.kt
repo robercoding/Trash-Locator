@@ -4,13 +4,13 @@ import android.content.BroadcastReceiver
 import androidx.lifecycle.LiveData
 import com.google.android.gms.maps.GoogleMap
 import com.rober.trashlocator.models.AddressLocation
-import com.rober.trashlocator.data.source.mapsmanager.MapsManager
+import com.rober.trashlocator.data.source.mapsmanager.MapsManagerImpl
 import com.rober.trashlocator.utils.Event
 import javax.inject.Inject
 
 class MapsRepositoryImpl @Inject constructor(
-    private val mapsManager: MapsManager
-) : IMapsRepository {
+    private val mapsManager: MapsManagerImpl
+) : MapsRepository {
 
     override var addressLocation: LiveData<AddressLocation> = mapsManager.addressLocation
     override var listAddressesLocation: LiveData<Event<List<AddressLocation>>> =

@@ -6,7 +6,7 @@ import com.rober.trashlocator.utils.listeners.interfaces.ICustomLocationListener
 
 class FakeCustomLocationManager(
     private var customLocationListener : ICustomLocationListener? = null
-) : ICustomLocationManager{
+) : CustomLocationManager{
 
     override fun requestSingleUpdate(locationListener: LocationListener) {
         val location = Location("")
