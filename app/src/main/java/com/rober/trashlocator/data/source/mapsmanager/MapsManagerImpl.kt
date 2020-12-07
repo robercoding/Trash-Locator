@@ -20,10 +20,10 @@ import com.google.maps.android.clustering.ClusterManager
 import com.rober.trashlocator.R
 import com.rober.trashlocator.data.source.mapsmanager.extensionutility.MapsExtensionUtilityManager
 import com.rober.trashlocator.data.source.mapsmanager.utils.CustomLocationManager
-import com.rober.trashlocator.models.AddressLocation
-import com.rober.trashlocator.models.Trash
 import com.rober.trashlocator.data.source.mapsmanager.utils.gpsmanager.GPSManager
 import com.rober.trashlocator.data.source.mapsmanager.utils.permissions.PermissionsManager
+import com.rober.trashlocator.models.AddressLocation
+import com.rober.trashlocator.models.Trash
 import com.rober.trashlocator.utils.CustomClusterRenderer
 import com.rober.trashlocator.utils.Event
 import com.rober.trashlocator.utils.listeners.CustomLocationListener
@@ -39,7 +39,7 @@ class MapsManagerImpl constructor(
     private val mapsExtensionUtilityManager: MapsExtensionUtilityManager,
     private val locationManager: CustomLocationManager
 ) : GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnCameraMoveStartedListener,
-    ICustomLocationListener, MapsManager{
+    ICustomLocationListener, MapsManager {
     override val TAG = "MapsManager"
 
     private val _addressLocation = MutableLiveData<AddressLocation>()
@@ -166,7 +166,9 @@ class MapsManagerImpl constructor(
             criteria.horizontalAccuracy = Criteria.ACCURACY_HIGH
             criteria.verticalAccuracy = Criteria.ACCURACY_HIGH
 
-            locationListener?.let { locationManager.requestSingleUpdate(it) } ?: _message.postValue(Event("Error trying to request a single update"))
+            locationListener?.let { locationManager.requestSingleUpdate(it) } ?: _message.postValue(
+                Event("Error trying to request a single update")
+            )
         } catch (e: Exception) {
             val errorMessage = e.message
             if (errorMessage != null) {
@@ -229,12 +231,7 @@ class MapsManagerImpl constructor(
         runBlocking {
             launch(Dispatchers.IO) {
                 foundDataSet = mapsExtensionUtilityManager.existsDataSet(addressLocation)
-
-                if (foundDataSet) {
-                    _message.postValue(Event(context.getString(R.string.dataset_found)))
-                } else {
-                    _message.postValue(Event(context.getString(R.string.dataset_not_found)))
-                }
+                if (foundDataSet) _message.postValue(Event(context.getString(R.string.dataset_found))) else _message.postValue(Event(context.getString(R.string.dataset_not_found)))
             }
         }
 
@@ -246,26 +243,26 @@ class MapsManagerImpl constructor(
                 ), 17f
             ), 2000, object : GoogleMap.CancelableCallback {
                 override fun onFinish() {
-                    var trashCluster = emptyList<Trash>()
-                    runBlocking {
-                        val job = launch(Dispatchers.IO) {
-                            if (!foundDataSet) return@launch
-                            trashCluster = getTrashCluster(addressLocation)
-                            if (trashCluster.isEmpty()) {
-                                _message.postValue(Event(context.getString(R.string.dataset_found)))
-                            }
-                        }
-                        job.join()
-                        if (!foundDataSet || trashCluster.isEmpty()) {
-                            return@runBlocking
-                        }
-                        setCluster(trashCluster)
-                    }
+                    setTrashClusterForLocation(addressLocation)
                 }
-
                 override fun onCancel() {}
             }
         )
+    }
+
+    private fun setTrashClusterForLocation(addressLocation: AddressLocation){
+        runBlocking {
+            var listTrashCluster = emptyList<Trash>()
+            val job = launch(Dispatchers.IO){
+                listTrashCluster = getTrashCluster(addressLocation)
+            }
+            job.join()
+            if (listTrashCluster.isEmpty()) {
+                _message.postValue(Event(context.getString(R.string.dataset_found)))
+            }else{
+                setCluster(listTrashCluster)
+            }
+        }
     }
 
     private suspend fun getTrashCluster(

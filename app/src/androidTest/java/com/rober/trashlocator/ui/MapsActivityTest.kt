@@ -22,6 +22,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 @HiltAndroidTest
 class MapsActivityTest {
+    //Test requires that location be activated or they will fail.
     @get:Rule
     var activityScenarioRule = ActivityScenarioRule(MapsActivity::class.java)
 

@@ -7,10 +7,10 @@ import android.util.Log
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.data.geojson.GeoJsonLayer
+import com.rober.trashlocator.data.source.mapsmanager.utils.TrashLocationUtils
 import com.rober.trashlocator.models.AddressLocation
 import com.rober.trashlocator.models.Trash
 import com.rober.trashlocator.models.TrashLocation
-import com.rober.trashlocator.data.source.mapsmanager.utils.TrashLocationUtils
 import com.rober.trashlocator.utils.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -43,7 +43,8 @@ class MapsExtensionUtilityManagerImpl constructor(
         trashLocation.streetName = if (address.thoroughfare == null) "" else address.thoroughfare
         trashLocation.locality = if (address.locality == null) "" else address.locality
 
-        val isFeatureNameNumber = if(address.featureName == null) false else Utils.isNumber(address.featureName)
+        val isFeatureNameNumber =
+            if (address.featureName == null) false else Utils.isNumber(address.featureName)
         if (isFeatureNameNumber)
             trashLocation.feature = address.featureName
 
@@ -121,5 +122,6 @@ class MapsExtensionUtilityManagerImpl constructor(
             listAddressesLocation.add(location)
         }
         return listAddressesLocation
+
     }
 }

@@ -15,19 +15,16 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.rober.trashlocator.R
+import com.rober.trashlocator.data.source.mapsmanager.utils.GPSReceiverListener
 import com.rober.trashlocator.databinding.MapsFragmentBinding
 import com.rober.trashlocator.models.AddressLocation
 import com.rober.trashlocator.ui.MapsActivity
 import com.rober.trashlocator.ui.base.BaseFragment
 import com.rober.trashlocator.ui.base.viewBinding
-import com.rober.trashlocator.data.source.mapsmanager.utils.GPSReceiverListener
-import com.rober.trashlocator.utils.Constants
-import com.rober.trashlocator.utils.GPSBroadcastReceiver
-import com.rober.trashlocator.utils.hide
+import com.rober.trashlocator.utils.*
 import com.rober.trashlocator.utils.listeners.TextWatcherListener
 import com.rober.trashlocator.utils.listeners.interfaces.RecyclerAddressLocationClickListener
 import com.rober.trashlocator.utils.listeners.interfaces.TextListener
-import com.rober.trashlocator.utils.show
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -88,23 +85,25 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     }
 
     //runOnUiThread because InstrumentationNeeds can't access to Ui staff since they are on a different thread
-    private fun setSearchAdapter(listAddressLocation: List<AddressLocation>) = activity?.runOnUiThread{
-        val searchAdapter = SearchLocationAdapter(listAddressLocation, this)
+    private fun setSearchAdapter(listAddressLocation: List<AddressLocation>) =
+        activity?.runOnUiThread {
+            EspressoIdlingResource.decrement()
+            val searchAdapter = SearchLocationAdapter(listAddressLocation, this)
 
-        binding.recyclerLocation.apply {
-            adapter = searchAdapter
-            layoutManager = LinearLayoutManager(requireContext())
-            addItemDecoration(
-                DividerItemDecoration(
-                    requireContext(),
-                    DividerItemDecoration.HORIZONTAL
+            binding.recyclerLocation.apply {
+                adapter = searchAdapter
+                layoutManager = LinearLayoutManager(requireContext())
+                addItemDecoration(
+                    DividerItemDecoration(
+                        requireContext(),
+                        DividerItemDecoration.HORIZONTAL
+                    )
                 )
-            )
-            scheduleLayoutAnimation()
-        }
+                scheduleLayoutAnimation()
+            }
 
-        binding.recyclerLocation.show()
-    }
+            binding.recyclerLocation.show()
+        }
 
     private fun subscribeObservers() {
         viewModel.listAddressesLocation.observe(viewLifecycleOwner) { eventListAddressesLocation ->
@@ -183,7 +182,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     override fun onAddressLocationClickListener(addressLocation: AddressLocation) {
         //Deactive to don't trigger textWatcher listener to don't trigger onUserStopTyping
         textWatcherListener.isSettingText(true)
-        viewModel.setUpdateLocationByAddressLocation(addressLocation)
+        wrapEspressoIdlingResource { viewModel.setUpdateLocationByAddressLocation(addressLocation) }
 
         binding.ETsearchLocation.setText(addressLocation.streetName)
         clearFocusSearchToolbar()

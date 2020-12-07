@@ -2,6 +2,8 @@ package com.rober.trashlocator.utils.listeners
 
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
+import com.rober.trashlocator.utils.EspressoIdlingResource
 import com.rober.trashlocator.utils.listeners.interfaces.TextListener
 import java.util.*
 
@@ -20,7 +22,10 @@ class TextWatcherListener(val textListener: TextListener) : TextWatcher {
     }
 
     override fun afterTextChanged(s: Editable?) {
+        EspressoIdlingResource.decrement()
+        EspressoIdlingResource.increment()
         if (isSettingText) {
+            EspressoIdlingResource.decrement()
             return
         }
         timer = Timer()
@@ -33,7 +38,6 @@ class TextWatcherListener(val textListener: TextListener) : TextWatcher {
                     textListener.onUserStopTypingIsEmpty()
                     return
                 }
-
                 textListener.onUserStopTyping(text)
             }
 

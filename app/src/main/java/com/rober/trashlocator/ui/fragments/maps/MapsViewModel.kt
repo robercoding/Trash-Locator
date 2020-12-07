@@ -13,7 +13,9 @@ import com.rober.trashlocator.data.repository.maps.MapsRepositoryImpl
 import com.rober.trashlocator.data.source.mapsmanager.utils.permissions.PermissionsManager
 import com.rober.trashlocator.data.source.mapsmanager.utils.permissions.PermissionsManagerImpl
 import com.rober.trashlocator.models.AddressLocation
+import com.rober.trashlocator.utils.EspressoIdlingResource
 import com.rober.trashlocator.utils.Event
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 class MapsViewModel @ViewModelInject constructor(
@@ -35,6 +37,8 @@ class MapsViewModel @ViewModelInject constructor(
     private val _message = MutableLiveData<Event<String>>()
     val message: LiveData<Event<String>>
         get() = _message
+
+    private var job: Job? = null
 
     init {
         Log.i("MapsFragment", "Init viewmodel!")
@@ -103,7 +107,11 @@ class MapsViewModel @ViewModelInject constructor(
         }
         lastNameLocation = nameLocation
 
-        viewModelScope.launch { mapsRepositoryImpl.getListAddressesByName(nameLocation) }
+
+        job =viewModelScope.launch { mapsRepositoryImpl.getListAddressesByName(nameLocation) }
+        job?.invokeOnCompletion {
+            EspressoIdlingResource.decrement()
+        }
     }
 
     fun registerReceiver(broadcastReceiver: BroadcastReceiver) =

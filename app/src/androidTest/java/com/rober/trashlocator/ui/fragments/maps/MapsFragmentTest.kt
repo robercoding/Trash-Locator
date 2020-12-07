@@ -1,13 +1,11 @@
 package com.rober.trashlocator.ui.fragments.maps
 
-import android.app.Activity
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.action.TypeTextAction
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -16,10 +14,12 @@ import androidx.test.runner.AndroidJUnitRunner
 import com.rober.trashlocator.R
 import com.rober.trashlocator.ToastMatcher
 import com.rober.trashlocator.launchFragmentInHiltContainer
+import com.rober.trashlocator.utils.EspressoIdlingResource
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -30,7 +30,8 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 @ExperimentalCoroutinesApi
 @HiltAndroidTest
-class MapsFragmentTest : AndroidJUnitRunner() {
+class MapsFragmentTest :
+    AndroidJUnitRunner() { //Don't launch them once at all because it crashes, launch one test manually
 
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
@@ -39,8 +40,15 @@ class MapsFragmentTest : AndroidJUnitRunner() {
     var hiltRule = HiltAndroidRule(this)
 
     @Before
-    fun init() {
+    fun setup() {
         hiltRule.inject()
+
+        IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource)
+    }
+
+    @After
+    fun unRegisterIdlingResource() {
+        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource)
     }
 
     @Test
@@ -61,15 +69,10 @@ class MapsFragmentTest : AndroidJUnitRunner() {
 
             //When
             onView(withId(R.id.ETsearchLocation)).check(matches(withText(stringToTest)))
-            Thread.sleep(5000) //Waiting for geocoder response
 
             //Then
-            onView(withId(R.id.recyclerLocation)).perform(
-                RecyclerViewActions.actionOnItem<RecyclerView.ViewHolder>(
-                    hasDescendant(withSubstring("Madrid")), click()
-                )
-            )
-            Thread.sleep(1500)
+            onView(withId(R.id.rowAddress)).check(matches(isDisplayed()))
+            onView(withId(R.id.rowAddress)).perform(click())
 
             onView(withText(InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.dataset_not_found))).inRoot(
                 ToastMatcher()
@@ -84,22 +87,16 @@ class MapsFragmentTest : AndroidJUnitRunner() {
     fun writeOnSearchPlace_clickOnRecyclerView_moveCameraPosition_displaysToastFoundDataSet() =
         runBlockingTest {
             //Given
-            var activity: Activity? = null
-            launchFragmentInHiltContainer<MapsFragment> { activity = requireActivity() }
-            val stringToTest = "Santa Cruz de tenerife"
+            launchFragmentInHiltContainer<MapsFragment>()
+            val stringToTest = "SantaCruzTenerife"
+
             onView(withId(R.id.ETsearchLocation)).perform(TypeTextAction(stringToTest))
 
             //When
             onView(withId(R.id.ETsearchLocation)).check(matches(withText(stringToTest)))
-            Thread.sleep(5000) //Waiting for geocoder response
 
             //Then
-            onView(withId(R.id.recyclerLocation)).perform(
-                RecyclerViewActions.actionOnItem<RecyclerView.ViewHolder>(
-                    hasDescendant(withSubstring("Santa Cruz de Tenerife")), click()
-                )
-            )
-            Thread.sleep(1500)
+            onView(withId(R.id.rowAddress)).perform(click())
 
             onView(withText(InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.dataset_found))).inRoot(
                 ToastMatcher()

@@ -1,0 +1,4 @@
+task testAll(dependsOn: ['test', 'connectedAndroidTest']) {
+    group = 'Verification'
+    description = "Run all tests"
+}
