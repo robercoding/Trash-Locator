@@ -122,6 +122,7 @@ dependencies {
     androidTestImplementation "androidx.test:rules:$runner"
     androidTestImplementation "com.google.truth:truth:1.1"
     androidTestImplementation "androidx.navigation:navigation-testing:$nav_version"
+    kaptAndroidTest 'com.google.dagger:hilt-android-compiler:2.28-alpha'
     androidTestImplementation 'org.mockito:mockito-android:2.24.5'
     androidTestImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.4.2'
 

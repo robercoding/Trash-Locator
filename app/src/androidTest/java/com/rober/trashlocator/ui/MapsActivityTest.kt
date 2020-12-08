@@ -1,5 +1,7 @@
 package com.rober.trashlocator.ui
 
+import android.content.Context
+import android.location.LocationManager
 import androidx.navigation.NavController
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
@@ -7,16 +9,30 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
 import androidx.test.espresso.contrib.DrawerMatchers.isOpen
 import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import com.rober.trashlocator.R
+import com.rober.trashlocator.data.source.mapsmanager.utils.gpsmanager.GPSManager
+import com.rober.trashlocator.data.source.mapsmanager.utils.gpsmanager.GPSManagerImpl
+import com.rober.trashlocator.di.GoogleMapModule
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ActivityComponent
+import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import dagger.hilt.android.testing.UninstallModules
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import javax.inject.Inject
+import javax.inject.Named
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
@@ -28,6 +44,21 @@ class MapsActivityTest {
 
     @get:Rule
     var hiltRule = HiltAndroidRule(this)
+
+
+    lateinit var gpsManager : GPSManagerImpl
+
+    @Inject @Named("location_manager_test")
+    lateinit var locationManager : LocationManager
+
+    @Before
+    fun setup(){
+        hiltRule.inject()
+        locationManager = InstrumentationRegistry.getInstrumentation().targetContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        gpsManager = GPSManagerImpl(InstrumentationRegistry.getInstrumentation().targetContext, locationManager)
+        performEnableGPSIfDisabled()
+    }
+
 
     @Test
     fun startApp_WithMapsFragmentAsStartDestination() {
@@ -114,8 +145,19 @@ class MapsActivityTest {
         assertThat(navcontroller?.currentDestination?.id).isEqualTo(R.id.settingsFragment)
     }
 
-    @Test
-    fun clickOnDrawerSSDS(){
-
+    private fun performEnableGPSIfDisabled(){
+        val isGPSEnabled = gpsManager.checkIfLocationGPSIsEnabled()
+        if(!isGPSEnabled){
+            onView(withText("YES")).perform(click())
+        }
     }
 }
+//@Module
+//@InstallIn(ActivityComponent::class)
+//object MapsActivityModule {
+//
+//    @Provides
+//    @Named("location_manager_test")
+//    fun provideLocationManager(@ActivityContext context: Context): LocationManager =
+//        context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+//}

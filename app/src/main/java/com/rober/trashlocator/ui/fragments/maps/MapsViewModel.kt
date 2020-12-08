@@ -10,7 +10,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.GoogleMap
 import com.rober.trashlocator.data.repository.maps.MapsRepositoryImpl
-import com.rober.trashlocator.data.source.mapsmanager.utils.permissions.PermissionsManager
 import com.rober.trashlocator.data.source.mapsmanager.utils.permissions.PermissionsManagerImpl
 import com.rober.trashlocator.models.AddressLocation
 import com.rober.trashlocator.utils.EspressoIdlingResource

@@ -1,6 +1,7 @@
 package com.rober.trashlocator.ui
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
@@ -195,5 +196,13 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         super.onDestroy()
         Log.i(TAG, "On Destroy activity")
 
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        Log.i("SeeGPS", "Receive in activity")
+        if((requestCode == Constants.GPS_REQUEST) && (navController.currentDestination?.id == Destinations.mapsFragment)){
+            navHostFragment.childFragmentManager.fragments[0].onActivityResult(requestCode, resultCode, data)
+        }
     }
 }

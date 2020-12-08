@@ -33,7 +33,7 @@ class GPSManagerImpl @Inject constructor(
         return isGPSEnabled
     }
 
-    override fun requestGPSEnable() {
+    fun requestGPSEnable2() {
         if (dialogRequestGps?.isShowing == true) {
             return
         }
@@ -68,6 +68,13 @@ class GPSManagerImpl @Inject constructor(
 //                messageConnectionTV.show()
             }
             .show()
+    }
+
+    override fun requestGPSEnable() {
+        GpsUtils(context).turnGPSOn(object : GpsUtils.onGpsListener {
+            override fun gpsStatus(isGPSEnable: Boolean) {
+            }
+        })
     }
 
     override fun isGPSEnabled(): Boolean {

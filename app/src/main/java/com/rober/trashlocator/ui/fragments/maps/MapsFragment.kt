@@ -1,11 +1,16 @@
 package com.rober.trashlocator.ui.fragments.maps
 
+import android.app.Activity
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -47,6 +52,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
     private var isFirstTimeEnter = true
     private var hasBeenDetached = false
+    private var startForResult : ActivityResultLauncher<Intent>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,6 +67,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         super.onViewCreated(view, savedInstanceState)
         subscribeObservers()
         initializeMaps()
+        openSomeActivityForResult()
     }
 
     private fun initializeMaps() {
@@ -238,6 +245,22 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
                     viewModel.setLocationPermissionsGranted(true)
                     viewModel.updateLocationUI()
                 }
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        Log.i("SeeGPS", "Receive fragment")
+//        super.onActivityResult(requestCode, resultCode, data)
+        if(requestCode == Constants.GPS_REQUEST){
+            viewModel.updateLocationUI()
+        }
+    }
+
+    private fun openSomeActivityForResult(){
+        startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+            Log.i("SeeGPS", "ActivateGps2")
+            if (result.resultCode == Constants.GPS_REQUEST) {
             }
         }
     }
