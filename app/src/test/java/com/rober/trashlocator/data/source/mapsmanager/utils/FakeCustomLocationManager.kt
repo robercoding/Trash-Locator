@@ -2,10 +2,10 @@ package com.rober.trashlocator.data.source.mapsmanager.utils
 
 import android.location.Location
 import android.location.LocationListener
-import com.rober.trashlocator.utils.listeners.interfaces.ICustomLocationListener
+import com.rober.trashlocator.utils.listeners.interfaces.CustomLocationListener
 
 class FakeCustomLocationManager(
-    private var customLocationListener : ICustomLocationListener? = null
+    private var customLocationListener : CustomLocationListener? = null
 ) : CustomLocationManager{
 
     override fun requestSingleUpdate(locationListener: LocationListener) {
@@ -15,7 +15,7 @@ class FakeCustomLocationManager(
         customLocationListener?.updateCurrentLocation(location)
     }
 
-    fun setCustomLocationListener(newCustomLocationListener : ICustomLocationListener){
+    fun setCustomLocationListener(newCustomLocationListener : CustomLocationListener){
         customLocationListener = newCustomLocationListener
     }
 }

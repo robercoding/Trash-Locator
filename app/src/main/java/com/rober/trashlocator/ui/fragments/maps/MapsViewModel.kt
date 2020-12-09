@@ -87,6 +87,11 @@ class MapsViewModel @ViewModelInject constructor(
         }
     }
 
+    private fun isAddressLocationTheSameAsLast(addressLocation: AddressLocation): Boolean {
+        if (listLocations.isEmpty()) return false
+        return addressLocation == listLocations.last()
+    }
+
     //NEW CHANGES
     //MapsRepository
     fun setGoogleMap(googleMap: GoogleMap) = mapsRepositoryImpl.setGoogleMap(googleMap)
@@ -94,8 +99,16 @@ class MapsViewModel @ViewModelInject constructor(
         mapsRepositoryImpl.setGoogleMapAndConfiguration(googleMap)
 
     fun updateLocationUI() = mapsRepositoryImpl.updateLocationUI()
-    fun setUpdateLocationByAddressLocation(addressLocation: AddressLocation) =
-        mapsRepositoryImpl.setUpdateLocationByAddressLocation(addressLocation, true)
+    fun setUpdateLocationByAddressLocation(addressLocation: AddressLocation) {
+        if (isAddressLocationTheSameAsLast(addressLocation)) {
+            mapsRepositoryImpl.setUpdateLocationByAddressLocation(
+                addressLocation,
+                false
+            ) //To not add the same 2 places in the backstack
+        } else {
+            mapsRepositoryImpl.setUpdateLocationByAddressLocation(addressLocation, true)
+        }
+    }
 
     fun requestLocationUpdate() = mapsRepositoryImpl.requestLocationUpdate()
 
@@ -107,7 +120,7 @@ class MapsViewModel @ViewModelInject constructor(
         lastNameLocation = nameLocation
 
 
-        job =viewModelScope.launch { mapsRepositoryImpl.getListAddressesByName(nameLocation) }
+        job = viewModelScope.launch { mapsRepositoryImpl.getListAddressesByName(nameLocation) }
         job?.invokeOnCompletion {
             EspressoIdlingResource.decrement()
         }

@@ -7,13 +7,14 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.rober.trashlocator.ui.MapsActivity
 import com.rober.trashlocator.data.source.mapsmanager.utils.gpsmanager.GPSManagerImpl
+import com.rober.trashlocator.data.source.mapsmanager.utils.gpsmanager.GpsUtilsImpl
 import com.rober.trashlocator.utils.Constants
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
 
 class PermissionsManagerImpl @Inject constructor(
     @ActivityScoped private val context: Context,
-    private val gpsManager: GPSManagerImpl
+    private val gpsUtils: GpsUtilsImpl
 ) : PermissionsManager {
     private val TAG = "PermissionsManager"
     override var gpsEnabled = false

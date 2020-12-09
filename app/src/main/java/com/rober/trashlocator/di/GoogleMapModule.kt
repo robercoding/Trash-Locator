@@ -4,12 +4,13 @@ import android.content.Context
 import android.location.Geocoder
 import android.location.LocationManager
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.SettingsClient
 import com.rober.trashlocator.data.repository.maps.MapsRepositoryImpl
 import com.rober.trashlocator.data.source.mapsmanager.utils.TrashLocationUtils
-import com.rober.trashlocator.data.source.mapsmanager.utils.gpsmanager.GPSManagerImpl
 import com.rober.trashlocator.data.source.mapsmanager.MapsManagerImpl
 import com.rober.trashlocator.data.source.mapsmanager.extensionutility.MapsExtensionUtilityManagerImpl
 import com.rober.trashlocator.data.source.mapsmanager.utils.CustomLocationManagerImpl
+import com.rober.trashlocator.data.source.mapsmanager.utils.gpsmanager.GpsUtilsImpl
 import com.rober.trashlocator.data.source.mapsmanager.utils.permissions.PermissionsManagerImpl
 import dagger.Module
 import dagger.Provides
@@ -26,11 +27,11 @@ object GoogleMapModule {
     fun provideMapsManager(
         @ActivityContext context: Context,
         permissionsManager: PermissionsManagerImpl,
-        gpsManager: GPSManagerImpl,
+        gpsUtils: GpsUtilsImpl,
         geoCoderManager: MapsExtensionUtilityManagerImpl,
         locationManager: CustomLocationManagerImpl
     ): MapsManagerImpl =
-        MapsManagerImpl(context, permissionsManager, gpsManager, geoCoderManager, locationManager)
+        MapsManagerImpl(context, permissionsManager, gpsUtils, geoCoderManager, locationManager)
 
     @Provides
     fun provideMapsRepository(mapsManager: MapsManagerImpl) = MapsRepositoryImpl(mapsManager)
@@ -38,13 +39,16 @@ object GoogleMapModule {
     @Provides
     fun providePermissionsManager(
         @ApplicationContext context: Context,
-        gpsManager: GPSManagerImpl
+        gpsUtils: GpsUtilsImpl
     ): PermissionsManagerImpl =
-        PermissionsManagerImpl(context, gpsManager)
+        PermissionsManagerImpl(context, gpsUtils)
 
     @Provides
-    fun provideGPSManager(@ActivityContext context: Context, locationManager: LocationManager) =
-        GPSManagerImpl(context, locationManager)
+    fun provideGPSManager(@ActivityContext context: Context, locationManager: LocationManager, settingsClient: SettingsClient) =
+        GpsUtilsImpl(context, locationManager, settingsClient)
+
+    @Provides
+    fun provideSettingsClient(@ActivityContext context: Context) = LocationServices.getSettingsClient(context)
 
     @Provides
     fun provideMapsExtensionUtilityManager(

@@ -16,7 +16,7 @@ import javax.inject.Inject
 class GPSManagerImpl @Inject constructor(
     @ActivityContext private val context: Context,
     private val locationManager: LocationManager
-) : GPSManager {
+) : GpsUtils {
     private val TAG = javaClass.simpleName
 
     private var dialogRequestGps: AlertDialog? = null
@@ -71,10 +71,10 @@ class GPSManagerImpl @Inject constructor(
     }
 
     override fun requestGPSEnable() {
-        GpsUtils(context).turnGPSOn(object : GpsUtils.onGpsListener {
-            override fun gpsStatus(isGPSEnable: Boolean) {
-            }
-        })
+//        GpsUtilsImpl(context).turnGPSOn(object : GpsUtilsImpl.onGpsListener {
+//            override fun gpsStatus(isGPSEnable: Boolean) {
+//            }
+//        })
     }
 
     override fun isGPSEnabled(): Boolean {

@@ -3,9 +3,9 @@ package com.rober.trashlocator.data.source.mapsmanager
 import android.Manifest
 import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.location.Criteria
 import android.location.Location
 import android.location.LocationListener
 import android.util.Log
@@ -20,14 +20,14 @@ import com.google.maps.android.clustering.ClusterManager
 import com.rober.trashlocator.R
 import com.rober.trashlocator.data.source.mapsmanager.extensionutility.MapsExtensionUtilityManager
 import com.rober.trashlocator.data.source.mapsmanager.utils.CustomLocationManager
-import com.rober.trashlocator.data.source.mapsmanager.utils.gpsmanager.GPSManager
+import com.rober.trashlocator.data.source.mapsmanager.utils.gpsmanager.GpsUtils
 import com.rober.trashlocator.data.source.mapsmanager.utils.permissions.PermissionsManager
 import com.rober.trashlocator.models.AddressLocation
 import com.rober.trashlocator.models.Trash
 import com.rober.trashlocator.utils.CustomClusterRenderer
 import com.rober.trashlocator.utils.Event
-import com.rober.trashlocator.utils.listeners.CustomLocationListener
-import com.rober.trashlocator.utils.listeners.interfaces.ICustomLocationListener
+import com.rober.trashlocator.utils.listeners.CustomLocationListenerImpl
+import com.rober.trashlocator.utils.listeners.interfaces.CustomLocationListener
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -35,11 +35,11 @@ import kotlinx.coroutines.runBlocking
 class MapsManagerImpl constructor(
     private val context: Context,
     private val permissionsManager: PermissionsManager,
-    private val gpsManager: GPSManager,
+    private val gpsUtils: GpsUtils,
     private val mapsExtensionUtilityManager: MapsExtensionUtilityManager,
     private val locationManager: CustomLocationManager
 ) : GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnCameraMoveStartedListener,
-    ICustomLocationListener, MapsManager {
+    CustomLocationListener, MapsManager {
     override val TAG = "MapsManager"
 
     private val _addressLocation = MutableLiveData<AddressLocation>()
@@ -57,7 +57,7 @@ class MapsManagerImpl constructor(
     private var googleMap: GoogleMap? = null
     private lateinit var clusterManager: ClusterManager<Trash>
 
-    private var locationListener: LocationListener? = CustomLocationListener(this)
+    private var locationListener: LocationListener? = CustomLocationListenerImpl(this)
     private var receiver: BroadcastReceiver? = null
 
     override fun setGoogleMap(googleMap: GoogleMap) {
@@ -75,7 +75,7 @@ class MapsManagerImpl constructor(
 
     override fun updateLocationUI() {
         val isLocationPermissionsOk = permissionsManager.checkLocationPermissionAndSettings()
-        val isGPSEnabled = gpsManager.checkIfLocationGPSIsEnabled()
+        val isGPSEnabled = gpsUtils.checkIfLocationGPSIsEnabled()
         if (!isLocationPermissionsOk) {
             permissionsManager.requestLocationPermissions()
             setMyLocationButton(false)
@@ -83,7 +83,7 @@ class MapsManagerImpl constructor(
         }
 
         if (!isGPSEnabled) {
-            gpsManager.requestGPSEnable()
+            gpsUtils.requestGPSEnable()
             setMyLocationButton(false)
             return
         }
@@ -103,9 +103,9 @@ class MapsManagerImpl constructor(
 
     override fun setUpdateLocationByAddressLocation(
         addressLocation: AddressLocation,
-        addInitialLocationToLiveData: Boolean
+        addToLiveData: Boolean
     ) {
-        if (addInitialLocationToLiveData) {
+        if (addToLiveData) {
             _addressLocation.value = addressLocation
         }
         moveCamera(addressLocation)
@@ -148,24 +148,15 @@ class MapsManagerImpl constructor(
             return
         }
 
-        val isGPSEnabled = gpsManager.checkIfLocationGPSIsEnabled()
+        val isGPSEnabled = gpsUtils.checkIfLocationGPSIsEnabled()
         if (!isGPSEnabled) {
             Log.i(TAG, "GPS Setting UI to false..")
-            gpsManager.requestGPSEnable()
+            gpsUtils.requestGPSEnable()
             setMyLocationButton(false)
             return
         }
 
         try {
-            val criteria = Criteria()
-            criteria.accuracy = Criteria.ACCURACY_COARSE
-            criteria.powerRequirement = Criteria.POWER_LOW
-            criteria.isAltitudeRequired = false
-            criteria.isBearingRequired = false
-            criteria.isCostAllowed = true
-            criteria.horizontalAccuracy = Criteria.ACCURACY_HIGH
-            criteria.verticalAccuracy = Criteria.ACCURACY_HIGH
-
             locationListener?.let { locationManager.requestSingleUpdate(it) } ?: _message.postValue(
                 Event("Error trying to request a single update")
             )
@@ -257,9 +248,7 @@ class MapsManagerImpl constructor(
                 listTrashCluster = getTrashCluster(addressLocation)
             }
             job.join()
-            if (listTrashCluster.isEmpty()) {
-                _message.postValue(Event(context.getString(R.string.dataset_found)))
-            }else{
+            if (listTrashCluster.isNotEmpty()) {
                 setCluster(listTrashCluster)
             }
         }
@@ -281,6 +270,10 @@ class MapsManagerImpl constructor(
     }
 
     override fun onMyLocationButtonClick(): Boolean {
+        val intent = Intent("GPS_REQUEST")
+//        intent.putExtra("requestCode", Constants.GPS_REQUEST)
+//        intent.putExtra("resultCode", Constants.GPS_REQUEST_OK)
+//        (context as MapsActivity).content?.launch(intent)
         getDeviceLocation()
         return true
     }

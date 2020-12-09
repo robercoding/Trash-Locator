@@ -52,7 +52,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
     private var isFirstTimeEnter = true
     private var hasBeenDetached = false
-    private var startForResult : ActivityResultLauncher<Intent>? = null
+    var startForResult : ActivityResultLauncher<Intent>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -252,15 +252,29 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         Log.i("SeeGPS", "Receive fragment")
 //        super.onActivityResult(requestCode, resultCode, data)
-        if(requestCode == Constants.GPS_REQUEST){
-            viewModel.updateLocationUI()
+        when(requestCode){
+            Constants.GPS_REQUEST ->{
+                if(isGPSRequestOk(requestCode, resultCode)){
+                    viewModel.updateLocationUI()
+                    showLocationMessage(getString(R.string.location_works), false)
+                } else showLocationMessage(getString(R.string.location_error), true)
+            }
         }
+    }
+
+    private fun isGPSRequestOk(requestCode: Int, resultCode: Int) : Boolean{
+        Log.i("SeeGPS", "Request is $requestCode and code is $resultCode")
+        if((requestCode == Constants.GPS_REQUEST && resultCode == Constants.GPS_REQUEST_OK)){
+            return true
+        }
+        return false
     }
 
     private fun openSomeActivityForResult(){
         startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
-            Log.i("SeeGPS", "ActivateGps2")
+            Log.i("SeeGPS", "Receive fragment new api result")
             if (result.resultCode == Constants.GPS_REQUEST) {
+                Log.i("SeeGPS", "Receive fragment new api result and is code GPS REQUEST")
             }
         }
     }

@@ -1,10 +1,17 @@
 package com.rober.trashlocator.ui
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.ActivityResultRegistry
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -30,6 +37,8 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var drawer: DrawerLayout? = null
 
     private var isNightMode = false
+    var content : ActivityResultLauncher<Intent>? = null
+//    var content: ActivityResultLauncher<ActivityResultContracts.StartActivityForResult>? = null
 
     override fun attachBaseContext(newBase: Context?) {
 //        val lang = "en" // your language or load from SharedPref
@@ -42,8 +51,8 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         binding = ActivityMapsBinding.inflate(layoutInflater)
         val root = binding.root
         setContentView(root)
-
         setupView()
+        onActivityResult()
     }
 
     private fun setupView() {
@@ -200,9 +209,31 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        Log.i("SeeGPS", "Receive in activity")
-        if((requestCode == Constants.GPS_REQUEST) && (navController.currentDestination?.id == Destinations.mapsFragment)){
-            navHostFragment.childFragmentManager.fragments[0].onActivityResult(requestCode, resultCode, data)
+        when(requestCode){
+            Constants.GPS_REQUEST -> sendActivityResultToMapsFragment(requestCode, resultCode)
         }
+//        if(isGPSRequestOk(requestCode, resultCode)){
+//            sendActivityResultToMapsFragment(requestCode, resultCode)
+//        }
+    }
+
+    fun onActivityResult(){
+        content = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){ result->
+            Log.i("SeeReceive", "Receive result = $result")
+            if(result.resultCode == Activity.RESULT_OK){
+                val intent = result.data ?: return@registerForActivityResult
+
+//                sendActivityResultToMapsFragment(requestCode, result.resultCode)
+            }
+        }
+    }
+
+    private fun sendActivityResultToMapsFragment( requestCode: Int, resultCode: Int){
+        if(isCurrentDestinationMapsFragment())
+            navHostFragment.childFragmentManager.fragments[0].onActivityResult(requestCode, resultCode, null) //[0] is the current destination
+    }
+
+    private fun isCurrentDestinationMapsFragment() : Boolean{
+        return navController.currentDestination?.id == Destinations.mapsFragment
     }
 }

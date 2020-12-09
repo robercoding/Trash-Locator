@@ -12,8 +12,7 @@ import com.rober.trashlocator.data.source.mapsmanager.utils.GPSReceiverListener
 class GPSBroadcastReceiver(
     private val locationManager: LocationManager,
     private val mGPSReceiverListener: GPSReceiverListener
-) :
-    BroadcastReceiver() {
+) :BroadcastReceiver() {
 
     private var handler: Handler? = null
     private var runnable: Runnable? = null

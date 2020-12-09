@@ -16,17 +16,9 @@ import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import com.rober.trashlocator.R
-import com.rober.trashlocator.data.source.mapsmanager.utils.gpsmanager.GPSManager
 import com.rober.trashlocator.data.source.mapsmanager.utils.gpsmanager.GPSManagerImpl
-import com.rober.trashlocator.di.GoogleMapModule
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ActivityComponent
-import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
-import dagger.hilt.android.testing.UninstallModules
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
