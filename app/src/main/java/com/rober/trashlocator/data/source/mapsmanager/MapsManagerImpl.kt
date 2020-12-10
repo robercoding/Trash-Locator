@@ -20,7 +20,7 @@ import com.google.maps.android.clustering.ClusterManager
 import com.rober.trashlocator.R
 import com.rober.trashlocator.data.source.mapsmanager.extensionutility.MapsExtensionUtilityManager
 import com.rober.trashlocator.data.source.mapsmanager.utils.CustomLocationManager
-import com.rober.trashlocator.data.source.mapsmanager.utils.gpsmanager.GpsUtils
+import com.rober.trashlocator.data.source.mapsmanager.utils.gps.GpsUtils
 import com.rober.trashlocator.data.source.mapsmanager.utils.permissions.PermissionsManager
 import com.rober.trashlocator.models.AddressLocation
 import com.rober.trashlocator.models.Trash
@@ -75,7 +75,7 @@ class MapsManagerImpl constructor(
 
     override fun updateLocationUI() {
         val isLocationPermissionsOk = permissionsManager.checkLocationPermissionAndSettings()
-        val isGPSEnabled = gpsUtils.checkIfLocationGPSIsEnabled()
+        val isGPSEnabled = gpsUtils.isGPSEnabled()
         if (!isLocationPermissionsOk) {
             permissionsManager.requestLocationPermissions()
             setMyLocationButton(false)
@@ -148,7 +148,7 @@ class MapsManagerImpl constructor(
             return
         }
 
-        val isGPSEnabled = gpsUtils.checkIfLocationGPSIsEnabled()
+        val isGPSEnabled = gpsUtils.isGPSEnabled()
         if (!isGPSEnabled) {
             Log.i(TAG, "GPS Setting UI to false..")
             gpsUtils.requestGPSEnable()

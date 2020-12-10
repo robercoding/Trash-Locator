@@ -71,7 +71,6 @@ class ContactFragment : BaseFragment<ContactViewModel>(R.layout.contact_fragment
         val gmailIntent = buildGmailIntent()
 
         if (gmailIntent == null) {
-            Log.d("SeeGmail", "Intent null!")
             Toast.makeText(requireContext(), getString(R.string.gmail_not_found), Toast.LENGTH_LONG)
                 .show()
             return
@@ -90,7 +89,6 @@ class ContactFragment : BaseFragment<ContactViewModel>(R.layout.contact_fragment
             )
         }
         if (intent.resolveActivity(requireContext().packageManager) == null) {
-            Log.d("SeeGmail", "Resolve activity null!")
             return null
         }
 

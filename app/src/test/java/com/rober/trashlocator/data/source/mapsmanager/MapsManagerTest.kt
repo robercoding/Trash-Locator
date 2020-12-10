@@ -13,7 +13,7 @@ import com.rober.trashlocator.data.source.mapsmanager.extensionutility.FakeMapsE
 import com.rober.trashlocator.data.source.mapsmanager.extensionutility.MapsExtensionUtilityManager
 import com.rober.trashlocator.data.source.mapsmanager.utils.FakeCustomLocationManager
 import com.rober.trashlocator.data.source.mapsmanager.utils.TrashLocationUtils
-import com.rober.trashlocator.data.source.mapsmanager.utils.gpsmanager.FakeGpsUtils
+import com.rober.trashlocator.data.source.mapsmanager.utils.gps.FakeGpsUtils
 import com.rober.trashlocator.data.source.mapsmanager.utils.permissionsmanager.FakePermissionsManager
 import com.rober.trashlocator.getOrAwaitValue
 import com.rober.trashlocator.models.AddressLocation

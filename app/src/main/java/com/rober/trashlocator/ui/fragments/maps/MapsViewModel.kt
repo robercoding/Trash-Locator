@@ -50,7 +50,6 @@ class MapsViewModel @ViewModelInject constructor(
 
     private fun subscribeObservers() {
         mapsRepositoryImpl.addressLocation.observeForever {
-            Log.i("SeeAddressLocation", "Add addressLOCATION")
             listLocations.add(it)
         }
 
@@ -66,7 +65,6 @@ class MapsViewModel @ViewModelInject constructor(
         mapsRepositoryImpl.message.observeForever {
             if (it.hasBeenHandled) return@observeForever
 
-            Log.i("SeeAddressLocation", "Add message")
             _message.value = it
         }
     }
@@ -76,10 +74,8 @@ class MapsViewModel @ViewModelInject constructor(
     }
 
     fun getLastLocation() {
-        Log.i("SeeListLocation", "listLocation = ${listLocations.size}")
         if (listLocations.size > 1) {
             listLocations.removeLast()
-            Log.i("SeeListLocation", "listLocation removed...= ${listLocations.size}")
 
             mapsRepositoryImpl.setUpdateLocationByAddressLocation(listLocations.last(), false)
         } else {

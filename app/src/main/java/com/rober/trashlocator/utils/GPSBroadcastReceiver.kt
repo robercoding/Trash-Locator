@@ -24,7 +24,6 @@ class GPSBroadcastReceiver(
     override fun onReceive(context: Context?, intent: Intent?) {
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
 
-            Log.i("SeeReceiver", "Connected!")
 
             mGPSReceiverListener.showLocationMessage(
                 context?.getString(R.string.location_works)!!,
@@ -33,7 +32,6 @@ class GPSBroadcastReceiver(
             runnable = Runnable { mGPSReceiverListener.hideLocationMessage() }
             handler?.postDelayed(runnable!!, 3000)
         } else {
-            Log.i("SeeReceiver", "Disconnected!")
             if (runnable != null)
                 handler?.removeCallbacks(runnable!!)
 

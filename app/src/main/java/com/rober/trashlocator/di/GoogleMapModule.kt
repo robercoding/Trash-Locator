@@ -10,7 +10,7 @@ import com.rober.trashlocator.data.source.mapsmanager.utils.TrashLocationUtils
 import com.rober.trashlocator.data.source.mapsmanager.MapsManagerImpl
 import com.rober.trashlocator.data.source.mapsmanager.extensionutility.MapsExtensionUtilityManagerImpl
 import com.rober.trashlocator.data.source.mapsmanager.utils.CustomLocationManagerImpl
-import com.rober.trashlocator.data.source.mapsmanager.utils.gpsmanager.GpsUtilsImpl
+import com.rober.trashlocator.data.source.mapsmanager.utils.gps.GpsUtilsImpl
 import com.rober.trashlocator.data.source.mapsmanager.utils.permissions.PermissionsManagerImpl
 import dagger.Module
 import dagger.Provides
@@ -44,7 +44,7 @@ object GoogleMapModule {
         PermissionsManagerImpl(context, gpsUtils)
 
     @Provides
-    fun provideGPSManager(@ActivityContext context: Context, locationManager: LocationManager, settingsClient: SettingsClient) =
+    fun provideGpsUtils(@ActivityContext context: Context, locationManager: LocationManager, settingsClient: SettingsClient) =
         GpsUtilsImpl(context, locationManager, settingsClient)
 
     @Provides

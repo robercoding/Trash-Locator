@@ -78,13 +78,11 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
-        Log.i("SeeMapsFragment", "OnMapReady")
 
         if (isFirstTimeEnter) {
             viewModel.setGoogleMapAndConfiguration(googleMap)
             viewModel.updateLocationUI()
         } else if (hasBeenDetached && !isFirstTimeEnter) {
-            Log.i("SeeMapsFragment", "On restored")
             viewModel.setGoogleMap(googleMap)
         }
 
@@ -250,7 +248,6 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        Log.i("SeeGPS", "Receive fragment")
 //        super.onActivityResult(requestCode, resultCode, data)
         when(requestCode){
             Constants.GPS_REQUEST ->{
@@ -263,21 +260,19 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     }
 
     private fun isGPSRequestOk(requestCode: Int, resultCode: Int) : Boolean{
-        Log.i("SeeGPS", "Request is $requestCode and code is $resultCode")
         if((requestCode == Constants.GPS_REQUEST && resultCode == Constants.GPS_REQUEST_OK)){
             return true
         }
         return false
     }
 
-    private fun openSomeActivityForResult(){
-        startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
-            Log.i("SeeGPS", "Receive fragment new api result")
-            if (result.resultCode == Constants.GPS_REQUEST) {
-                Log.i("SeeGPS", "Receive fragment new api result and is code GPS REQUEST")
-            }
-        }
-    }
+//    private fun openSomeActivityForResult(){
+//        startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+//            if (result.resultCode == Constants.GPS_REQUEST) {
+//                Log.i("SeeGPS", "Receive fragment new api result and is code GPS REQUEST")
+//            }
+//        }
+//    }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)

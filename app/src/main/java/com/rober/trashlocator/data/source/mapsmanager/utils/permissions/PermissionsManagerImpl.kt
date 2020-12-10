@@ -6,8 +6,7 @@ import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.rober.trashlocator.ui.MapsActivity
-import com.rober.trashlocator.data.source.mapsmanager.utils.gpsmanager.GPSManagerImpl
-import com.rober.trashlocator.data.source.mapsmanager.utils.gpsmanager.GpsUtilsImpl
+import com.rober.trashlocator.data.source.mapsmanager.utils.gps.GpsUtilsImpl
 import com.rober.trashlocator.utils.Constants
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
@@ -39,6 +38,7 @@ class PermissionsManagerImpl @Inject constructor(
         }
 
         if (!locationPermissionGranted && alreadyRequestLocationPermission) {
+            //TODO Send permissions are disabled onActivityResult
 //            binding.textPermissionApp.text = getString(R.string.location_permission_error)
 //            binding.textPermissionApp.show()
 //            binding.textPermissionApp.setBackgroundColor(
@@ -49,16 +49,6 @@ class PermissionsManagerImpl @Inject constructor(
 //            )
             return false
         }
-
-//        binding.textPermissionApp.hide()
-//        Log.i(TAG, "location is granted")
-//
-//        val gpsEnabled = gpsManager.checkIfLocationGPSIsEnabled()
-//        if (!gpsEnabled) {
-//            gpsManager.checkIfLocationGPSIsEnabled()
-//            return false
-//        }
-
         return true
     }
 

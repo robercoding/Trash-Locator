@@ -36,7 +36,6 @@ class TrashLocationUtils(private val context: Context) {
     fun getDataset(addressLocation: AddressLocation): Int {
         var raw = -1
 
-        Log.i("SeeAddress", "Trying to get -> $addressLocation")
         //Try to find the dataset in file Object LocalitiesDataset
         loopLocalityDataset@ for (localityDataset in LocalitiesDataset.listLocalityDataset) {
             //Some localities are with "" so they directly go to check the admin area

@@ -217,16 +217,16 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 //        }
     }
 
-    fun onActivityResult(){
-        content = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){ result->
-            Log.i("SeeReceive", "Receive result = $result")
-            if(result.resultCode == Activity.RESULT_OK){
-                val intent = result.data ?: return@registerForActivityResult
-
-//                sendActivityResultToMapsFragment(requestCode, result.resultCode)
-            }
-        }
-    }
+//    fun onActivityResult(){
+//        content = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){ result->
+//            Log.i("SeeReceive", "Receive result = $result")
+//            if(result.resultCode == Activity.RESULT_OK){
+//                val intent = result.data ?: return@registerForActivityResult
+//
+////                sendActivityResultToMapsFragment(requestCode, result.resultCode)
+//            }
+//        }
+//    }
 
     private fun sendActivityResultToMapsFragment( requestCode: Int, resultCode: Int){
         if(isCurrentDestinationMapsFragment())

@@ -36,7 +36,6 @@ class MapsExtensionUtilityManagerImpl constructor(
 
     override fun getSingleTrashLocation(location: Location): TrashLocation {
         val address = geoCoder.getFromLocation(location.latitude, location.longitude, 4)[0]
-        Log.i("SeeAddress", "$address")
 
         var trashLocation = TrashLocation()
 

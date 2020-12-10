@@ -1,4 +1,4 @@
-package com.rober.trashlocator.data.source.mapsmanager.utils.gpsmanager
+package com.rober.trashlocator.data.source.mapsmanager.utils.gps
 
 import android.app.Activity
 import android.content.ContentValues
@@ -25,19 +25,17 @@ class GpsUtilsImpl(@ActivityContext private val context: Context, private val lo
 
     // method for turn on GPS
     fun turnGPSOn(onGpsListener: onGpsListener?) {
-        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+        if (isGPSEnabled()) {
             onGpsListener?.gpsStatus(true)
         } else {
             settingsClient //Access to settings client
                 .checkLocationSettings(locationSettingsRequest) // Check Location settings client by creating a request to location
                 .addOnSuccessListener((context as Activity)) { //  GPS is already enable, callback GPS status through listener
-                    Log.i("SeeGPS", "Already enabled")
                     onGpsListener?.gpsStatus(true)
                 }
                 .addOnFailureListener(
                     context
                 ) { e ->
-                    Log.i("SeeGPS", "We have to enable")
                     val statusCode = (e as ApiException).statusCode
                     when (statusCode) {
                         LocationSettingsStatusCodes.RESOLUTION_REQUIRED -> try {
@@ -48,7 +46,6 @@ class GpsUtilsImpl(@ActivityContext private val context: Context, private val lo
                                 context,
                                 Constants.GPS_REQUEST
                             )
-                            Log.i("SeeGPS", "Send")
                         } catch (sie: SendIntentException) {
                             Log.i(
                                 ContentValues.TAG,
@@ -67,16 +64,16 @@ class GpsUtilsImpl(@ActivityContext private val context: Context, private val lo
         }
     }
 
-    override fun checkIfLocationGPSIsEnabled(): Boolean {
-        try {
-            isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-        } catch (e: Exception) {
-            e.message?.let {
-                Log.e(TAG, it)
-            }
-        }
-        return isGPSEnabled
-    }
+//    override fun checkIfLocationGPSIsEnabled(): Boolean {
+//        try {
+//            isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+//        } catch (e: Exception) {
+//            e.message?.let {
+//                Log.e(TAG, it)
+//            }
+//        }
+//        return isGPSEnabled
+//    }
 
     override fun requestGPSEnable() {
         turnGPSOn(object : onGpsListener {
@@ -87,6 +84,7 @@ class GpsUtilsImpl(@ActivityContext private val context: Context, private val lo
     }
 
     override fun isGPSEnabled(): Boolean {
+        isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
         return isGPSEnabled
     }
 
