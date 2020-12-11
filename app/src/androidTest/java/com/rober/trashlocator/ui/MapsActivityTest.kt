@@ -9,14 +9,18 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.DrawerActions
 import androidx.test.espresso.contrib.DrawerMatchers.isOpen
 import androidx.test.espresso.matcher.ViewMatchers.withId
-import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.UiObjectNotFoundException
+import androidx.test.uiautomator.UiSelector
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.SettingsClient
 import com.google.common.truth.Truth.assertThat
 import com.rober.trashlocator.R
-import com.rober.trashlocator.data.source.mapsmanager.utils.gpsmanager.GPSManagerImpl
+import com.rober.trashlocator.data.source.mapsmanager.utils.gps.GpsUtilsImpl
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Before
@@ -25,6 +29,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import javax.inject.Inject
 import javax.inject.Named
+
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
@@ -37,40 +42,49 @@ class MapsActivityTest {
     @get:Rule
     var hiltRule = HiltAndroidRule(this)
 
+    lateinit var gpsUtils: GpsUtilsImpl
+    lateinit var locationManager: LocationManager
+    lateinit var settingsClient: SettingsClient
 
-    lateinit var gpsManager : GPSManagerImpl
+    lateinit var device: UiDevice
 
-    @Inject @Named("location_manager_test")
-    lateinit var locationManager : LocationManager
+    lateinit var navController: NavController
 
     @Before
-    fun setup(){
+    fun setupAndCheckGps() {
+        //Setup
         hiltRule.inject()
-        locationManager = InstrumentationRegistry.getInstrumentation().targetContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        gpsManager = GPSManagerImpl(InstrumentationRegistry.getInstrumentation().targetContext, locationManager)
-        performEnableGPSIfDisabled()
-    }
+        locationManager =
+            InstrumentationRegistry.getInstrumentation().targetContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        settingsClient =
+            LocationServices.getSettingsClient(InstrumentationRegistry.getInstrumentation().targetContext)
+        gpsUtils = GpsUtilsImpl(
+            InstrumentationRegistry.getInstrumentation().targetContext,
+            locationManager,
+            settingsClient
+        )
 
+        //Check GPS
+        val scenario = activityScenarioRule.scenario
+        scenario.onActivity { mapsActivity ->
+            navController = mapsActivity.findNavController() //Init navController for the tests
+        }
+
+        device =
+            UiDevice.getInstance(InstrumentationRegistry.getInstrumentation()) //Init automator to enable GPS
+
+        if (!isGpsEnabled()) {
+            performClickEnableGPS()
+        }
+    }
 
     @Test
     fun startApp_WithMapsFragmentAsStartDestination() {
-        val scenario = activityScenarioRule.scenario
-        var navcontroller : NavController? = null
-        scenario.onActivity {mapsActivity ->
-            navcontroller = mapsActivity.findNavController()
-        }
-
-        assertThat(navcontroller?.currentDestination?.id).isEqualTo(R.id.mapsFragment)
+        assertThat(navController.currentDestination?.id).isEqualTo(R.id.mapsFragment)
     }
 
     @Test
     fun clickOnDrawerMaps_NavigateToMapsFragment() {
-        val scenario = activityScenarioRule.scenario
-        var navcontroller : NavController? = null
-        scenario.onActivity {mapsActivity ->
-            navcontroller = mapsActivity.findNavController()
-        }
-
         //Since start destination is MapsFragment we navigate to other fragment and then navigate to Maps
         onView(withId(R.id.drawerLayout)).perform(DrawerActions.open()).check(matches(isOpen()))
         onView(withId(R.id.aboutAppFragment)).perform(click())
@@ -78,78 +92,61 @@ class MapsActivityTest {
         onView(withId(R.id.drawerLayout)).perform(DrawerActions.open()).check(matches(isOpen()))
         onView(withId(R.id.mapsFragment)).perform(click())
 
-        assertThat(navcontroller?.currentDestination?.id).isEqualTo(R.id.mapsFragment)
+        assertThat(navController.currentDestination?.id).isEqualTo(R.id.mapsFragment)
     }
 
     @Test
     fun clickOnDrawerAbout_NavigateToAboutFragment() {
-        val scenario = activityScenarioRule.scenario
-        var navcontroller : NavController? = null
-        scenario.onActivity {mapsActivity ->
-            navcontroller = mapsActivity.findNavController()
-        }
-
         onView(withId(R.id.drawerLayout)).perform(DrawerActions.open()).check(matches(isOpen()))
         onView(withId(R.id.aboutAppFragment)).perform(click())
 
-        assertThat(navcontroller?.currentDestination?.id).isEqualTo(R.id.aboutAppFragment)
+        assertThat(navController.currentDestination?.id).isEqualTo(R.id.aboutAppFragment)
     }
 
     @Test
     fun clickOnDrawerTrashStats_NavigateToTrashStatsFragment() {
-        val scenario = activityScenarioRule.scenario
-        var navcontroller : NavController? = null
-        scenario.onActivity {mapsActivity ->
-            navcontroller = mapsActivity.findNavController()
-        }
-
         onView(withId(R.id.drawerLayout)).perform(DrawerActions.open()).check(matches(isOpen()))
         onView(withId(R.id.trashStatsFragment)).perform(click())
 
-        assertThat(navcontroller?.currentDestination?.id).isEqualTo(R.id.trashStatsFragment)
+        assertThat(navController.currentDestination?.id).isEqualTo(R.id.trashStatsFragment)
     }
 
     @Test
     fun clickOnDrawerContact_NavigateToContactFragment() {
-        val scenario = activityScenarioRule.scenario
-        var navcontroller : NavController? = null
-        scenario.onActivity {mapsActivity ->
-            navcontroller = mapsActivity.findNavController()
-        }
-
         onView(withId(R.id.drawerLayout)).perform(DrawerActions.open()).check(matches(isOpen()))
         onView(withId(R.id.contactFragment)).perform(click())
 
-        assertThat(navcontroller?.currentDestination?.id).isEqualTo(R.id.contactFragment)
+        assertThat(navController.currentDestination?.id).isEqualTo(R.id.contactFragment)
     }
 
     @Test
     fun clickOnDrawerSettings_NavigateToSettingsFragment() {
-        val scenario = activityScenarioRule.scenario
-        var navcontroller : NavController? = null
-        scenario.onActivity {mapsActivity ->
-            navcontroller = mapsActivity.findNavController()
-        }
-
         onView(withId(R.id.drawerLayout)).perform(DrawerActions.open()).check(matches(isOpen()))
         onView(withId(R.id.settingsFragment)).perform(click())
 
-        assertThat(navcontroller?.currentDestination?.id).isEqualTo(R.id.settingsFragment)
+        assertThat(navController.currentDestination?.id).isEqualTo(R.id.settingsFragment)
     }
 
-    private fun performEnableGPSIfDisabled(){
-        val isGPSEnabled = gpsManager.checkIfLocationGPSIsEnabled()
-        if(!isGPSEnabled){
-            onView(withText("YES")).perform(click())
+    private fun isGpsEnabled(): Boolean {
+        if (!gpsUtils.isGPSEnabled()) {
+            return false
+        }
+        return true
+    }
+
+    @Throws(UiObjectNotFoundException::class)
+    private fun performClickEnableGPS() {
+        val allowGpsBtn = device.findObject(
+            UiSelector()
+                .className("android.widget.Button").packageName("com.google.android.gms")
+                .resourceId("android:id/button1")
+                .clickable(true).checkable(false)
+        )
+        device.pressDelete() // just in case to turn ON blur screen (not a wake up) for some devices like HTC and some other
+        if (allowGpsBtn.exists() && allowGpsBtn.isEnabled) {
+            do {
+                allowGpsBtn.click()
+            } while (allowGpsBtn.exists())
         }
     }
 }
-//@Module
-//@InstallIn(ActivityComponent::class)
-//object MapsActivityModule {
-//
-//    @Provides
-//    @Named("location_manager_test")
-//    fun provideLocationManager(@ActivityContext context: Context): LocationManager =
-//        context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-//}
