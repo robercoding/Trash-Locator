@@ -52,7 +52,6 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val root = binding.root
         setContentView(root)
         setupView()
-        onActivityResult()
     }
 
     private fun setupView() {

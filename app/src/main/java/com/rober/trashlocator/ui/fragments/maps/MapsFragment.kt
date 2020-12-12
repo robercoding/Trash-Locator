@@ -67,7 +67,6 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         super.onViewCreated(view, savedInstanceState)
         subscribeObservers()
         initializeMaps()
-        openSomeActivityForResult()
     }
 
     private fun initializeMaps() {
