@@ -1,17 +1,13 @@
 package com.rober.trashlocator.ui
 
-import android.app.Activity
+import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.ActivityResultRegistry
-import androidx.activity.result.IntentSenderRequest
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -27,8 +23,9 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
-
     private val TAG = "MainActivity"
+
+    private val sharedViewModel: SharedViewModel by viewModels()
 
     private lateinit var binding: ActivityMapsBinding
     private lateinit var navigationView: NavigationView
@@ -37,8 +34,6 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var drawer: DrawerLayout? = null
 
     private var isNightMode = false
-    var content : ActivityResultLauncher<Intent>? = null
-//    var content: ActivityResultLauncher<ActivityResultContracts.StartActivityForResult>? = null
 
     override fun attachBaseContext(newBase: Context?) {
 //        val lang = "en" // your language or load from SharedPref
@@ -206,33 +201,41 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     }
 
+    //set permission in a sharedviewmodel that MapsFragment is listening
+    //Asynchronous task waiting for response of the user once launched
+    fun requestPermissions(requestPermissions : Array<String>) {
+        val test =
+            registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+                permissions.forEach {
+                    val permission = it.key
+                    when (permission) {
+                        Manifest.permission.ACCESS_FINE_LOCATION -> sharedViewModel.registerPermission(
+                            Permission.GpsPermission(it.key, it.value)
+                        )
+                    }
+                }
+            }
+
+        test.launch(requestPermissions)
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        when(requestCode){
+        when (requestCode) {
             Constants.GPS_REQUEST -> sendActivityResultToMapsFragment(requestCode, resultCode)
         }
-//        if(isGPSRequestOk(requestCode, resultCode)){
-//            sendActivityResultToMapsFragment(requestCode, resultCode)
-//        }
     }
 
-//    fun onActivityResult(){
-//        content = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){ result->
-//            Log.i("SeeReceive", "Receive result = $result")
-//            if(result.resultCode == Activity.RESULT_OK){
-//                val intent = result.data ?: return@registerForActivityResult
-//
-////                sendActivityResultToMapsFragment(requestCode, result.resultCode)
-//            }
-//        }
-//    }
-
-    private fun sendActivityResultToMapsFragment( requestCode: Int, resultCode: Int){
-        if(isCurrentDestinationMapsFragment())
-            navHostFragment.childFragmentManager.fragments[0].onActivityResult(requestCode, resultCode, null) //[0] is the current destination
+    private fun sendActivityResultToMapsFragment(requestCode: Int, resultCode: Int) {
+        if (isCurrentDestinationMapsFragment())
+            navHostFragment.childFragmentManager.fragments[0].onActivityResult(
+                requestCode,
+                resultCode,
+                null
+            )
     }
 
-    private fun isCurrentDestinationMapsFragment() : Boolean{
+    private fun isCurrentDestinationMapsFragment(): Boolean {
         return navController.currentDestination?.id == Destinations.mapsFragment
     }
 }

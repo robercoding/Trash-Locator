@@ -3,15 +3,10 @@ package com.rober.trashlocator.data.source.mapsmanager.utils.permissionsmanager
 import com.rober.trashlocator.data.source.mapsmanager.utils.permissions.PermissionsManager
 
 class FakePermissionsManager: PermissionsManager {
-    override var gpsEnabled: Boolean = false
     override var alreadyRequestLocationPermission: Boolean = false
     private var returnPermissionsOk = false
 
     override fun checkLocationPermission(): Boolean {
-        return returnPermissionsOk
-    }
-
-    override fun checkLocationPermissionAndSettings(): Boolean {
         return returnPermissionsOk
     }
 

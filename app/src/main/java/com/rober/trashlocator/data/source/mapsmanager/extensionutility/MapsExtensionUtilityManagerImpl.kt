@@ -21,19 +21,6 @@ class MapsExtensionUtilityManagerImpl constructor(
     private val trashLocationUtils: TrashLocationUtils
 ) : MapsExtensionUtilityManager {
 
-    //Function not being used in the app
-//    fun getSingleAddressLocation(location: Location): AddressLocation {
-//        val address = geoCoder.getFromLocation(location.latitude, location.longitude, 1)[0]
-//        Log.i("SeeAddress", "$address")
-//
-//        val addressLocation = AddressLocation()
-//        addressLocation.localityName = address.locality
-//        addressLocation.localityAdminAreaName = address.adminArea
-//        addressLocation.location = location
-//
-//        return addressLocation
-//    }
-
     override fun getSingleTrashLocation(location: Location): TrashLocation {
         val address = geoCoder.getFromLocation(location.latitude, location.longitude, 4)[0]
 

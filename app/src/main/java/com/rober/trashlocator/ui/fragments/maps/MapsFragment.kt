@@ -1,17 +1,13 @@
 package com.rober.trashlocator.ui.fragments.maps
 
-import android.app.Activity
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -24,6 +20,8 @@ import com.rober.trashlocator.data.source.mapsmanager.utils.GPSReceiverListener
 import com.rober.trashlocator.databinding.MapsFragmentBinding
 import com.rober.trashlocator.models.AddressLocation
 import com.rober.trashlocator.ui.MapsActivity
+import com.rober.trashlocator.utils.Permission
+import com.rober.trashlocator.ui.SharedViewModel
 import com.rober.trashlocator.ui.base.BaseFragment
 import com.rober.trashlocator.ui.base.viewBinding
 import com.rober.trashlocator.utils.*
@@ -40,6 +38,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     private val TAG = "MapsFragment"
 
     override val viewModel: MapsViewModel by viewModels()
+    private val sharedViewModel : SharedViewModel by activityViewModels()
     private val binding: MapsFragmentBinding by viewBinding(MapsFragmentBinding::bind)
 
     @Inject
@@ -52,7 +51,6 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
     private var isFirstTimeEnter = true
     private var hasBeenDetached = false
-    var startForResult : ActivityResultLauncher<Intent>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -128,6 +126,11 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         }
         viewModel.message.observe(viewLifecycleOwner) { eventMessage ->
             displayToast(eventMessage.getContentIfNotHandled() ?: return@observe)
+        }
+
+        sharedViewModel.requestPermission.observe(viewLifecycleOwner){permission ->
+            val permission = permission.getContentIfNotHandled() ?: return@observe
+            handlePermission(permission)
         }
     }
 
@@ -227,30 +230,11 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         }
     }
 
-    //Clean from mapsmanager to view
-//    override fun onCameraMoveStarted(p0: Int) {
-//        clearFocusSearchToolbar()
-//    }
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        when (requestCode) {
-            Constants.PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION -> {
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    viewModel.setLocationPermissionsGranted(true)
-                    viewModel.updateLocationUI()
-                }
-            }
-        }
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
 //        super.onActivityResult(requestCode, resultCode, data)
-        when(requestCode){
-            Constants.GPS_REQUEST ->{
-                if(isGPSRequestOk(requestCode, resultCode)){
+        when (requestCode) {
+            Constants.GPS_REQUEST -> {
+                if (isGPSRequestOk(requestCode, resultCode)) {
                     viewModel.updateLocationUI()
                     showLocationMessage(getString(R.string.location_works), false)
                 } else showLocationMessage(getString(R.string.location_error), true)
@@ -258,20 +242,28 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         }
     }
 
-    private fun isGPSRequestOk(requestCode: Int, resultCode: Int) : Boolean{
-        if((requestCode == Constants.GPS_REQUEST && resultCode == Constants.GPS_REQUEST_OK)){
+    private fun isGPSRequestOk(requestCode: Int, resultCode: Int): Boolean {
+        if ((requestCode == Constants.GPS_REQUEST && resultCode == Constants.GPS_REQUEST_OK)) {
             return true
         }
         return false
     }
 
-//    private fun openSomeActivityForResult(){
-//        startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
-//            if (result.resultCode == Constants.GPS_REQUEST) {
-//                Log.i("SeeGPS", "Receive fragment new api result and is code GPS REQUEST")
-//            }
-//        }
-//    }
+    private fun handlePermission(permission: Permission){
+        when(permission){
+            is Permission.GpsPermission -> handleGPSPermission(permission)
+        }
+    }
+
+    private fun handleGPSPermission(permission: Permission.GpsPermission) {
+        when(permission.key){
+            android.Manifest.permission.ACCESS_FINE_LOCATION -> requestLocationUpdateIfTrue(permission.value)
+        }
+    }
+
+    private fun requestLocationUpdateIfTrue(value : Boolean){
+        if(value) viewModel.updateLocationUI()
+    }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)

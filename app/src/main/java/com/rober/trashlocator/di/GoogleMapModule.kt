@@ -38,7 +38,7 @@ object GoogleMapModule {
 
     @Provides
     fun providePermissionsManager(
-        @ApplicationContext context: Context,
+        @ActivityContext context: Context,
         gpsUtils: GpsUtilsImpl
     ): PermissionsManagerImpl =
         PermissionsManagerImpl(context, gpsUtils)

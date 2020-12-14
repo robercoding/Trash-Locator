@@ -74,14 +74,13 @@ class MapsManagerImpl constructor(
     }
 
     override fun updateLocationUI() {
-        val isLocationPermissionsOk = permissionsManager.checkLocationPermissionAndSettings()
-        val isGPSEnabled = gpsUtils.isGPSEnabled()
+        val isLocationPermissionsOk = permissionsManager.checkLocationPermission()
         if (!isLocationPermissionsOk) {
             permissionsManager.requestLocationPermissions()
-            setMyLocationButton(false)
             return
         }
 
+        val isGPSEnabled = gpsUtils.isGPSEnabled()
         if (!isGPSEnabled) {
             gpsUtils.requestGPSEnable()
             setMyLocationButton(false)

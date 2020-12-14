@@ -161,7 +161,7 @@ class MapsManagerTest {
     fun getDeviceLocation_GpsDisabled() {
         locationManager.setCustomLocationListener(mapsManager)
         permissionsManager.setReturnPermissionsOk(true)
-        gpsManager.setGpsValue(true)
+        gpsManager.setGpsValue(false)
 
         mapsManager.updateLocationUI()
         var value: AddressLocation? = null

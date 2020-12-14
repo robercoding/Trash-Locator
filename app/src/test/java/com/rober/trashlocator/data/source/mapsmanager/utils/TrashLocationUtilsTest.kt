@@ -20,7 +20,6 @@ import org.robolectric.annotation.Config
 @RunWith(AndroidJUnit4::class)
 class TrashLocationUtilsTest {
 
-
     lateinit var trashLocationUtils: TrashLocationUtils
 
     @Before
