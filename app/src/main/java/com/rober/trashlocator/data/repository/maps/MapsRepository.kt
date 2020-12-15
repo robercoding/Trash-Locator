@@ -18,6 +18,7 @@ interface MapsRepository {
     fun updateLocationUI()
     fun setUpdateLocationByAddressLocation(addressLocation: AddressLocation, addToLiveData: Boolean)
     fun requestLocationUpdate()
+    fun enableMyLocationButton()
 
     suspend fun getListAddressesByName(nameLocation: String)
 

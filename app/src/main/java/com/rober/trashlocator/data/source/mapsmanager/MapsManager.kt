@@ -15,6 +15,8 @@ interface MapsManager {
         addToLiveData: Boolean
     )
 
+    fun enableMyLocationButton()
+
     //Get list addresses of addresses by name location and set on MutableLiveData
     suspend fun getListAddressesByName(nameLocation: String)
     fun registerReceiver(receiver: BroadcastReceiver)

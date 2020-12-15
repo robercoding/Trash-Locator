@@ -75,11 +75,12 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
-
         if (isFirstTimeEnter) {
             viewModel.setGoogleMapAndConfiguration(googleMap)
             viewModel.updateLocationUI()
         } else if (hasBeenDetached && !isFirstTimeEnter) {
+            viewModel.setGoogleMap(googleMap)
+        }else{
             viewModel.setGoogleMap(googleMap)
         }
 
@@ -176,7 +177,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
     override fun onUserStopTyping(text: String) {
 //        displayToast("Stopped ")
-        viewModel.getListAddressesByName(text, requireContext())
+        viewModel.getListAddressesByName(text)
     }
 
     //This function is executed in background thread from TextListener, so we need main thread to update UI

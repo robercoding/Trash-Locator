@@ -3,7 +3,6 @@ package com.rober.trashlocator.data.source.mapsmanager
 import android.Manifest
 import android.content.BroadcastReceiver
 import android.content.Context
-import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.location.Location
@@ -59,17 +58,28 @@ class MapsManagerImpl constructor(
 
     private var locationListener: LocationListener? = CustomLocationListenerImpl(this)
     private var receiver: BroadcastReceiver? = null
+    private var listTrash = listOf<Trash>()
 
     override fun setGoogleMap(googleMap: GoogleMap) {
         this.googleMap = googleMap
+        setGoogleMapConfiguration()
+
         clusterManager = ClusterManager(context, googleMap)
+        setCluster()
+
+        enableMyLocationButton()
     }
 
     override fun setGoogleMapAndConfiguration(googleMap: GoogleMap) {
         this.googleMap = googleMap
+
         clusterManager = ClusterManager(context, googleMap)
+        setCluster()
+        enableMyLocationButton()
+    }
+
+    private fun setGoogleMapConfiguration(){
         this.googleMap?.mapType = GoogleMap.MAP_TYPE_NORMAL
-        this.googleMap?.setOnMyLocationButtonClickListener(this)
         this.googleMap?.setOnCameraMoveStartedListener(this)
     }
 
@@ -83,16 +93,14 @@ class MapsManagerImpl constructor(
         val isGPSEnabled = gpsUtils.isGPSEnabled()
         if (!isGPSEnabled) {
             gpsUtils.requestGPSEnable()
-            setMyLocationButton(false)
             return
         }
 
         try {
             if (isLocationPermissionsOk && isGPSEnabled) {
-                setMyLocationButton(true)
+                enableMyLocationButton()
                 getDeviceLocation()
             } else {
-                setMyLocationButton(false)
                 permissionsManager.checkLocationPermission()
             }
         } catch (e: SecurityException) {
@@ -116,7 +124,7 @@ class MapsManagerImpl constructor(
             Event(mapsExtensionUtilityManager.getListAddressesByName(nameLocation))
     }
 
-    private fun setMyLocationButton(value: Boolean) {
+    override fun enableMyLocationButton() {
         if (ActivityCompat.checkSelfPermission(
                 context,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -128,22 +136,15 @@ class MapsManagerImpl constructor(
             permissionsManager.requestLocationPermissions()
             return
         }
-
-        if (value) {
-            googleMap?.isMyLocationEnabled = true
-            googleMap?.uiSettings?.isMyLocationButtonEnabled = true
-            googleMap?.setOnMyLocationButtonClickListener(this)
-        } else {
-            googleMap?.isMyLocationEnabled = false
-            googleMap?.uiSettings?.isMyLocationButtonEnabled = false
-        }
+        googleMap?.isMyLocationEnabled = true
+        googleMap?.uiSettings?.isMyLocationButtonEnabled = true
+        googleMap?.setOnMyLocationButtonClickListener(this)
     }
 
     private fun getDeviceLocation() {
         val isLocationPermissionsOk = permissionsManager.checkLocationPermission()
         if (!isLocationPermissionsOk) {
             permissionsManager.requestLocationPermissions()
-            setMyLocationButton(false)
             return
         }
 
@@ -151,7 +152,6 @@ class MapsManagerImpl constructor(
         if (!isGPSEnabled) {
             Log.i(TAG, "GPS Setting UI to false..")
             gpsUtils.requestGPSEnable()
-            setMyLocationButton(false)
             return
         }
 
@@ -167,7 +167,7 @@ class MapsManagerImpl constructor(
         }
     }
 
-    private fun setCluster(listTrash: List<Trash>) {
+    private fun setCluster() {
         //Clear to don't duplicate the cluster that was loaded before
         clusterManager.run {
             googleMap?.clear()
@@ -217,11 +217,13 @@ class MapsManagerImpl constructor(
          * To make animate Camera work we have to add the lapse 2500
          * To don't lag and provide a good UI experience I look for trash after finishing
          */
-        var foundDataSet = false
+        var foundDataSet: Boolean
         runBlocking {
             launch(Dispatchers.IO) {
                 foundDataSet = mapsExtensionUtilityManager.existsDataSet(addressLocation)
-                if (foundDataSet) _message.postValue(Event(context.getString(R.string.dataset_found))) else _message.postValue(Event(context.getString(R.string.dataset_not_found)))
+                if (foundDataSet) _message.postValue(Event(context.getString(R.string.dataset_found))) else _message.postValue(
+                    Event(context.getString(R.string.dataset_not_found))
+                )
             }
         }
 
@@ -235,20 +237,21 @@ class MapsManagerImpl constructor(
                 override fun onFinish() {
                     setTrashClusterForLocation(addressLocation)
                 }
+
                 override fun onCancel() {}
             }
         )
     }
 
-    private fun setTrashClusterForLocation(addressLocation: AddressLocation){
+    private fun setTrashClusterForLocation(addressLocation: AddressLocation) {
         runBlocking {
             var listTrashCluster = emptyList<Trash>()
-            val job = launch(Dispatchers.IO){
+            val job = launch(Dispatchers.IO) {
                 listTrashCluster = getTrashCluster(addressLocation)
             }
             job.join()
             if (listTrashCluster.isNotEmpty()) {
-                setCluster(listTrashCluster)
+                setCluster()
             }
         }
     }
@@ -256,12 +259,14 @@ class MapsManagerImpl constructor(
     private suspend fun getTrashCluster(
         addressLocation: AddressLocation
     ): List<Trash> {
-        return googleMap?.let { verifiedGoogleMap ->
+        listTrash = googleMap?.let { verifiedGoogleMap ->
             mapsExtensionUtilityManager.getTrashCluster(
                 verifiedGoogleMap,
                 addressLocation
             )
         } ?: kotlin.run { emptyList() }
+
+        return listTrash
     }
 
     override fun onCameraMoveStarted(p0: Int) {
@@ -269,10 +274,6 @@ class MapsManagerImpl constructor(
     }
 
     override fun onMyLocationButtonClick(): Boolean {
-        val intent = Intent("GPS_REQUEST")
-//        intent.putExtra("requestCode", Constants.GPS_REQUEST)
-//        intent.putExtra("resultCode", Constants.GPS_REQUEST_OK)
-//        (context as MapsActivity).content?.launch(intent)
         getDeviceLocation()
         return true
     }
@@ -284,8 +285,7 @@ class MapsManagerImpl constructor(
     }
 
     override fun requestLocationUpdate() {
-        setMyLocationButton(true)
-        googleMap?.setOnMyLocationButtonClickListener(this)
+        enableMyLocationButton()
         if (addressLocation.value == null) {
             getDeviceLocation()
         }

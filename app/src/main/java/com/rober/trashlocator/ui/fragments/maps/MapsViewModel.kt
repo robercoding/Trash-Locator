@@ -18,7 +18,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 class MapsViewModel @ViewModelInject constructor(
-    private val mapsRepositoryImpl: MapsRepositoryImpl,
+    private val mapsRepository: MapsRepositoryImpl,
     private val permissionsManager: PermissionsManagerImpl
 ) : ViewModel() {
     private val TAG = "MapsViewModel"
@@ -49,20 +49,20 @@ class MapsViewModel @ViewModelInject constructor(
     private var lastNameLocation = ""
 
     private fun subscribeObservers() {
-        mapsRepositoryImpl.addressLocation.observeForever {
+        mapsRepository.addressLocation.observeForever {
             listLocations.add(it)
         }
 
-        mapsRepositoryImpl.listAddressesLocation.observeForever {
+        mapsRepository.listAddressesLocation.observeForever {
             _listAddressesLocation.value = it
         }
 
-        mapsRepositoryImpl.cameraMove.observeForever {
+        mapsRepository.cameraMove.observeForever {
             if (it.hasBeenHandled) return@observeForever
             _cameraMove.value = it
         }
 
-        mapsRepositoryImpl.message.observeForever {
+        mapsRepository.message.observeForever {
             if (it.hasBeenHandled) return@observeForever
 
             _message.value = it
@@ -77,7 +77,7 @@ class MapsViewModel @ViewModelInject constructor(
         if (listLocations.size > 1) {
             listLocations.removeLast()
 
-            mapsRepositoryImpl.setUpdateLocationByAddressLocation(listLocations.last(), false)
+            mapsRepository.setUpdateLocationByAddressLocation(listLocations.last(), false)
         } else {
             _onBackPressed.value = true
         }
@@ -90,42 +90,44 @@ class MapsViewModel @ViewModelInject constructor(
 
     //NEW CHANGES
     //MapsRepository
-    fun setGoogleMap(googleMap: GoogleMap) = mapsRepositoryImpl.setGoogleMap(googleMap)
+    fun setGoogleMap(googleMap: GoogleMap) = mapsRepository.setGoogleMap(googleMap)
     fun setGoogleMapAndConfiguration(googleMap: GoogleMap) =
-        mapsRepositoryImpl.setGoogleMapAndConfiguration(googleMap)
+        mapsRepository.setGoogleMapAndConfiguration(googleMap)
 
-    fun updateLocationUI() = mapsRepositoryImpl.updateLocationUI()
+    fun updateLocationUI() = mapsRepository.updateLocationUI()
     fun setUpdateLocationByAddressLocation(addressLocation: AddressLocation) {
         if (isAddressLocationTheSameAsLast(addressLocation)) {
-            mapsRepositoryImpl.setUpdateLocationByAddressLocation(
+            mapsRepository.setUpdateLocationByAddressLocation(
                 addressLocation,
                 false
             ) //To not add the same 2 places in the backstack
         } else {
-            mapsRepositoryImpl.setUpdateLocationByAddressLocation(addressLocation, true)
+            mapsRepository.setUpdateLocationByAddressLocation(addressLocation, true)
         }
     }
 
-    fun requestLocationUpdate() = mapsRepositoryImpl.requestLocationUpdate()
+    fun requestLocationUpdate() = mapsRepository.requestLocationUpdate()
+
+    fun enableMyLocationButton() = mapsRepository.enableMyLocationButton()
 
     //Get list addresses of addresses by name location
-    fun getListAddressesByName(nameLocation: String, context: Context) {
-        if ((nameLocation == lastNameLocation)) {
+    fun getListAddressesByName(nameLocation: String) {
+        if (nameLocation == lastNameLocation) {
             return
         }
         lastNameLocation = nameLocation
 
 
-        job = viewModelScope.launch { mapsRepositoryImpl.getListAddressesByName(nameLocation) }
+        job = viewModelScope.launch { mapsRepository.getListAddressesByName(nameLocation) }
         job?.invokeOnCompletion {
             EspressoIdlingResource.decrement()
         }
     }
 
     fun registerReceiver(broadcastReceiver: BroadcastReceiver) =
-        mapsRepositoryImpl.registerReceiver(broadcastReceiver)
+        mapsRepository.registerReceiver(broadcastReceiver)
 
-    fun unregisterReceiver() = mapsRepositoryImpl.unregisterReceiver()
+    fun unregisterReceiver() = mapsRepository.unregisterReceiver()
 
     fun setLocationPermissionsGranted(isLocationPermissionsGranted: Boolean) =
         permissionsManager.setLocationPermissionGranted(isLocationPermissionsGranted)

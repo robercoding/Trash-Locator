@@ -29,6 +29,7 @@ class MapsRepositoryImpl @Inject constructor(
     ) = mapsManager.setUpdateLocationByAddressLocation(addressLocation, addToLiveData)
 
     override fun requestLocationUpdate() = mapsManager.requestLocationUpdate()
+    override fun enableMyLocationButton()  = mapsManager.enableMyLocationButton()
 
     override suspend fun getListAddressesByName(nameLocation: String) =
         mapsManager.getListAddressesByName(nameLocation)
