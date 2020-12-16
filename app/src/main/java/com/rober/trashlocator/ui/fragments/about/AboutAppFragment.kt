@@ -18,7 +18,7 @@ import kotlinx.android.synthetic.main.about_app_fragment.*
 @AndroidEntryPoint
 class AboutAppFragment : BaseFragment<AboutAppViewModel>(R.layout.about_app_fragment) {
 
-    override val viewModel: AboutAppViewModel by viewModels()
+    override val viewmodel: AboutAppViewModel by viewModels()
     private val binding: AboutAppFragmentBinding by viewBinding(AboutAppFragmentBinding::bind)
     private var easterEgg = false
     private var countClick = 10

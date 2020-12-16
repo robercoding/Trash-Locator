@@ -2,7 +2,6 @@ package com.rober.trashlocator.utils.listeners
 
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import com.rober.trashlocator.utils.EspressoIdlingResource
 import com.rober.trashlocator.utils.listeners.interfaces.TextListener
 import java.util.*

@@ -3,7 +3,6 @@ package com.rober.trashlocator.ui.fragments.contact
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,7 +17,7 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class ContactFragment : BaseFragment<ContactViewModel>(R.layout.contact_fragment) {
-    override val viewModel: ContactViewModel by viewModels()
+    override val viewmodel: ContactViewModel by viewModels()
     private val binding: ContactFragmentBinding by viewBinding(ContactFragmentBinding::bind)
 
     override fun onCreateView(

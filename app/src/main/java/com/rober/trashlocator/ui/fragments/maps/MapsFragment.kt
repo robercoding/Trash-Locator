@@ -20,7 +20,6 @@ import com.rober.trashlocator.data.source.mapsmanager.utils.GPSReceiverListener
 import com.rober.trashlocator.databinding.MapsFragmentBinding
 import com.rober.trashlocator.models.AddressLocation
 import com.rober.trashlocator.ui.MapsActivity
-import com.rober.trashlocator.utils.Permission
 import com.rober.trashlocator.ui.SharedViewModel
 import com.rober.trashlocator.ui.base.BaseFragment
 import com.rober.trashlocator.ui.base.viewBinding
@@ -37,8 +36,8 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
     private val TAG = "MapsFragment"
 
-    override val viewModel: MapsViewModel by viewModels()
-    private val sharedViewModel : SharedViewModel by activityViewModels()
+    override val viewmodel: MapsViewModel by viewModels()
+    private val sharedViewModel: SharedViewModel by activityViewModels()
     private val binding: MapsFragmentBinding by viewBinding(MapsFragmentBinding::bind)
 
     @Inject
@@ -76,12 +75,10 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
     override fun onMapReady(googleMap: GoogleMap) {
         if (isFirstTimeEnter) {
-            viewModel.setGoogleMapAndConfiguration(googleMap)
-            viewModel.updateLocationUI()
-        } else if (hasBeenDetached && !isFirstTimeEnter) {
-            viewModel.setGoogleMap(googleMap)
-        }else{
-            viewModel.setGoogleMap(googleMap)
+            viewmodel.setGoogleMapAndConfiguration(googleMap)
+            viewmodel.updateLocationUI()
+        } else {
+            viewmodel.setGoogleMap(googleMap)
         }
 
         isFirstTimeEnter = false
@@ -109,27 +106,27 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
         }
 
     private fun subscribeObservers() {
-        viewModel.listAddressesLocation.observe(viewLifecycleOwner) { eventListAddressesLocation ->
+        viewmodel.listAddressesLocation.observe(viewLifecycleOwner) { eventListAddressesLocation ->
             setSearchAdapter(eventListAddressesLocation.getContentIfNotHandled() ?: return@observe)
         }
 
-        viewModel.cameraMove.observe(viewLifecycleOwner) {
+        viewmodel.cameraMove.observe(viewLifecycleOwner) {
             if (it.hasBeenHandled) return@observe
             clearFocusSearchToolbar()
         }
 
-        viewModel.onBackPressed.observe(viewLifecycleOwner) { onBackPressed ->
+        viewmodel.onBackPressed.observe(viewLifecycleOwner) { onBackPressed ->
             if (!onBackPressed) {
                 return@observe
             }
 
             defaultOnBackPressed()
         }
-        viewModel.message.observe(viewLifecycleOwner) { eventMessage ->
+        viewmodel.message.observe(viewLifecycleOwner) { eventMessage ->
             displayToast(eventMessage.getContentIfNotHandled() ?: return@observe)
         }
 
-        sharedViewModel.requestPermission.observe(viewLifecycleOwner){permission ->
+        sharedViewModel.requestPermission.observe(viewLifecycleOwner) { permission ->
             val permission = permission.getContentIfNotHandled() ?: return@observe
             handlePermission(permission)
         }
@@ -139,7 +136,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     * We register receivers so Android notifies us of changes in the runtime
     */
     private fun initializeReceivers() {
-        viewModel.registerReceiver(GPSBroadcastReceiver(locationManager, this))
+        viewmodel.registerReceiver(LocationBroadcastReceiver(locationManager, this))
     }
 
     private fun clearFocusSearchToolbar() {
@@ -170,27 +167,27 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    viewModel.getLastLocation()
+                    viewmodel.getLastLocation()
                 }
             })
     }
 
     override fun onUserStopTyping(text: String) {
 //        displayToast("Stopped ")
-        viewModel.getListAddressesByName(text)
+        viewmodel.getListAddressesByName(text)
     }
 
     //This function is executed in background thread from TextListener, so we need main thread to update UI
     override fun onUserStopTypingIsEmpty() {
         requireActivity().runOnUiThread { setSearchAdapter(emptyList()) }
-        viewModel.setLastNameLocationEmpty()
+        viewmodel.setLastNameLocationEmpty()
     }
 
     //activated by RecyclerLocationListener
     override fun onAddressLocationClickListener(addressLocation: AddressLocation) {
         //Deactive to don't trigger textWatcher listener to don't trigger onUserStopTyping
         textWatcherListener.isSettingText(true)
-        wrapEspressoIdlingResource { viewModel.setUpdateLocationByAddressLocation(addressLocation) }
+        wrapEspressoIdlingResource { viewmodel.setUpdateLocationByAddressLocation(addressLocation) }
 
         binding.ETsearchLocation.setText(addressLocation.streetName)
         clearFocusSearchToolbar()
@@ -216,7 +213,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
                 )
             )
             binding.textLocationSettings.show()
-            viewModel.requestLocationUpdate()
+            viewmodel.requestLocationUpdate()
         }
     }
 
@@ -232,38 +229,30 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-//        super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
+            //Called from resolution
             Constants.GPS_REQUEST -> {
-                if (isGPSRequestOk(requestCode, resultCode)) {
-                    viewModel.updateLocationUI()
-                    showLocationMessage(getString(R.string.location_works), false)
-                } else showLocationMessage(getString(R.string.location_error), true)
+                viewmodel.updateLocationUI()
             }
         }
     }
 
-    private fun isGPSRequestOk(requestCode: Int, resultCode: Int): Boolean {
-        if ((requestCode == Constants.GPS_REQUEST && resultCode == Constants.GPS_REQUEST_OK)) {
-            return true
-        }
-        return false
-    }
-
-    private fun handlePermission(permission: Permission){
-        when(permission){
+    private fun handlePermission(permission: Permission) {
+        when (permission) {
             is Permission.GpsPermission -> handleGPSPermission(permission)
         }
     }
 
     private fun handleGPSPermission(permission: Permission.GpsPermission) {
-        when(permission.key){
-            android.Manifest.permission.ACCESS_FINE_LOCATION -> requestLocationUpdateIfTrue(permission.value)
+        when (permission.key) {
+            android.Manifest.permission.ACCESS_FINE_LOCATION -> requestLocationUpdateIfTrue(
+                permission.value
+            )
         }
     }
 
-    private fun requestLocationUpdateIfTrue(value : Boolean){
-        if(value) viewModel.updateLocationUI()
+    private fun requestLocationUpdateIfTrue(value: Boolean) {
+        if (value) viewmodel.updateLocationUI()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -291,7 +280,7 @@ class MapsFragment : BaseFragment<MapsViewModel>(R.layout.maps_fragment), OnMapR
 
     override fun onPause() {
         super.onPause()
-        viewModel.unregisterReceiver()
+        viewmodel.unregisterReceiver()
     }
 
     override fun onDestroy() {

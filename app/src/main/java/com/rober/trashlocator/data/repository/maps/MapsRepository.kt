@@ -1,10 +1,10 @@
 package com.rober.trashlocator.data.repository.maps
 
-import android.content.BroadcastReceiver
 import androidx.lifecycle.LiveData
 import com.google.android.gms.maps.GoogleMap
 import com.rober.trashlocator.models.AddressLocation
 import com.rober.trashlocator.utils.Event
+import com.rober.trashlocator.utils.LocationBroadcastReceiver
 
 interface MapsRepository {
     var addressLocation: LiveData<AddressLocation>
@@ -22,6 +22,6 @@ interface MapsRepository {
 
     suspend fun getListAddressesByName(nameLocation: String)
 
-    fun registerReceiver(broadcastReceiver: BroadcastReceiver)
+    fun registerReceiver(broadcastReceiver: LocationBroadcastReceiver)
     fun unregisterReceiver()
 }

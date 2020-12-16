@@ -24,8 +24,10 @@ class MapsViewModelTest {
 
     @Mock
     lateinit var mapsRepositoryImpl: MapsRepositoryImpl
+
     @Mock
     lateinit var permissionsManagerImpl: PermissionsManagerImpl
+
     @Mock
     lateinit var mapsManager: MapsManagerImpl
 

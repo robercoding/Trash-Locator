@@ -8,10 +8,10 @@ import com.rober.trashlocator.utils.Permission
 
 class SharedViewModel : ViewModel() {
     private val _requestPermission = MutableLiveData<Event<Permission>>()
-    val requestPermission : LiveData<Event<Permission>>
+    val requestPermission: LiveData<Event<Permission>>
         get() = _requestPermission
 
-    fun registerPermission(permission: Permission){
+    fun registerPermission(permission: Permission) {
         _requestPermission.value = Event(permission)
     }
 }

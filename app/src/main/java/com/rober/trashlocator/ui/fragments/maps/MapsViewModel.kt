@@ -1,7 +1,5 @@
 package com.rober.trashlocator.ui.fragments.maps
 
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
@@ -14,6 +12,7 @@ import com.rober.trashlocator.data.source.mapsmanager.utils.permissions.Permissi
 import com.rober.trashlocator.models.AddressLocation
 import com.rober.trashlocator.utils.EspressoIdlingResource
 import com.rober.trashlocator.utils.Event
+import com.rober.trashlocator.utils.LocationBroadcastReceiver
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
@@ -124,14 +123,10 @@ class MapsViewModel @ViewModelInject constructor(
         }
     }
 
-    fun registerReceiver(broadcastReceiver: BroadcastReceiver) =
+    fun registerReceiver(broadcastReceiver: LocationBroadcastReceiver) =
         mapsRepository.registerReceiver(broadcastReceiver)
 
     fun unregisterReceiver() = mapsRepository.unregisterReceiver()
-
-    fun setLocationPermissionsGranted(isLocationPermissionsGranted: Boolean) =
-        permissionsManager.setLocationPermissionGranted(isLocationPermissionsGranted)
-
 
     override fun onCleared() {
         super.onCleared()

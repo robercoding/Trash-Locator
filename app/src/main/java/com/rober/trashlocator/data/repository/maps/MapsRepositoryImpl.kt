@@ -1,11 +1,11 @@
 package com.rober.trashlocator.data.repository.maps
 
-import android.content.BroadcastReceiver
 import androidx.lifecycle.LiveData
 import com.google.android.gms.maps.GoogleMap
-import com.rober.trashlocator.models.AddressLocation
 import com.rober.trashlocator.data.source.mapsmanager.MapsManagerImpl
+import com.rober.trashlocator.models.AddressLocation
 import com.rober.trashlocator.utils.Event
+import com.rober.trashlocator.utils.LocationBroadcastReceiver
 import javax.inject.Inject
 
 class MapsRepositoryImpl @Inject constructor(
@@ -29,13 +29,14 @@ class MapsRepositoryImpl @Inject constructor(
     ) = mapsManager.setUpdateLocationByAddressLocation(addressLocation, addToLiveData)
 
     override fun requestLocationUpdate() = mapsManager.requestLocationUpdate()
-    override fun enableMyLocationButton()  = mapsManager.enableMyLocationButton()
+    override fun enableMyLocationButton() = mapsManager.enableMyLocationButton()
 
     override suspend fun getListAddressesByName(nameLocation: String) =
         mapsManager.getListAddressesByName(nameLocation)
 
-    override fun registerReceiver(broadcastReceiver: BroadcastReceiver) =
+    override fun registerReceiver(broadcastReceiver: LocationBroadcastReceiver) =
         mapsManager.registerReceiver(broadcastReceiver)
+
 
     override fun unregisterReceiver() = mapsManager.unregisterReceiver()
 }

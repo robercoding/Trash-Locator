@@ -1,7 +1,6 @@
 package com.rober.trashlocator
 
 import android.os.IBinder
-import android.view.WindowManager
 import android.view.WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
 import android.view.WindowManager.LayoutParams.TYPE_TOAST
 import androidx.test.espresso.Root

@@ -72,7 +72,7 @@ class MapsFragmentTest :
         IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource)
         launchFragmentInHiltContainer<MapsFragment>()
 
-        if(!isGpsEnabled()){
+        if (!isGpsEnabled()) {
             performClickEnableGPS()
         }
     }
@@ -91,7 +91,7 @@ class MapsFragmentTest :
 
     @Test
     fun writeOnSearchPlace_clickOnRecyclerView_moveCameraPosition_displaysToastNotFoundDataSet() =
-    runBlockingTest {
+        runBlockingTest {
             //Given
             val stringToTest = "Madrid"
             onView(withId(R.id.ETsearchLocation)).perform(TypeTextAction(stringToTest))

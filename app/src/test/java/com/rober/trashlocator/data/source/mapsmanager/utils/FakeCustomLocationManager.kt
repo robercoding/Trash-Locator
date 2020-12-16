@@ -5,8 +5,8 @@ import android.location.LocationListener
 import com.rober.trashlocator.utils.listeners.interfaces.CustomLocationListener
 
 class FakeCustomLocationManager(
-    private var customLocationListener : CustomLocationListener? = null
-) : CustomLocationManager{
+    private var customLocationListener: CustomLocationListener? = null
+) : CustomLocationManager {
 
     override fun requestSingleUpdate(locationListener: LocationListener) {
         val location = Location("")
@@ -15,7 +15,7 @@ class FakeCustomLocationManager(
         customLocationListener?.updateCurrentLocation(location)
     }
 
-    fun setCustomLocationListener(newCustomLocationListener : CustomLocationListener){
+    fun setCustomLocationListener(newCustomLocationListener: CustomLocationListener) {
         customLocationListener = newCustomLocationListener
     }
 }

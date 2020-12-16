@@ -4,13 +4,10 @@ import android.location.Location
 import android.os.Build
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.internal.IGoogleMapDelegate
 import com.google.common.truth.Truth
 import com.rober.trashlocator.data.source.mapsmanager.utils.TrashLocationUtils
 import com.rober.trashlocator.models.AddressLocation
 import kotlinx.coroutines.test.runBlockingTest
-import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -19,19 +16,20 @@ import org.robolectric.annotation.Config
 
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
 @RunWith(AndroidJUnit4::class)
-class MapsExtensionUtilityManagerTest{
+class MapsExtensionUtilityManagerTest {
 
     lateinit var fakeMapsExtensionUtilityManager: FakeMapsExtensionUtilityManager
     lateinit var trashLocationUtils: TrashLocationUtils
 
     @Before
-    fun setup(){
-        trashLocationUtils = TrashLocationUtils(InstrumentationRegistry.getInstrumentation().targetContext)
+    fun setup() {
+        trashLocationUtils =
+            TrashLocationUtils(InstrumentationRegistry.getInstrumentation().targetContext)
         fakeMapsExtensionUtilityManager = FakeMapsExtensionUtilityManager(trashLocationUtils)
     }
 
     @Test
-    fun setFeatureEmpty_returnTrashLocationWithEmptyFeature(){
+    fun setFeatureEmpty_returnTrashLocationWithEmptyFeature() {
         //Given
         fakeMapsExtensionUtilityManager.setShouldAddTrashLocationFeature(false)
 
@@ -45,7 +43,7 @@ class MapsExtensionUtilityManagerTest{
     }
 
     @Test
-    fun setFeature_returnTrashLocationWithFeature(){
+    fun setFeature_returnTrashLocationWithFeature() {
         //Given
         fakeMapsExtensionUtilityManager.setShouldAddTrashLocationFeature(true)
 
@@ -59,7 +57,7 @@ class MapsExtensionUtilityManagerTest{
     }
 
     @Test
-    fun passLatitude_returnTrashLocationLocalityCaceres(){
+    fun passLatitude_returnTrashLocationLocalityCaceres() {
         //Given
         fakeMapsExtensionUtilityManager.setShouldAddTrashLocationFeature(true)
         fakeMapsExtensionUtilityManager.setShouldAddTrashLocationLocality(true)
@@ -74,7 +72,7 @@ class MapsExtensionUtilityManagerTest{
     }
 
     @Test
-    fun setLocationSantaCruzDeTenerife_returnTrashLocationSantaCruzDeTenerife(){
+    fun setLocationSantaCruzDeTenerife_returnTrashLocationSantaCruzDeTenerife() {
         //Given
         fakeMapsExtensionUtilityManager.setShouldAddTrashLocationFeature(true)
         fakeMapsExtensionUtilityManager.setShouldAddTrashLocationLocality(true)
@@ -89,7 +87,7 @@ class MapsExtensionUtilityManagerTest{
     }
 
     @Test
-    fun setWithLocality_returnTrashLocationLocality(){
+    fun setWithLocality_returnTrashLocationLocality() {
         //Given
         fakeMapsExtensionUtilityManager.setShouldAddTrashLocationLocality(true)
 
@@ -103,7 +101,7 @@ class MapsExtensionUtilityManagerTest{
     }
 
     @Test
-    fun setWithoutLocality_returnTrashLocationLocalityEmpty(){
+    fun setWithoutLocality_returnTrashLocationLocalityEmpty() {
         //Given
         fakeMapsExtensionUtilityManager.setShouldAddTrashLocationLocality(false)
 
@@ -117,7 +115,7 @@ class MapsExtensionUtilityManagerTest{
     }
 
     @Test
-    fun setLocationWithLess100Distance_returnListWithTrash() = runBlockingTest{
+    fun setLocationWithLess100Distance_returnListWithTrash() = runBlockingTest {
         //Given
         val location = Location("")
         //Location caceres
@@ -133,13 +131,14 @@ class MapsExtensionUtilityManagerTest{
     }
 
     @Test
-    fun setLocationWithLess100Distance_returnEmptyList() = runBlockingTest{
+    fun setLocationWithLess100Distance_returnEmptyList() = runBlockingTest {
         //Given
         val location = Location("")
         //location that is far from caceres
         location.latitude = 9.4754331
         location.longitude = -5.377640
-        val addressLocation = AddressLocation("Far from caceres", "Far from caceres", "Far from caceres", location)
+        val addressLocation =
+            AddressLocation("Far from caceres", "Far from caceres", "Far from caceres", location)
 
         //When
         val trashCluster = fakeMapsExtensionUtilityManager.getTrashCluster(null, addressLocation)

@@ -10,5 +10,8 @@ interface MapsExtensionUtilityManager {
     fun getSingleTrashLocation(location: Location): TrashLocation
     suspend fun getListAddressesByName(nameLocation: String): List<AddressLocation>
     suspend fun existsDataSet(addressLocation: AddressLocation): Boolean
-    suspend fun getTrashCluster(googleMap: GoogleMap?, addressLocation: AddressLocation): List<Trash>
+    suspend fun getTrashCluster(
+        googleMap: GoogleMap?,
+        addressLocation: AddressLocation
+    ): List<Trash>
 }

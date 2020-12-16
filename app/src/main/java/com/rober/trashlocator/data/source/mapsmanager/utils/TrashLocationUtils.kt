@@ -1,7 +1,6 @@
 package com.rober.trashlocator.data.source.mapsmanager.utils
 
 import android.content.Context
-import android.util.Log
 import com.rober.trashlocator.R
 import com.rober.trashlocator.models.AddressLocation
 import com.rober.trashlocator.models.TrashLocation

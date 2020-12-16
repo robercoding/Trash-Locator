@@ -2,7 +2,7 @@ package com.rober.trashlocator.data.source.mapsmanager.utils.permissionsmanager
 
 import com.rober.trashlocator.data.source.mapsmanager.utils.permissions.PermissionsManager
 
-class FakePermissionsManager: PermissionsManager {
+class FakePermissionsManager : PermissionsManager {
     override var alreadyRequestLocationPermission: Boolean = false
     private var returnPermissionsOk = false
 
@@ -10,7 +10,7 @@ class FakePermissionsManager: PermissionsManager {
         return returnPermissionsOk
     }
 
-    fun setReturnPermissionsOk(value: Boolean){
+    fun setReturnPermissionsOk(value: Boolean) {
         returnPermissionsOk = value
     }
 

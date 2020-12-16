@@ -203,7 +203,7 @@ class MapsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     //set permission in a sharedviewmodel that MapsFragment is listening
     //Asynchronous task waiting for response of the user once launched
-    fun requestPermissions(requestPermissions : Array<String>) {
+    fun requestPermissions(requestPermissions: Array<String>) {
         val test =
             registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
                 permissions.forEach {

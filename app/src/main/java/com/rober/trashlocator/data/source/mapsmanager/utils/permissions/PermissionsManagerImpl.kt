@@ -4,8 +4,8 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
-import com.rober.trashlocator.ui.MapsActivity
 import com.rober.trashlocator.data.source.mapsmanager.utils.gps.GpsUtilsImpl
+import com.rober.trashlocator.ui.MapsActivity
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
 
@@ -30,7 +30,10 @@ class PermissionsManagerImpl @Inject constructor(
     override fun requestLocationPermissions() {
         val activity =
             if (context is MapsActivity) context else throw Exception("Can't get instance of MapsActivity")
-        val requestPermissions = arrayOf(android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION)
+        val requestPermissions = arrayOf(
+            android.Manifest.permission.ACCESS_COARSE_LOCATION,
+            android.Manifest.permission.ACCESS_FINE_LOCATION
+        )
         activity.requestPermissions(requestPermissions)
     }
 

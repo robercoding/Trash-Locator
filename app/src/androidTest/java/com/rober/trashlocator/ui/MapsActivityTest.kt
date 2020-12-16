@@ -27,8 +27,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import javax.inject.Inject
-import javax.inject.Named
 
 
 @LargeTest

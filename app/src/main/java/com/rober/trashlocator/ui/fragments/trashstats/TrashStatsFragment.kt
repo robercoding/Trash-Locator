@@ -15,7 +15,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class TrashStatsFragment : BaseFragment<TrashStatsViewModel>(R.layout.trash_stats_fragment) {
 
-    override val viewModel: TrashStatsViewModel by viewModels()
+    override val viewmodel: TrashStatsViewModel by viewModels()
     private val binding: TrashStatsFragmentBinding by viewBinding(TrashStatsFragmentBinding::bind)
 
     override fun setupView() {

@@ -1,11 +1,7 @@
 package com.rober.trashlocator.utils
 
 object Constants {
-
-    const val PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 0
     const val GPS_REQUEST = 1
-    const val GPS_REQUEST_OK = -1
-    const val GPS_REQUEST_FAILURE = 0
 
     //SharedPreferences
     const val IS_DETACHED_VALUE = "isDetached"

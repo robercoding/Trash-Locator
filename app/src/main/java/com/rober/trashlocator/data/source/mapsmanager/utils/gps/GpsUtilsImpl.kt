@@ -9,13 +9,20 @@ import android.util.Log
 import android.widget.Toast
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.ResolvableApiException
-import com.google.android.gms.location.*
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationSettingsRequest
+import com.google.android.gms.location.LocationSettingsStatusCodes
+import com.google.android.gms.location.SettingsClient
 import com.rober.trashlocator.utils.Constants
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
 
 @ActivityScoped
-class GpsUtilsImpl(@ActivityContext private val context: Context, private val locationManager: LocationManager, private val settingsClient: SettingsClient) : GpsUtils{
+class GpsUtilsImpl(
+    @ActivityContext private val context: Context,
+    private val locationManager: LocationManager,
+    private val settingsClient: SettingsClient
+) : GpsUtils {
     private val TAG = javaClass.simpleName
 
     private val locationSettingsRequest: LocationSettingsRequest

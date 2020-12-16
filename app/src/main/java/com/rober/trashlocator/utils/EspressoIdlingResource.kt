@@ -1,6 +1,5 @@
 package com.rober.trashlocator.utils
 
-import android.util.Log
 import androidx.test.espresso.idling.CountingIdlingResource
 
 object EspressoIdlingResource {

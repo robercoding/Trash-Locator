@@ -1,7 +1,6 @@
 package com.rober.trashlocator.data.source.mapsmanager
 
 import android.Manifest
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.IntentFilter
 import android.content.pm.PackageManager
@@ -25,6 +24,7 @@ import com.rober.trashlocator.models.AddressLocation
 import com.rober.trashlocator.models.Trash
 import com.rober.trashlocator.utils.CustomClusterRenderer
 import com.rober.trashlocator.utils.Event
+import com.rober.trashlocator.utils.LocationBroadcastReceiver
 import com.rober.trashlocator.utils.listeners.CustomLocationListenerImpl
 import com.rober.trashlocator.utils.listeners.interfaces.CustomLocationListener
 import kotlinx.coroutines.Dispatchers
@@ -57,7 +57,7 @@ class MapsManagerImpl constructor(
     private lateinit var clusterManager: ClusterManager<Trash>
 
     private var locationListener: LocationListener? = CustomLocationListenerImpl(this)
-    private var receiver: BroadcastReceiver? = null
+    private var receiver: LocationBroadcastReceiver? = null
     private var listTrash = listOf<Trash>()
 
     override fun setGoogleMap(googleMap: GoogleMap) {
@@ -78,7 +78,7 @@ class MapsManagerImpl constructor(
         enableMyLocationButton()
     }
 
-    private fun setGoogleMapConfiguration(){
+    private fun setGoogleMapConfiguration() {
         this.googleMap?.mapType = GoogleMap.MAP_TYPE_NORMAL
         this.googleMap?.setOnCameraMoveStartedListener(this)
     }
@@ -291,7 +291,7 @@ class MapsManagerImpl constructor(
         }
     }
 
-    override fun registerReceiver(receiver: BroadcastReceiver) {
+    override fun registerReceiver(receiver: LocationBroadcastReceiver) {
         this.receiver = receiver
         context.registerReceiver(receiver, IntentFilter("android.location.PROVIDERS_CHANGED"))
     }

@@ -5,14 +5,13 @@ import android.content.Context
 import android.content.Intent
 import android.location.LocationManager
 import android.os.Handler
-import android.util.Log
 import com.rober.trashlocator.R
 import com.rober.trashlocator.data.source.mapsmanager.utils.GPSReceiverListener
 
-class GPSBroadcastReceiver(
+class LocationBroadcastReceiver(
     private val locationManager: LocationManager,
-    private val mGPSReceiverListener: GPSReceiverListener
-) :BroadcastReceiver() {
+    private val mGPSReceiverListener: GPSReceiverListener,
+) : BroadcastReceiver() {
 
     private var handler: Handler? = null
     private var runnable: Runnable? = null
@@ -22,9 +21,15 @@ class GPSBroadcastReceiver(
     }
 
     override fun onReceive(context: Context?, intent: Intent?) {
-        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+        val isProviderEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+        showLocationMessage(isProviderEnabled, context)
+    }
 
+    fun showLocationMessage(isProviderEnabled: Boolean, context: Context?) {
+        if (runnable != null)
+            handler?.removeCallbacks(runnable!!)
 
+        if (isProviderEnabled) {
             mGPSReceiverListener.showLocationMessage(
                 context?.getString(R.string.location_works)!!,
                 false
@@ -32,13 +37,14 @@ class GPSBroadcastReceiver(
             runnable = Runnable { mGPSReceiverListener.hideLocationMessage() }
             handler?.postDelayed(runnable!!, 3000)
         } else {
-            if (runnable != null)
-                handler?.removeCallbacks(runnable!!)
-
             mGPSReceiverListener.showLocationMessage(
                 context?.getString(R.string.location_error)!!,
                 true
             )
+
+            runnable = Runnable { mGPSReceiverListener.hideLocationMessage() }
+            handler?.postDelayed(runnable!!, 3000)
+
         }
     }
 }
