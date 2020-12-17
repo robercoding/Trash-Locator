@@ -10,10 +10,10 @@ import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
 
 @ActivityScoped
-class PermissionsManagerImpl @Inject constructor(
+class PermissionsUtilsImpl @Inject constructor(
     @ActivityScoped private val context: Context,
     private val gpsUtils: GpsUtilsImpl
-) : PermissionsManager {
+) : PermissionsUtils {
     private val TAG = "PermissionsManager"
 
     private var locationPermissionGranted = false

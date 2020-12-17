@@ -15,11 +15,11 @@ import com.rober.trashlocator.utils.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class MapsExtensionUtilityManagerImpl constructor(
+class MapsExtensionUtilityImpl constructor(
     private val context: Context,
     private val geoCoder: Geocoder,
     private val trashLocationUtils: TrashLocationUtils
-) : MapsExtensionUtilityManager {
+) : MapsExtensionUtility {
 
     override fun getSingleTrashLocation(location: Location): TrashLocation {
         val address = geoCoder.getFromLocation(location.latitude, location.longitude, 4)[0]

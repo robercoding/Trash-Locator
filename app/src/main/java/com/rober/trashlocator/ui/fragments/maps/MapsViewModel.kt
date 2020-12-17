@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.GoogleMap
 import com.rober.trashlocator.data.repository.maps.MapsRepositoryImpl
-import com.rober.trashlocator.data.source.mapsmanager.utils.permissions.PermissionsManagerImpl
+import com.rober.trashlocator.data.source.mapsmanager.utils.permissions.PermissionsUtilsImpl
 import com.rober.trashlocator.models.AddressLocation
 import com.rober.trashlocator.utils.EspressoIdlingResource
 import com.rober.trashlocator.utils.Event
@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 
 class MapsViewModel @ViewModelInject constructor(
     private val mapsRepository: MapsRepositoryImpl,
-    private val permissionsManager: PermissionsManagerImpl
+    private val permissionsManager: PermissionsUtilsImpl
 ) : ViewModel() {
     private val TAG = "MapsViewModel"
 

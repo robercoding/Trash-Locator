@@ -16,16 +16,16 @@ import org.robolectric.annotation.Config
 
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
 @RunWith(AndroidJUnit4::class)
-class MapsExtensionUtilityManagerTest {
+class MapsExtensionUtilityTest {
 
-    lateinit var fakeMapsExtensionUtilityManager: FakeMapsExtensionUtilityManager
+    lateinit var fakeMapsExtensionUtilityManager: FakeMapsExtensionUtility
     lateinit var trashLocationUtils: TrashLocationUtils
 
     @Before
     fun setup() {
         trashLocationUtils =
             TrashLocationUtils(InstrumentationRegistry.getInstrumentation().targetContext)
-        fakeMapsExtensionUtilityManager = FakeMapsExtensionUtilityManager(trashLocationUtils)
+        fakeMapsExtensionUtilityManager = FakeMapsExtensionUtility(trashLocationUtils)
     }
 
     @Test

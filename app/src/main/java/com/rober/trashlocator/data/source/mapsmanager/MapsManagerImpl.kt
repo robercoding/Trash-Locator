@@ -16,10 +16,10 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.clustering.ClusterManager
 import com.rober.trashlocator.R
-import com.rober.trashlocator.data.source.mapsmanager.extensionutility.MapsExtensionUtilityManager
+import com.rober.trashlocator.data.source.mapsmanager.extensionutility.MapsExtensionUtility
 import com.rober.trashlocator.data.source.mapsmanager.utils.CustomLocationManager
 import com.rober.trashlocator.data.source.mapsmanager.utils.gps.GpsUtils
-import com.rober.trashlocator.data.source.mapsmanager.utils.permissions.PermissionsManager
+import com.rober.trashlocator.data.source.mapsmanager.utils.permissions.PermissionsUtils
 import com.rober.trashlocator.models.AddressLocation
 import com.rober.trashlocator.models.Trash
 import com.rober.trashlocator.utils.CustomClusterRenderer
@@ -33,9 +33,9 @@ import kotlinx.coroutines.runBlocking
 
 class MapsManagerImpl constructor(
     private val context: Context,
-    private val permissionsManager: PermissionsManager,
+    private val permissionsUtils: PermissionsUtils,
     private val gpsUtils: GpsUtils,
-    private val mapsExtensionUtilityManager: MapsExtensionUtilityManager,
+    private val mapsExtensionUtility: MapsExtensionUtility,
     private val locationManager: CustomLocationManager
 ) : GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnCameraMoveStartedListener,
     CustomLocationListener, MapsManager {
@@ -84,9 +84,9 @@ class MapsManagerImpl constructor(
     }
 
     override fun updateLocationUI() {
-        val isLocationPermissionsOk = permissionsManager.checkLocationPermission()
+        val isLocationPermissionsOk = permissionsUtils.checkLocationPermission()
         if (!isLocationPermissionsOk) {
-            permissionsManager.requestLocationPermissions()
+            permissionsUtils.requestLocationPermissions()
             return
         }
 
@@ -101,7 +101,7 @@ class MapsManagerImpl constructor(
                 enableMyLocationButton()
                 getDeviceLocation()
             } else {
-                permissionsManager.checkLocationPermission()
+                permissionsUtils.checkLocationPermission()
             }
         } catch (e: SecurityException) {
             Log.e("Exception: %s", e.message, e)
@@ -121,7 +121,7 @@ class MapsManagerImpl constructor(
     //Get list addresses of addresses by name location and set on MutableLiveData
     override suspend fun getListAddressesByName(nameLocation: String) {
         _addressesLocation.value =
-            Event(mapsExtensionUtilityManager.getListAddressesByName(nameLocation))
+            Event(mapsExtensionUtility.getListAddressesByName(nameLocation))
     }
 
     override fun enableMyLocationButton() {
@@ -133,7 +133,7 @@ class MapsManagerImpl constructor(
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            permissionsManager.requestLocationPermissions()
+            permissionsUtils.requestLocationPermissions()
             return
         }
         googleMap?.isMyLocationEnabled = true
@@ -142,9 +142,9 @@ class MapsManagerImpl constructor(
     }
 
     private fun getDeviceLocation() {
-        val isLocationPermissionsOk = permissionsManager.checkLocationPermission()
+        val isLocationPermissionsOk = permissionsUtils.checkLocationPermission()
         if (!isLocationPermissionsOk) {
-            permissionsManager.requestLocationPermissions()
+            permissionsUtils.requestLocationPermissions()
             return
         }
 
@@ -220,7 +220,7 @@ class MapsManagerImpl constructor(
         var foundDataSet: Boolean
         runBlocking {
             launch(Dispatchers.IO) {
-                foundDataSet = mapsExtensionUtilityManager.existsDataSet(addressLocation)
+                foundDataSet = mapsExtensionUtility.existsDataSet(addressLocation)
                 if (foundDataSet) _message.postValue(Event(context.getString(R.string.dataset_found))) else _message.postValue(
                     Event(context.getString(R.string.dataset_not_found))
                 )
@@ -260,7 +260,7 @@ class MapsManagerImpl constructor(
         addressLocation: AddressLocation
     ): List<Trash> {
         listTrash = googleMap?.let { verifiedGoogleMap ->
-            mapsExtensionUtilityManager.getTrashCluster(
+            mapsExtensionUtility.getTrashCluster(
                 verifiedGoogleMap,
                 addressLocation
             )

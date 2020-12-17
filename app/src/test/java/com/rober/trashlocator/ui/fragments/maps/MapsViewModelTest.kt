@@ -4,7 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.rober.trashlocator.data.repository.maps.MapsRepositoryImpl
 import com.rober.trashlocator.data.source.mapsmanager.MapsManagerImpl
-import com.rober.trashlocator.data.source.mapsmanager.utils.permissions.PermissionsManagerImpl
+import com.rober.trashlocator.data.source.mapsmanager.utils.permissions.PermissionsUtilsImpl
 import com.rober.trashlocator.models.AddressLocation
 import com.rober.trashlocator.utils.Event
 import org.junit.Before
@@ -26,7 +26,7 @@ class MapsViewModelTest {
     lateinit var mapsRepositoryImpl: MapsRepositoryImpl
 
     @Mock
-    lateinit var permissionsManagerImpl: PermissionsManagerImpl
+    lateinit var permissionsManagerImpl: PermissionsUtilsImpl
 
     @Mock
     lateinit var mapsManager: MapsManagerImpl

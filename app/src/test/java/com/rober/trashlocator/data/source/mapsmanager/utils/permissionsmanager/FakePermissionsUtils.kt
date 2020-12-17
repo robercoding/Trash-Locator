@@ -1,8 +1,8 @@
 package com.rober.trashlocator.data.source.mapsmanager.utils.permissionsmanager
 
-import com.rober.trashlocator.data.source.mapsmanager.utils.permissions.PermissionsManager
+import com.rober.trashlocator.data.source.mapsmanager.utils.permissions.PermissionsUtils
 
-class FakePermissionsManager : PermissionsManager {
+class FakePermissionsUtils : PermissionsUtils {
     override var alreadyRequestLocationPermission: Boolean = false
     private var returnPermissionsOk = false
 

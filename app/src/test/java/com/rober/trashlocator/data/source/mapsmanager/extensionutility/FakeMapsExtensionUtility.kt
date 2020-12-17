@@ -12,9 +12,9 @@ import com.rober.trashlocator.utils.Utils
 import java.util.*
 import kotlin.collections.LinkedHashMap
 
-class FakeMapsExtensionUtilityManager(
+class FakeMapsExtensionUtility(
     private val trashLocationUtils: TrashLocationUtils
-) : MapsExtensionUtilityManager {
+) : MapsExtensionUtility {
 
     val listLocations = listOf<String>("Madrid", "Valencia")
     val listAddressLocation: LinkedHashMap<String, AddressLocation> = LinkedHashMap()

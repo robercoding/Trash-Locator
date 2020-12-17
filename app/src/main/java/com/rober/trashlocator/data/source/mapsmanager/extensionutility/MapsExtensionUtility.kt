@@ -6,7 +6,7 @@ import com.rober.trashlocator.models.AddressLocation
 import com.rober.trashlocator.models.Trash
 import com.rober.trashlocator.models.TrashLocation
 
-interface MapsExtensionUtilityManager {
+interface MapsExtensionUtility {
     fun getSingleTrashLocation(location: Location): TrashLocation
     suspend fun getListAddressesByName(nameLocation: String): List<AddressLocation>
     suspend fun existsDataSet(addressLocation: AddressLocation): Boolean

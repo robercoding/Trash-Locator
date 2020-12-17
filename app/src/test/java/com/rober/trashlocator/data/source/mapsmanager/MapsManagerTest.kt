@@ -9,12 +9,12 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.rule.GrantPermissionRule
 import com.google.common.truth.Truth.assertThat
-import com.rober.trashlocator.data.source.mapsmanager.extensionutility.FakeMapsExtensionUtilityManager
-import com.rober.trashlocator.data.source.mapsmanager.extensionutility.MapsExtensionUtilityManager
+import com.rober.trashlocator.data.source.mapsmanager.extensionutility.FakeMapsExtensionUtility
+import com.rober.trashlocator.data.source.mapsmanager.extensionutility.MapsExtensionUtility
 import com.rober.trashlocator.data.source.mapsmanager.utils.FakeCustomLocationManager
 import com.rober.trashlocator.data.source.mapsmanager.utils.TrashLocationUtils
 import com.rober.trashlocator.data.source.mapsmanager.utils.gps.FakeGpsUtils
-import com.rober.trashlocator.data.source.mapsmanager.utils.permissionsmanager.FakePermissionsManager
+import com.rober.trashlocator.data.source.mapsmanager.utils.permissionsmanager.FakePermissionsUtils
 import com.rober.trashlocator.getOrAwaitValue
 import com.rober.trashlocator.models.AddressLocation
 import com.rober.trashlocator.utils.Event
@@ -40,26 +40,26 @@ class MapsManagerTest {
     )
 
     lateinit var mapsManager: MapsManagerImpl
-    lateinit var mapsExtensionUtilityManager: MapsExtensionUtilityManager
+    lateinit var mapsExtensionUtility: MapsExtensionUtility
     lateinit var trashLocationUtils: TrashLocationUtils
 
 
-    lateinit var permissionsManager: FakePermissionsManager
+    lateinit var permissionsManager: FakePermissionsUtils
     lateinit var gpsManager: FakeGpsUtils
     lateinit var locationManager: FakeCustomLocationManager
 
     @Before
     fun setup() {
         gpsManager = FakeGpsUtils()
-        permissionsManager = FakePermissionsManager()
+        permissionsManager = FakePermissionsUtils()
         trashLocationUtils = TrashLocationUtils(ApplicationProvider.getApplicationContext())
-        mapsExtensionUtilityManager = FakeMapsExtensionUtilityManager(trashLocationUtils)
+        mapsExtensionUtility = FakeMapsExtensionUtility(trashLocationUtils)
         locationManager = FakeCustomLocationManager()
         mapsManager = MapsManagerImpl(
             ApplicationProvider.getApplicationContext(),
             permissionsManager,
             gpsManager,
-            mapsExtensionUtilityManager,
+            mapsExtensionUtility,
             locationManager
         )
     }

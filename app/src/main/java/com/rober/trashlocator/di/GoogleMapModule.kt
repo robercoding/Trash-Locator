@@ -7,11 +7,11 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.SettingsClient
 import com.rober.trashlocator.data.repository.maps.MapsRepositoryImpl
 import com.rober.trashlocator.data.source.mapsmanager.MapsManagerImpl
-import com.rober.trashlocator.data.source.mapsmanager.extensionutility.MapsExtensionUtilityManagerImpl
+import com.rober.trashlocator.data.source.mapsmanager.extensionutility.MapsExtensionUtilityImpl
 import com.rober.trashlocator.data.source.mapsmanager.utils.CustomLocationManagerImpl
 import com.rober.trashlocator.data.source.mapsmanager.utils.TrashLocationUtils
 import com.rober.trashlocator.data.source.mapsmanager.utils.gps.GpsUtilsImpl
-import com.rober.trashlocator.data.source.mapsmanager.utils.permissions.PermissionsManagerImpl
+import com.rober.trashlocator.data.source.mapsmanager.utils.permissions.PermissionsUtilsImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -26,9 +26,9 @@ object GoogleMapModule {
     @Provides
     fun provideMapsManager(
         @ActivityContext context: Context,
-        permissionsManager: PermissionsManagerImpl,
+        permissionsManager: PermissionsUtilsImpl,
         gpsUtils: GpsUtilsImpl,
-        geoCoderManager: MapsExtensionUtilityManagerImpl,
+        geoCoderManager: MapsExtensionUtilityImpl,
         locationManager: CustomLocationManagerImpl
     ): MapsManagerImpl =
         MapsManagerImpl(context, permissionsManager, gpsUtils, geoCoderManager, locationManager)
@@ -40,8 +40,8 @@ object GoogleMapModule {
     fun providePermissionsManager(
         @ActivityContext context: Context,
         gpsUtils: GpsUtilsImpl
-    ): PermissionsManagerImpl =
-        PermissionsManagerImpl(context, gpsUtils)
+    ): PermissionsUtilsImpl =
+        PermissionsUtilsImpl(context, gpsUtils)
 
     @Provides
     fun provideGpsUtils(
@@ -52,7 +52,7 @@ object GoogleMapModule {
         GpsUtilsImpl(context, locationManager, settingsClient)
 
     @Provides
-    fun provideSettingsClient(@ActivityContext context: Context) =
+    fun provideSettingsClient(@ActivityContext context: Context): SettingsClient =
         LocationServices.getSettingsClient(context)
 
     @Provides
@@ -60,7 +60,7 @@ object GoogleMapModule {
         @ApplicationContext context: Context,
         geoCoder: Geocoder,
         trashLocationUtils: TrashLocationUtils
-    ) = MapsExtensionUtilityManagerImpl(context, geoCoder, trashLocationUtils)
+    ) = MapsExtensionUtilityImpl(context, geoCoder, trashLocationUtils)
 
     @Provides
     fun provideGeoCoder(@ActivityContext context: Context) = Geocoder(context)

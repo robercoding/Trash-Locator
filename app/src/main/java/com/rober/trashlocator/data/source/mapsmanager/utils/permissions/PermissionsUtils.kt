@@ -1,6 +1,6 @@
 package com.rober.trashlocator.data.source.mapsmanager.utils.permissions
 
-interface PermissionsManager {
+interface PermissionsUtils {
     var alreadyRequestLocationPermission: Boolean
     fun checkLocationPermission(): Boolean
     fun requestLocationPermissions()
